@@ -8,11 +8,11 @@
 import os
 
 from flask import Flask, render_template
-from flask.ext.login import LoginManager
-from flask.ext.bcrypt import Bcrypt
+from flask_login import LoginManager
+from flask_bcrypt import Bcrypt
 from flask_mail import Mail
-from flask.ext.debugtoolbar import DebugToolbarExtension
-from flask.ext.sqlalchemy import SQLAlchemy
+# from flask_debugtoolbar import DebugToolbarExtension
+from flask_sqlalchemy import SQLAlchemy
 
 
 ################
@@ -31,7 +31,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 bcrypt = Bcrypt(app)
 mail = Mail(app)
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 db = SQLAlchemy(app)
 
 
