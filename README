@@ -8,7 +8,7 @@
 
 ## Set Environment Variables
 
-    export APP_SETTINGS="project.config.DevelopmentConfig"
+    export APP_SETTINGS="source.config.DevelopmentConfig"
 
 ### Create DB
 
