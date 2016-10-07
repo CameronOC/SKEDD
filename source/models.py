@@ -36,3 +36,29 @@ class User(db.Model):
 
     def __repr__(self):
         return '<email {}'.format(self.email)
+
+
+class Organization(db.Model):
+
+    __tablename__ = "organizations"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+
+    def __init__(self, name):
+        self.name = name
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
+    def __repr__(self):
+        return '<Organization name: {}'.format(self.name)
