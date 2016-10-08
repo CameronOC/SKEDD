@@ -15,6 +15,10 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
+    
+    # relationship with shifts
+    shifts = relationship("Shift", backref="user")
+
 
     def __init__(self, email, password, paid=False, admin=False):
         self.email = email
@@ -36,3 +40,18 @@ class User(db.Model):
 
     def __repr__(self):
         return '<email {}'.format(self.email)
+
+class Shift(db.Model):
+	
+	__tablename__ = "shifts"
+	
+	id = db.Column(db.Integer, primary_key=True)
+	day = db.Column(db.DateTime, nullable=False)
+	start_time = db.Column(db.DateTime, nullable=False)
+	end_time = db.Column(db.DateTime, nullable=False)
+	duration = db.Column(db.Float, nullable=False)
+	
+	# relationship with user
+	assigned_user_id = db.Column(db.Integer, ForeignKey('user.id'))
+
+
