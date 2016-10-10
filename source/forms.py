@@ -6,3 +6,6 @@ from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 from source.models import User
+
+class CreateOrganizationForm(Form):
+    name = StringField('name', validators=[DataRequired()])
