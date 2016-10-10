@@ -57,7 +57,8 @@ def create():
         return redirect('/organization')
 
 
-@main_blueprint.route('/organization', methods=['GET', ])
+@main_blueprint.route('/organization/<key>', methods=['GET', ])
 @login_required
-def organization():
-    return render_template('main/organization.html')
+def organization(key):
+    org = Organization.query.filter_by(id=key).first()
+    return render_template('main/organization.html', organization=org)

@@ -2,6 +2,7 @@
 
 {% block content %}
 
-<h1>You have successfully created your organization!</h1>
+<h1>{{ organization.name }}</h1>
+<h2>Owner: {{ organization.owner.email }}</h2>
 
 {% endblock %}
