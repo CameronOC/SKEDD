@@ -8,7 +8,7 @@ from source import db, bcrypt
 
 class User(db.Model):
 
-    __tablename__ = "user"
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, nullable=False)
@@ -36,7 +36,7 @@ class User(db.Model):
         return self.id
 
     def __repr__(self):
-        return '<email {}'.format(self.email)
+        return '<email {}>'.format(self.email)
 
 
 class Organization(db.Model):
@@ -45,5 +45,12 @@ class Organization(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __init__(self, name, owner):
+        self.name = name
+        self.owner_id = owner.id
+
+    def __repr__(self):
+        return '<name: {}>'.format(self.name)
 
