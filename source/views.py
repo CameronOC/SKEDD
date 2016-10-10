@@ -24,3 +24,9 @@ main_blueprint = Blueprint('main', __name__,)
 @login_required
 def home():
     return render_template('main/index.html')
+
+
+@main_blueprint.route('/create')
+@login_required
+def create():
+    return render_template('main/create.html')
