@@ -37,10 +37,22 @@ def load_user():
 #    routes    #
 ################
 
+"""
 @main_blueprint.route('/')
 @login_required
 def home():
     return render_template('main/index.html')
+"""
+
+
+@main_blueprint.route('/home', methods=['GET', ])
+@login_required
+def home():
+
+    orgs = g.user.orgs_owned.all()
+
+    return render_template('main/home.html', organizations=orgs)
+
 
 
 @main_blueprint.route('/create', methods=['GET', 'POST'])
@@ -69,10 +81,3 @@ def organization(key):
         return render_template('errors/403_organization.html'), 403
 
     return render_template('main/organization.html', organization=org)
-
-"""
-@main_blueprint.route('/home', methods=['GET', ])
-@login_required
-def home():
-    return render_template('main/home.html')
-"""
