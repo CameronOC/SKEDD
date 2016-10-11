@@ -37,12 +37,9 @@ def load_user():
 #    routes    #
 ################
 
-"""
 @main_blueprint.route('/')
-@login_required
-def home():
+def landing():
     return render_template('main/index.html')
-"""
 
 
 @main_blueprint.route('/home', methods=['GET', ])
