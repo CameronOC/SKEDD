@@ -14,6 +14,12 @@ class LoginForm(Form):
 
 
 class RegisterForm(Form):
+    first_name = StringField(
+        'first_name',
+        validators=[DataRequired(), Length(min=1, max=20)])
+    last_name = StringField(
+        'last_name',
+        validators=[DataRequired(), Length(min=1, max=20)])
     email = StringField(
         'email',
         validators=[DataRequired(), Email(message=None), Length(min=6, max=40)])

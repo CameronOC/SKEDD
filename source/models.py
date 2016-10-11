@@ -12,12 +12,16 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, nullable=False)
+    first_name = db.Column(db.String(20))
+    last_name = db.Column(db.String(20))
     password = db.Column(db.String, nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
     orgs_owned = db.relationship('Organization', backref='owner', lazy='dynamic')
 
-    def __init__(self, email, password, paid=False, admin=False):
+    def __init__(self, email, password, first_name, last_name, paid=False, admin=False):
+        self.first_name = first_name
+        self.last_name = last_name
         self.email = email
         self.password = bcrypt.generate_password_hash(password)
         self.registered_on = datetime.datetime.now()
