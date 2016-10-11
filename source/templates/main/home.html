@@ -8,9 +8,10 @@
     {% for org in organizations %}
     <li><a href="/organization/{{ org.id }}">{{ org.name }}</a></li>
     {% endfor %}
+    <li><a href="/create">Create New Organization</a></li>
 </ul>
 {% else %}
-Looks like you don't have any organizations
+Looks like you don't have any organizations, would you like to <a href="/create">create one</a>?
 {% endif %}
 
 {% endblock %}
