@@ -70,4 +70,9 @@ def organization(key):
 
     return render_template('main/organization.html', organization=org)
 
-
+"""
+@main_blueprint.route('/home', methods=['GET', ])
+@login_required
+def home():
+    return render_template('main/home.html')
+"""
