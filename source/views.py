@@ -57,7 +57,7 @@ def create():
         db.session.add(org)
         db.session.commit()
 
-        return redirect('/organization')
+        return redirect('/organization/' + str(org.id))
 
 
 @main_blueprint.route('/organization/<key>', methods=['GET', ])
