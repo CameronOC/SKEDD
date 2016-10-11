@@ -22,10 +22,13 @@ main_blueprint = Blueprint('main', __name__,)
 
 @app.before_request
 def load_user():
-    if session["user_id"]:
-        user = User.query.filter_by(id=session["user_id"]).first()
+    if 'user_id' in session:
+        if session["user_id"]:
+            user = User.query.filter_by(id=session["user_id"]).first()
+        else:
+            user = {"email": "Guest"}  # Make it better, use an anonymous User instead
     else:
-        user = {"name": "Guest"}  # Make it better, use an anonymous User instead
+        user = {"email": "Guest"}  # Make it better, use an anonymous User instead
 
     g.user = user
 
