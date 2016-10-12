@@ -9,6 +9,8 @@
 ## Set Environment Variables
 
     export APP_SETTINGS="source.config.DevelopmentConfig"
+## For Windows
+		setx APP_SETTINGS "source.config.DevelopmentConfig"
 
 ### Create DB
 

@@ -4,3 +4,4 @@ flask
 migrations
 dev.sqlite
 *.pyc
+*.sqlite-journal
