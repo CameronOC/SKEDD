@@ -18,14 +18,18 @@ class User(db.Model):
     registered_on = db.Column(db.DateTime, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
     orgs_owned = db.relationship('Organization', backref='owner', lazy='dynamic')
+    confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    confirmed_on = db.Column(db.DateTime, nullable=True)
 
-    def __init__(self, email, password, first_name, last_name, paid=False, admin=False):
+    def __init__(self, email, password, confirmed, first_name, last_name, paid=False, admin=False, confirmed_on=None):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.password = bcrypt.generate_password_hash(password)
         self.registered_on = datetime.datetime.now()
         self.admin = admin
+        self.confirmed = confirmed
+        self.confirmed_on = confirmed_on
 
     def is_authenticated(self):
         return True
