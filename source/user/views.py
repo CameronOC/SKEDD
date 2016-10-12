@@ -18,6 +18,7 @@ from source.token import generate_confirmation_token, confirm_token
 
 import datetime
 from source.email import send_email
+from source.decorators import check_confirmed
 ################
 #### config ####
 ################
@@ -52,7 +53,7 @@ def register():
         login_user(user)
         flash('You registered and are now logged in. Welcome!', 'success')
 
-        return redirect(url_for('main.home'))
+        return redirect(url_for('user.unconfirmed'))
 
     return render_template('user/register.html', form=form)
 
@@ -83,6 +84,7 @@ def logout():
 
 @user_blueprint.route('/profile', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def profile():
     form = ChangePasswordForm(request.form)
     if form.validate_on_submit():
@@ -113,4 +115,23 @@ def confirm_email(token):
         db.session.add(user)
         db.session.commit()
         flash('You have confirmed your account. Thank You!', 'success')
-    return redirect(url_for('main.home'))   
+    return redirect(url_for('main.home'))
+
+@user_blueprint.route('/unconfirmed')
+@login_required
+def unconfirmed():
+    if current_user.confirmed:
+        return redirect('main.home')
+    flash('Please confirm your account!', 'warning')
+    return render_template('user/unconfirmed.html')
+
+@user_blueprint.route('/resend')
+@login_required
+def resend_confirmation():
+    token = generate_confirmation_token(current_user.email)
+    confirm_url = url_for('user.confirm_email', token=token, _external=True)
+    html = render_template('user/activate.html', confirm_url=confirm_url)
+    subject = "Please confirm your email"
+    send_email(current_user.email, subject, html)
+    flash('A new confirmation email has been sent.', 'success')
+    return redirect(url_for('user.unconfirmed'))

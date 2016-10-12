@@ -69,6 +69,8 @@ def create_admin():
         email="ad@min.com",
         password="admin",
         admin=True,
+        first_name="admin",
+        last_name="admin",
         confirmed=True,
         confirmed_on=datetime.datetime.now())
     )

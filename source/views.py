@@ -11,6 +11,7 @@ from flask_login import login_required
 from forms import CreateForm
 
 from models import User, Organization
+from decorators import check_confirmed
 
 
 ################
@@ -44,6 +45,7 @@ def landing():
 
 @main_blueprint.route('/home', methods=['GET', ])
 @login_required
+@check_confirmed
 def home():
 
     orgs = g.user.orgs_owned.all()
