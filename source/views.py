@@ -8,7 +8,7 @@
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
 from source import app, db
 from flask_login import login_required
-from forms import CreateForm, InviteForm
+from forms import CreateForm, InviteForm, JoinForm
 
 from models import User, Organization
 from decorators import check_confirmed
@@ -123,15 +123,41 @@ def invite(key):
         #db.session.commit()
 
         token = generate_invitation_token(user.email)
-        #invited_url = url_for('user.confirm_invite_email', token=token, _external=True)
-        confirm_url = url_for('user.confirm_email', token=token, _external=True)
-        #html = render_template('main/index.html', invited_url=invited_url)
+
+        confirm_url = url_for('main.confirm_invite', key=org.id, token=token, _external=True)
+
         html = render_template('emails/invitation.html', confirm_url=confirm_url, user=user, organization=org)
+
         subject = "You've been invited to use SKEDD"
+
         send_email(user.email, subject, html)
 
-        flash('You succesfully invited' + user.first_name + ' ' + user.last_name + '.', 'success')
+        flash('You succesfully invited ' + user.first_name + ' ' + user.last_name + '.', 'success')
 
         #return redirect(url_for('user.unconfirmed'))
 
     return render_template('main/invite.html', form=form, organization=org)
+
+
+@main_blueprint.route('/organization/<key>/join/<token>')
+def confirm_invite(key, token):
+    org = Organization.query.filter_by(id=key).first()
+    form = JoinForm(request.form)
+
+    if form.validate_on_submit():
+        try:
+            email = confirm_token(token)
+            user = User.query.filter_by(email=email).first_or_404()
+            if user.confirmed:
+                flash('Account already confirmed. Please login', 'success')
+            else:
+                user.confirmed = True
+                user.confirmed_on = datetime.datetime.now()
+                db.session.add(user)
+                db.session.commit()
+                flash('You have confirmed your account. Thank You!', 'success')
+        except:
+            flash('The confirmation link is invalid or has expired.', 'danger')
+
+        return redirect(url_for('main.home'))
+    return render_template('main/join.html', form=form, organization=org)
