@@ -1,6 +1,6 @@
 {% extends "_base.html" %}
 {% block content %}
 <h1>403 Unauthorized Access</h1>
-<p>You aren't a part of this organization!</p>
+<p>You must own this organization to access this page!</p>
 <p><em>Return <a href="{{url_for('main.home')}}">Home</a>?</em></p>
 {% endblock %}
