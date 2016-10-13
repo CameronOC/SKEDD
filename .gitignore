@@ -5,3 +5,4 @@ migrations
 dev.sqlite
 *.pyc
 *.sqlite-journal
+setup_env.sh
