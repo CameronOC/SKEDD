@@ -17,7 +17,7 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
-        
+
     # relationship with shifts
     shifts = db.relationship("Shift", backref="user")
 
@@ -85,3 +85,27 @@ class Organization(db.Model):
 
     def __repr__(self):
         return '<name: {}>'.format(self.name)
+
+users = db.Table('users',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('position_id', db.Interger, db.ForeignKey('position.id'))
+)
+
+class Position(db.Model):
+
+    __tablename__ = "positions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50))
+    shifts = db.relationship('Shift',
+        backref='Position', lazy='dynamic')
+    company_id = db.Column(db.Integer, db.ForeignKey('position.id'))
+    users = db.relationship('User', secondary=users,
+        backref=db.backref('positions', lazy='dynamic'))
+
+    def __init__(self, id, title):
+        self.id = id
+        self.title = title
+
+    def __repr__(self):
+        return '<name: {}>'.format(self.title)
