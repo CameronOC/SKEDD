@@ -21,7 +21,7 @@ class User(db.Model):
     # relationship with shifts
     shifts = db.relationship("Shift", backref="user")
 
-	# relationship with organization
+    # relationship with organization
     orgs_owned = db.relationship('Organization', backref='owner', lazy='dynamic')
 
     def __init__(self, email, password, first_name, last_name, paid=False, admin=False):
@@ -49,26 +49,29 @@ class User(db.Model):
         
         
 class Shift(db.Model):
-	
-	__tablename__ = "shifts"
-	
-	id = db.Column(db.Integer, primary_key=True)
-	day = db.Column(db.String, nullable=False)
-	start_time = db.Column(db.DateTime, nullable=False)
-	end_time = db.Column(db.DateTime, nullable=False)
-	duration = db.Column(db.String, nullable=False)
-	
-	# relationship with user
-	assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-	
-	def __init__(self, assigned_user_id, day):
-		self.assigned_user_id = assigned_user_id
-		self.day = day
-		self.start_time = datetime.datetime.now()
-		self.end_time = datetime.datetime.now()
-		#self.start_time = start_time
-		#self.end_time = end_time
-		self.duration = datetime.time(0, 0, (self.end_time - self.start_time).seconds).strftime("%H:%M")
+
+    __tablename__ = "shifts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    day = db.Column(db.String, nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=False)
+    duration = db.Column(db.String, nullable=False)
+
+    # relationship with user
+    assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    # relationship with position
+    position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
+
+    def __init__(self, assigned_user_id, day):
+        self.assigned_user_id = assigned_user_id
+        self.day = day
+        self.start_time = datetime.datetime.now()
+        self.end_time = datetime.datetime.now()
+        #self.start_time = start_time
+        #self.end_time = end_time
+        self.duration = datetime.time(0, 0, (self.end_time - self.start_time).seconds).strftime("%H:%M")
 
 
 class Organization(db.Model):
@@ -79,6 +82,10 @@ class Organization(db.Model):
     name = db.Column(db.String(50))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+    #positions connected to organization
+    positions = db.relationship('Position',
+            backref='Organization', lazy='dynamic')
+
     def __init__(self, name, owner):
         self.name = name
         self.owner_id = owner.id
@@ -86,9 +93,9 @@ class Organization(db.Model):
     def __repr__(self):
         return '<name: {}>'.format(self.name)
 
-users = db.Table('users',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('position_id', db.Interger, db.ForeignKey('position.id'))
+claimed = db.Table('claimed',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
 )
 
 class Position(db.Model):
@@ -97,11 +104,14 @@ class Position(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50))
+    #shifts connected to Position
     shifts = db.relationship('Shift',
         backref='Position', lazy='dynamic')
-    company_id = db.Column(db.Integer, db.ForeignKey('position.id'))
-    users = db.relationship('User', secondary=users,
-        backref=db.backref('positions', lazy='dynamic'))
+    #Organization associated with shift
+    oranization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+    #Users many to many relationship with position
+    users = db.relationship('User', secondary=claimed,
+        backref=db.backref('Position', lazy='dynamic'))
 
     def __init__(self, id, title):
         self.id = id
