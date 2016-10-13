@@ -2,13 +2,16 @@
 {% block content %}
 
 
-<h1 class="SKEDD_title">SKEDD</h1>
+<h1 class="INDEX_title">SKEDD</h1>
 	
-<div class="SKEDD_information">
+<div class="INDEX_information">
     <div>
     	<p>Control your work schedule</p>
        <!-- <p>Welcome!  SKEDD is time management application designed for businesses, workplaces and organizations that offers managers and employees flexibility in managing their schedules and shifts.</p> -->
     </div>
+
+<a href="{{ url_for('user.register') }}" class="INDEX_signup" role="button" type="submit">Sign up</a>
+
 
 <!---<a href="/home">the '/home' url</a>--->
 <body class="SKEDD_Landing">

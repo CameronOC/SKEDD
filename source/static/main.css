@@ -1,26 +1,10 @@
 /* custom styles */
+@import url("index.css");
+@import url("register.css");
+@import url("login.css");
 
 body {
   padding-top: 70px;
-  background-color: #00802b;
+  background-color: #2da325;
 }
 
-body.SKEDD_landing {
-	background-color: green;
-}
-
-h1.SKEDD_title {
-   text-align: center;
-   color: white;
-   font-size: 240px;
-   font-weight: bold;
-   padding-top: 150px;
- }
-
-div.SKEDD_information {
-    width: 780px;
-    margin: auto;
-    text-align: center;
-    color: white;
-    font-size: 32px;
-}

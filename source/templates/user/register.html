@@ -1,10 +1,9 @@
 {% extends "_base.html" %}
 
 {% block content %}
-
-<h1>Please Register</h1>
+<form class="REGISTER_form-signin" role="form" method="post" action="">
+<h1 class="REGISTER_title">Register</h1>
 <br>
-<form class="form-signin" role="form" method="post" action="">
   {{ form.csrf_token }}
   <p>
   {{ form.first_name(placeholder="first name") }}
@@ -56,9 +55,9 @@
       {% endif %}
     </span>
   </p>
-  <button class="btn btn-success" type="submit">Register!</button>
+  <button class="REGISTER_btn-btn-success" type="submit">Submit</button>
   <br><br>
-  <p>Already have an account? <a href="/login">Sign in</a>.</p>
+  <p>Already have an account? <a href="/login">Log in</a>.</p>
 </form>
 
 {% endblock %}
