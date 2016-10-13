@@ -56,19 +56,25 @@ class Shift(db.Model):
 	day = db.Column(db.String, nullable=False)
 	start_time = db.Column(db.DateTime, nullable=False)
 	end_time = db.Column(db.DateTime, nullable=False)
-	duration = db.Column(db.String, nullable=False)
+	duration = db.Column(db.DateTime, nullable=False)
 	
 	# relationship with user
 	assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	
-	def __init__(self, assigned_user_id, day):
+	# relationship with position
+	#position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
+	
+	def __init__(self, assigned_user_id, day, start_time, end_time):
 		self.assigned_user_id = assigned_user_id
+		#self.position_id = position_id
 		self.day = day
-		self.start_time = datetime.datetime.now()
-		self.end_time = datetime.datetime.now()
-		#self.start_time = start_time
-		#self.end_time = end_time
-		self.duration = datetime.time(0, 0, (self.end_time - self.start_time).seconds).strftime("%H:%M")
+		#self.start_time = datetime.datetime.now()
+		#self.end_time = datetime.datetime.now()
+		self.start_time = start_time
+		self.end_time = end_time
+		
+		zero = datetime.datetime.strptime('00:00', '%H:%M')	# zero o'clock datetime to add timedelta object to (end_time - start_time)
+		self.duration = zero + (self.end_time - self.start_time)
 
 
 class Organization(db.Model):
