@@ -2,4 +2,25 @@
 
 body {
   padding-top: 70px;
+  background-color: #00802b;
+}
+
+body.SKEDD_landing {
+	background-color: green;
+}
+
+h1.SKEDD_title {
+   text-align: center;
+   color: white;
+   font-size: 240px;
+   font-weight: bold;
+   padding-top: 150px;
+ }
+
+div.SKEDD_information {
+    width: 780px;
+    margin: auto;
+    text-align: center;
+    color: white;
+    font-size: 32px;
 }
