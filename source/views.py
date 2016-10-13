@@ -103,11 +103,14 @@ def organization(key):
 #
 
 
-@main_blueprint.route('/invite', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
-def invite():
+def invite(key):
+    # get the organization to invite users to
+    org = Organization.query.filter_by(id=key).first()
     form = InviteForm(request.form)
     if form.validate_on_submit():
+
         user = User(
             first_name=form.first_name.data,
             last_name=form.last_name.data,
@@ -123,12 +126,12 @@ def invite():
         #invited_url = url_for('user.confirm_invite_email', token=token, _external=True)
         confirm_url = url_for('user.confirm_email', token=token, _external=True)
         #html = render_template('main/index.html', invited_url=invited_url)
-        html = render_template('main/index.html', confirm_url=confirm_url)
+        html = render_template('emails/invitation.html', confirm_url=confirm_url, user=user, organization=org)
         subject = "You've been invited to use SKEDD"
         send_email(user.email, subject, html)
 
-        flash('You invited the person with the email entered.', 'success')
+        flash('You succesfully invited' + user.first_name + ' ' + user.last_name + '.', 'success')
 
         #return redirect(url_for('user.unconfirmed'))
 
-    return render_template('main/invite.html', form=form)
+    return render_template('main/invite.html', form=form, organization=org)
