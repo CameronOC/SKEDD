@@ -4,13 +4,14 @@
 #################
 #### imports ####
 #################
+import datetime
 
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
-from source import app, db
+from source import app, db, bcrypt
 from flask_login import login_required
 from forms import CreateForm, InviteForm, JoinForm
 
-from models import User, Organization
+from models import User, Organization, Membership
 from decorators import check_confirmed
 
 
@@ -116,11 +117,17 @@ def invite(key):
             last_name=form.last_name.data,
             email=form.email.data,
             password="temp",
-            confirmed=True
-            #invited=True
+            confirmed=False
         )
         db.session.add(user)
-        #db.session.commit()
+        db.session.commit()
+
+        membership = Membership(
+            member=user,
+            organization=org
+        )
+        db.session.add(membership)
+        db.session.commit()
 
         token = generate_invitation_token(user.email)
 
@@ -139,7 +146,7 @@ def invite(key):
     return render_template('main/invite.html', form=form, organization=org)
 
 
-@main_blueprint.route('/organization/<key>/join/<token>')
+@main_blueprint.route('/organization/<key>/join/<token>', methods=['GET', 'POST'])
 def confirm_invite(key, token):
     org = Organization.query.filter_by(id=key).first()
     form = JoinForm(request.form)
@@ -148,6 +155,16 @@ def confirm_invite(key, token):
         try:
             email = confirm_token(token)
             user = User.query.filter_by(email=email).first_or_404()
+            membership = user.memberships.filter_by(organization_id=org.id).first_or_404()
+
+            # will need error handling
+            user.password = bcrypt.generate_password_hash(form.password.data)
+            user.confirmed = True
+            user.confirmed_on = datetime.datetime.now()
+            membership.joined = True
+            db.session.commit()
+
+            """
             if user.confirmed:
                 flash('Account already confirmed. Please login', 'success')
             else:
@@ -156,6 +173,8 @@ def confirm_invite(key, token):
                 db.session.add(user)
                 db.session.commit()
                 flash('You have confirmed your account. Thank You!', 'success')
+            """
+
         except:
             flash('The confirmation link is invalid or has expired.', 'danger')
 

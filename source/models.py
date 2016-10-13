@@ -4,6 +4,7 @@
 import datetime
 
 from source import db, bcrypt
+from sqlalchemy import UniqueConstraint
 
 
 class User(db.Model):
@@ -59,6 +60,9 @@ class Membership(db.Model):
 
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+
+    # makes it so that a user can't be a member of an organization multiple times
+    UniqueConstraint('member_id', 'organization_id')
 
     def __init__(self, member, organization):
         self.member_id = member.id
