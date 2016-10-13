@@ -102,14 +102,15 @@ def organization(key):
 #        return redirect('/organization/' + str(org.id))
 #
 
+
 @main_blueprint.route('/invite', methods=['GET', 'POST'])
 @login_required
 def invite():
     form = InviteForm(request.form)
     if form.validate_on_submit():
         user = User(
-            first_name="temp",
-            last_name="temp",
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
             email=form.email.data,
             password="temp",
             confirmed=True

@@ -14,4 +14,10 @@ class CreateForm(Form):
 class InviteForm(Form):
     email = StringField(
         'email',
-        validators=[DataRequired(), Email(message=None), Length(min=1, max=50)])
+        validators=[DataRequired(), Email(message=None), Length(min=1, max=50),])
+    first_name = StringField(
+        'first_name',
+        validators=[DataRequired(), Length(min=1, max=20)])
+    last_name = StringField(
+        'last_name',
+        validators=[DataRequired(), Length(min=1, max=20)])
