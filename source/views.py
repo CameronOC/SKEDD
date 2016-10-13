@@ -5,15 +5,20 @@
 #### imports ####
 #################
 
-from flask import render_template, Blueprint, request, session, g, redirect, url_for
+from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
 from source import app, db
 from flask_login import login_required
-from forms import CreateForm
+from forms import CreateForm, InviteForm
 
 from models import User, Organization
 from decorators import check_confirmed
 
 
+from source.token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
+
+import datetime
+from source.email import send_email
+from source.decorators import check_confirmed
 ################
 #    config    #
 ################
@@ -80,3 +85,49 @@ def organization(key):
         return render_template('errors/403_organization.html'), 403
 
     return render_template('main/organization.html', organization=org)
+
+#
+#@main_blueprint.route('/invite', methods=['GET', 'POST'])
+#@login_required
+#def invite():
+#    if request.method == 'GET':
+#        return render_template('main/invite.html', form=InviteForm())
+#    else:
+#        name = request.form['name']
+#        owner = g.user
+#
+#        db.session.add(org)
+#        db.session.commit()
+#
+#        return redirect('/organization/' + str(org.id))
+#
+
+@main_blueprint.route('/invite', methods=['GET', 'POST'])
+@login_required
+def invite():
+    form = InviteForm(request.form)
+    if form.validate_on_submit():
+        user = User(
+            first_name="temp",
+            last_name="temp",
+            email=form.email.data,
+            password="temp",
+            confirmed=True
+            #invited=True
+        )
+        db.session.add(user)
+        #db.session.commit()
+
+        token = generate_invitation_token(user.email)
+        #invited_url = url_for('user.confirm_invite_email', token=token, _external=True)
+        confirm_url = url_for('user.confirm_email', token=token, _external=True)
+        #html = render_template('main/index.html', invited_url=invited_url)
+        html = render_template('main/index.html', confirm_url=confirm_url)
+        subject = "You've been invited to use SKEDD"
+        send_email(user.email, subject, html)
+
+        flash('You invited the person with the email entered.', 'success')
+
+        #return redirect(url_for('user.unconfirmed'))
+
+    return render_template('main/invite.html', form=form)

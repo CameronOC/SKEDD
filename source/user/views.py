@@ -14,7 +14,7 @@ from source.models import User
 # from project.email import send_email
 from source import db, bcrypt
 from .forms import LoginForm, RegisterForm, ChangePasswordForm
-from source.token import generate_confirmation_token, confirm_token
+from source.token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
 
 import datetime
 from source.email import send_email
@@ -39,7 +39,7 @@ def register():
             last_name=form.last_name.data,
             email=form.email.data,
             password=form.password.data,
-            confirmed=False
+            confirmed=False,
         )
         db.session.add(user)
         db.session.commit()
@@ -56,7 +56,6 @@ def register():
         return redirect(url_for('user.unconfirmed'))
 
     return render_template('user/register.html', form=form)
-
 
 @user_blueprint.route('/login', methods=['GET', 'POST'])
 def login():

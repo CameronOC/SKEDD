@@ -10,3 +10,8 @@ from source.models import User
 
 class CreateForm(Form):
     name = StringField('name', validators=[DataRequired(), Length(min=1, max=50)])
+
+class InviteForm(Form):
+    email = StringField(
+        'email',
+        validators=[DataRequired(), Email(message=None), Length(min=1, max=50)])
