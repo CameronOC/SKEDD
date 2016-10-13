@@ -21,6 +21,9 @@ class User(db.Model):
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
 
+    # membership relationship with Organization
+    memberships = db.relationship('Membership', backref='member', lazy='dynamic')
+
     def __init__(self, email, password, confirmed, first_name, last_name, paid=False, admin=False, confirmed_on=None):
         self.first_name = first_name
         self.last_name = last_name
@@ -47,6 +50,24 @@ class User(db.Model):
         return '<email {}>'.format(self.email)
 
 
+class Membership(db.Model):
+
+    __tablename__ = 'organization_members'
+
+    id = db.Column(db.Integer, primary_key=True)
+    joined = db.Column(db.Boolean, default=False, nullable=False)
+
+    member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+
+    def __init__(self, member, organization):
+        self.member_id = member.id
+        self.organization_id = organization.id
+
+    def __repr__(self):
+        return '<Organization: {}, Member: {}, joined: {}>'.format(self.organization_id, self.member_id, self.joined)
+
+
 class Organization(db.Model):
 
     __tablename__ = "organizations"
@@ -54,6 +75,10 @@ class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    # membership relationship with users
+    memberships = db.relationship('Membership', backref='organization', lazy='dynamic')
+
 
     def __init__(self, name, owner):
         self.name = name
