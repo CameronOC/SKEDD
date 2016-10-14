@@ -62,7 +62,7 @@ class Shift(db.Model):
     assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # relationship with position
-    position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
+    assigned_position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
 
     def __init__(self, assigned_user_id, day):
         self.assigned_user_id = assigned_user_id
@@ -83,7 +83,7 @@ class Organization(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     #positions connected to organization
-    positions = db.relationship('Position',
+    owned_positions = db.relationship('Position',
             backref='Organization', lazy='dynamic')
 
     def __init__(self, name, owner):
@@ -105,16 +105,15 @@ class Position(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50))
     #shifts connected to Position
-    shifts = db.relationship('Shift',
+    assigned_shifts = db.relationship('Shift',
         backref='Position', lazy='dynamic')
     #Organization associated with shift
     oranization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     #Users many to many relationship with position
-    users = db.relationship('User', secondary=claimed,
+    assigned_users = db.relationship('User', secondary=claimed,
         backref=db.backref('Position', lazy='dynamic'))
 
-    def __init__(self, id, title):
-        self.id = id
+    def __init__(self, title):
         self.title = title
 
     def __repr__(self):

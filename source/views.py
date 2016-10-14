@@ -10,8 +10,7 @@ from source import app, db
 from flask_login import login_required
 from forms import CreateForm
 
-from models import User, Organization
-
+from models import User, Organization, Position
 
 ################
 #    config    #
@@ -78,3 +77,37 @@ def organization(key):
         return render_template('errors/403_organization.html'), 403
 
     return render_template('main/organization.html', organization=org)
+
+@main_blueprint.route('/organization/<key>/position/<key2>' , methods={'GET','POST' })
+@login_required
+def position(key, key2):
+    org = Organization.query.filter_by(id=key).first()
+
+    if org.owner.id != g.user.id:
+        return render_template('errors/403_organization.html'), 403
+
+    pos = Position.query.filter_by(id=key2).first()
+    return render_template('/organization/' + str(org.id)+ '/position/' +str(pos.id), position=pos)
+
+@main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
+@login_required
+def create_position(key):
+    if request.method == 'GET':
+        org = Organization.query.filter_by(id=key).first()
+
+        if org.owner.id != g.user.id:
+            return render_template('errors/403_organization.html'), 403
+
+        return render_template('main/create_position.html', form=CreateForm())
+    else:
+        org = Organization.query.filter_by(id=key).first()
+
+        if org.owner.id != g.user.id:
+            return render_template('errors/403_organization.html'), 403
+
+        title = request.form['title']
+        pos = Position(title=title)
+        db.session.add(pos)
+        db.session.commit()
+
+        return redirect('/organization/' + str(org.id)+'/position/' + str(pos.id))
