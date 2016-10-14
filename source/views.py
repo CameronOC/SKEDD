@@ -78,7 +78,7 @@ def organization(key):
 
     return render_template('main/organization.html', organization=org)
 
-@main_blueprint.route('/organization/<key>/position/<key2>' , methods={'GET','POST' })
+@main_blueprint.route('/organization/<key>/position/<key2>' , methods={'GET', })
 @login_required
 def position(key, key2):
     org = Organization.query.filter_by(id=key).first()
@@ -87,7 +87,7 @@ def position(key, key2):
         return render_template('errors/403_organization.html'), 403
 
     pos = Position.query.filter_by(id=key2).first()
-    return render_template('/organization/' + str(org.id)+ '/position/' +str(pos.id), position=pos)
+    return render_template('main/position.html', position=pos)
 
 @main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
 @login_required
@@ -105,7 +105,7 @@ def create_position(key):
         if org.owner.id != g.user.id:
             return render_template('errors/403_organization.html'), 403
 
-        title = request.form['title']
+        title = request.form['name']
         pos = Position(title=title)
         db.session.add(pos)
         db.session.commit()

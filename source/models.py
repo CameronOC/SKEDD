@@ -117,4 +117,4 @@ class Position(db.Model):
         self.title = title
 
     def __repr__(self):
-        return '<name: {}>'.format(self.title)
+        return '<title: {}>'.format(self.title)
