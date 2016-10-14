@@ -59,7 +59,6 @@ def home():
     return render_template('main/home.html', organizations=orgs)
 
 
-
 @main_blueprint.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
@@ -83,7 +82,7 @@ def organization(key):
     org = Organization.query.filter_by(id=key).first()
 
     if org.owner.id != g.user.id:
-        return render_template('errors/403_organization.html'), 403
+        return render_template('errors/403_organization_owner.html'), 403
 
     return render_template('main/organization.html', organization=org)
 
