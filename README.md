@@ -9,6 +9,12 @@
 ## Set Environment Variables
 
     export APP_SETTINGS="source.config.DevelopmentConfig"
+	
+	If necessary:
+	
+	export APP_MAIL_USERNAME="skedd.mail@gmail.com"
+	export APP_MAIL_PASSWORD="cumulonimbus"
+	
 ## For Windows
 		setx APP_SETTINGS "source.config.DevelopmentConfig"
 
