@@ -13,8 +13,11 @@ h1.LOGIN_title {
   	margin: auto;
   	border-radius:4px;
   	box-shadow:0 4px 10px 4px rgba(0,0,0,0.19);
-  	color: white;
+}
 
+label[for="LOGIN_register-redirect"] {
+	text-align: center;
+	color:white;
 }
 
 .LOGIN_btn-btn-success {
