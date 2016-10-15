@@ -1,5 +1,10 @@
 /* custom styles */
+@import url("index.css");
+@import url("register.css");
+@import url("login.css");
 
 body {
   padding-top: 70px;
+  background-color: #2da325;
 }
+

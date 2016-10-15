@@ -2,9 +2,9 @@
 
 {% block content %}
 
-<h1>Please login</h1>
-<br>
-<form class="form-login" role="form" method="post" action="">
+<form class="LOGIN_form-login" role="form" method="post" action="">
+  <h1 class="LOGIN_title">Existing Users</h1>
+  <br>
   {{ form.csrf_token }}
   <p>
     {{ form.email(placeholder="email") }}
@@ -26,9 +26,11 @@
       {% endif %}
     </span>
   </p>
-  <button class="btn btn-success" type="submit">Sign in!</button>
+  <button class="LOGIN_btn-btn-success" type="submit">Log in</button>
   <br><br>
-  <p>Need to <a href="/register">Register</a>?</p>
+  <label for="LOGIN_register-redirect">
+    <p>Need to <a href="/register">Register</a>?</p>
+  </label> 
 </form>
 
 {% endblock %}
