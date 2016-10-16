@@ -8,12 +8,13 @@ import datetime
 
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
 from source import app, db, bcrypt
-from flask_login import login_required
+from flask_login import login_required, login_user, logout_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm
 
 from models import User, Organization, Membership, Position
 from decorators import check_confirmed
-from source.token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
+
+from token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
 
 import datetime
 from source.email import send_email
@@ -34,7 +35,7 @@ def load_user():
         else:
             user = {"email": "Guest"}  # Make it better, use an anonymous User instead
     else:
-        user = {"email": "Guest"}  # Make it better, use an anonymous User instead
+        user = None
 
     g.user = user
 
@@ -85,22 +86,6 @@ def organization(key):
     return render_template('main/organization.html', organization=org)
 
 
-# @main_blueprint.route('/invite', methods=['GET', 'POST'])
-# @login_required
-# def invite():
-#    if request.method == 'GET':
-#        return render_template('main/invite.html', form=InviteForm())
-#    else:
-#        name = request.form['name']
-#        owner = g.user
-#
-#        db.session.add(org)
-#        db.session.commit()
-#
-#        return redirect('/organization/' + str(org.id))
-#
-
-
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
 def invite(key):
@@ -108,15 +93,26 @@ def invite(key):
     org = Organization.query.filter_by(id=key).first()
     form = InviteForm(request.form)
     if form.validate_on_submit():
-        user = User(
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
-            email=form.email.data,
-            password="temp",
-            confirmed=False
-        )
-        db.session.add(user)
+
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if user is None:
+            user = User(
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                email=form.email.data,
+                password="temp",
+                confirmed=False
+            )
+            db.session.add(user)
+
         db.session.commit()
+
+        membership = Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
+
+        if membership is not None or user.id == org.owner.id:
+            flash('This person is already a member of ' + org.name, 'danger')
+            return render_template('main/invite.html', form=form, organization=org)
 
         membership = Membership(
             member=user,
@@ -144,38 +140,33 @@ def invite(key):
 
 @main_blueprint.route('/organization/<key>/join/<token>', methods=['GET', 'POST'])
 def confirm_invite(key, token):
-    org = Organization.query.filter_by(id=key).first()
-    form = JoinForm(request.form)
+    try:
+        email = confirm_token(token)
+        user = User.query.filter_by(email=email).first_or_404()
+        org = Organization.query.filter_by(id=key).first()
+        membership = user.memberships.filter_by(organization_id=org.id).first_or_404()
+        form = JoinForm(request.form)
 
-    if form.validate_on_submit():
-        try:
-            email = confirm_token(token)
-            user = User.query.filter_by(email=email).first_or_404()
-            membership = user.memberships.filter_by(organization_id=org.id).first_or_404()
-
+        if user.confirmed:
+            membership.joined = True
+            db.session.commit()
+            flash('You have now joined ' + org.name, 'success')
+            return redirect(url_for('main.home'))
+        elif form.validate_on_submit():
             # will need error handling
             user.password = bcrypt.generate_password_hash(form.password.data)
             user.confirmed = True
             user.confirmed_on = datetime.datetime.now()
             membership.joined = True
             db.session.commit()
+            flash('You have now joined ' + org.name, 'success')
+            return redirect(url_for('main.home'))
+        else:
+            return render_template('main/join.html', form=form, organization=org)
 
-            """
-            if user.confirmed:
-                flash('Account already confirmed. Please login', 'success')
-            else:
-                user.confirmed = True
-                user.confirmed_on = datetime.datetime.now()
-                db.session.add(user)
-                db.session.commit()
-                flash('You have confirmed your account. Thank You!', 'success')
-            """
-
-        except:
-            flash('The confirmation link is invalid or has expired.', 'danger')
-
+    except:
+        flash('The confirmation link is invalid or has expired.', 'danger')
         return redirect(url_for('main.home'))
-    return render_template('main/join.html', form=form, organization=org)
 
 
 @main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', })

@@ -61,12 +61,16 @@ def register():
 def login():
     form = LoginForm(request.form)
     if form.validate_on_submit():
+        next = request.args.get('next')
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(
                 user.password, request.form['password']):
             login_user(user)
             flash('Welcome.', 'success')
-            return redirect(url_for('main.home'))
+            if next is not None:
+                return redirect(next)
+            else:
+                return redirect(url_for('main.home'))
         else:
             flash('Invalid email and/or password.', 'danger')
             return render_template('user/login.html', form=form)
@@ -99,7 +103,6 @@ def profile():
     return render_template('user/profile.html', form=form)
 
 @user_blueprint.route('/confirm/<token>')
-@login_required
 def confirm_email(token):
     try:
         email = confirm_token(token)
