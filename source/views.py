@@ -16,7 +16,7 @@ from models import User, Organization, Position
 #    config    #
 ################
 
-main_blueprint = Blueprint('main', __name__,)
+main_blueprint = Blueprint('main', __name__, )
 
 
 @app.before_request
@@ -44,11 +44,9 @@ def landing():
 @main_blueprint.route('/home', methods=['GET', ])
 @login_required
 def home():
-
     orgs = g.user.orgs_owned.all()
 
     return render_template('main/home.html', organizations=orgs)
-
 
 
 @main_blueprint.route('/create', methods=['GET', 'POST'])
@@ -78,7 +76,8 @@ def organization(key):
 
     return render_template('main/organization.html', organization=org)
 
-@main_blueprint.route('/organization/<key>/position/<key2>' , methods={'GET', })
+
+@main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', })
 @login_required
 def position(key, key2):
     org = Organization.query.filter_by(id=key).first()
@@ -88,6 +87,7 @@ def position(key, key2):
 
     pos = Position.query.filter_by(id=key2).first()
     return render_template('main/position.html', position=pos)
+
 
 @main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
 @login_required
@@ -106,8 +106,9 @@ def create_position(key):
             return render_template('errors/403_organization.html'), 403
 
         title = request.form['name']
-        pos = Position(title=title)
+        pos = Position(title=title, organization_id=org.id)
         db.session.add(pos)
+        org.owned_positions.append(pos)
         db.session.commit()
 
-        return redirect('/organization/' + str(org.id)+'/position/' + str(pos.id))
+        return redirect('/organization/' + str(org.id) + '/position/' + str(pos.id))
