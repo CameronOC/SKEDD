@@ -5,6 +5,19 @@
 <h1>{{ organization.name }}</h1>
 <h2>Owner: {{ organization.owner.first_name }} {{ organization.owner.last_name }}</h2>
 
+<h2>Employees</h2>
+<ul>
+    {% for membership in organization.memberships.all() %}
+    <li>
+        {{ membership.member.first_name }} {{ membership.member.last_name }}
+        {% if not membership.joined %}
+        (invited)
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+
 <br>
 
 <a href="/organization/{{ organization.id }}/invite">Invite people to this organization</a>
