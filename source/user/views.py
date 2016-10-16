@@ -99,7 +99,6 @@ def profile():
     return render_template('user/profile.html', form=form)
 
 @user_blueprint.route('/confirm/<token>')
-@login_required
 def confirm_email(token):
     try:
         email = confirm_token(token)
