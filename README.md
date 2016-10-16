@@ -17,7 +17,8 @@
 	
 ## For Windows
 		setx APP_SETTINGS "source.config.DevelopmentConfig"
-
+        setx APP_MAIL_USERNAME "skedd.mail@gmail.com"
+	    setx APP_MAIL_PASSWORD "cumulonimbus"
 ### Create DB
 
     python manage.py create_db
