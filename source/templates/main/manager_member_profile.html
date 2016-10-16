@@ -2,15 +2,23 @@
 
 {% block content %}
 
-<h1> {{ member.first_name }} {{member.last_name}} </h1>
+<h1> {{member.first_name}}{{member.organization_id}} </h1>
 
 <!--
 
-display the members positions in that organization
+update the database so that i can get the names from it
+
+display the members position/positions in that organization
+
 display the members shifts for those positions
+
 give this member a position in a organization?
+
 fire/remove the member from the organization
 
 -->
+
+<br>
+<a href="/organization/{{ organization.id }}">Go back</a>
 
 {% endblock %}

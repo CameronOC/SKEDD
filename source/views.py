@@ -82,7 +82,7 @@ def organization(key):
     if org.owner.id != g.user.id:
         return render_template('errors/403_organization_owner.html'), 403
 
-    #fix this later
+    #this needs to be a dictionary of all the members in that org i believe
     memberslist = ["3", "4"]
 
     return render_template('main/organization.html', organization=org, memberslist=memberslist)
@@ -92,14 +92,17 @@ def organization(key):
 #add owns_org 
 def manger_members_profile(key1, key2):
 
-    org = Organization.query.filter_by(id=key).first()
+    org = Organization.query.filter_by(id=key1).first()
 
     if org.owner.id != g.user.id:
         return render_template('errors/403_organization.html'), 403
 
+    #too make sure theyre a member
     mem = Membership.query.filter_by(id=key2).first()
+    #too view the positions i think ill have to add this
+    #pos = Position.query.filter_by(id=key3).first()
 
-    return render_template('main/manager_member_profile.html', position=mem, organization=org)
+    return render_template('main/manager_member_profile.html', member=mem, organization=org)
 
 
 @main_blueprint.route('/shifts', methods=['GET', 'POST'])
