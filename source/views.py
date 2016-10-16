@@ -1,6 +1,5 @@
 # project/main/views.py
 
-
 #################
 #### imports ####
 #################
@@ -9,9 +8,9 @@ import datetime
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
 from source import app, db, bcrypt
 from flask_login import login_required, login_user, logout_user
-from forms import CreateForm, InviteForm, JoinForm, PositionForm
+from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftDay
 
-from models import User, Organization, Membership, Position
+from models import User, Organization, Membership, Position, Shift
 from decorators import check_confirmed
 
 from token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
@@ -85,6 +84,25 @@ def organization(key):
 
     return render_template('main/organization.html', organization=org)
 
+@main_blueprint.route('/shifts', methods=['GET', 'POST'])
+@login_required
+def shift():
+    if request.method == 'GET':
+        shifts = Shift.query.all()
+        return render_template('main/shifts.html', shifts=shifts, form=ShiftDay())
+    else:
+        position = request.form['position']			# figure out what to do with this later
+        assigned_user_id = g.user.id				# and this
+        day = request.form['day']
+        start_time = datetime.datetime.strptime(request.form['start_time'], '%H:%M')
+        end_time = datetime.datetime.strptime(request.form['end_time'], '%H:%M')
+
+        shift = Shift(assigned_user_id=assigned_user_id, day=day, start_time=start_time, end_time=end_time)
+
+        db.session.add(shift)
+        db.session.commit()
+
+        return redirect('/shifts')
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
