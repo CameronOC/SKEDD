@@ -67,8 +67,11 @@ class Shift(db.Model):
     # relationship with user
     assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-class Membership(db.Model):
+    # relationship with Position
+    assigned_position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
 
+
+class Membership(db.Model):
     __tablename__ = 'organization_members'
 
     id = db.Column(db.Integer, primary_key=True)
