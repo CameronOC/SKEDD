@@ -1,17 +1,17 @@
 {% extends "_base.html" %}
-
+<link rel="stylesheet" href="../../static/font-awesome.min.css">
 {% block content %}
 
 <h1>Organizations</h1>
 {% if organizations %}
-<ul>
+<ul class="list-group">
     {% for org in organizations %}
-    <li><a href="/organization/{{ org.id }}">{{ org.name }}</a></li>
+    <li class="list-group-item"><a href="/organization/{{ org.id }}">{{ org.name }}</a></li>
     {% endfor %}
-    <li><a href="/create">Create New Organization</a></li>
+    <a class="btn btn-info" href="/create" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create New Organization</a>
 </ul>
 {% else %}
-Looks like you don't have any organizations, would you like to <a href="/create">create one</a>?
+Looks like you don't have any organizations, would you like to <a class="btn btn-info" href="/create">create one</a>?
 {% endif %}
 
 {% endblock %}
