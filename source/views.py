@@ -8,7 +8,7 @@ import datetime
 
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
 from source import app, db, bcrypt
-from flask_login import login_required
+from flask_login import login_required, login_user, logout_user
 from forms import CreateForm, InviteForm, JoinForm
 
 from models import User, Organization, Membership
@@ -35,7 +35,7 @@ def load_user():
         else:
             user = {"email": "Guest"}  # Make it better, use an anonymous User instead
     else:
-        user = {"email": "Guest"}  # Make it better, use an anonymous User instead
+        user = None
 
     g.user = user
 
