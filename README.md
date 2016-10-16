@@ -9,7 +9,7 @@
 ## Set Environment Variables
 
     export APP_SETTINGS="source.config.DevelopmentConfig"
-	
+export  DATABASE_URL='postgresql:///discover_flask_dev'	
 	If necessary:
 	
 	export APP_MAIL_USERNAME="skedd.mail@gmail.com"

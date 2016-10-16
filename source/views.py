@@ -178,7 +178,7 @@ def position(key, key2):
         return render_template('errors/403_organization.html'), 403
 
     pos = Position.query.filter_by(id=key2).first()
-    return render_template('main/position.html', position=pos)
+    return render_template('main/position.html', position=pos, organization=org)
 
 
 @main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
