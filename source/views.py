@@ -55,8 +55,8 @@ def landing():
 def home():
 
     orgs = g.user.orgs_owned.all()
-
-    return render_template('main/home.html', organizations=orgs)
+    memberships = g.user.memberships.all()
+    return render_template('main/home.html', organizations=orgs, memberships=memberships)
 
 
 @main_blueprint.route('/create', methods=['GET', 'POST'])

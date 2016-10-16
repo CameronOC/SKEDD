@@ -14,4 +14,22 @@
 Looks like you don't have any organizations, would you like to <a href="/create">create one</a>?
 {% endif %}
 
+<h1>Memberships</h1>
+{% if memberships %}
+<ul>
+    {% for membership in memberships %}
+    <li>
+        <a href="/organization/{{ membership.organization.id }}">
+            {{ membership.organization.name }}
+            {% if not membership.joined %}
+            (invited)
+            {% endif %}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+Looks like you aren't a member of any organizations, please wait for an invitation!
+{% endif %}
+
 {% endblock %}
