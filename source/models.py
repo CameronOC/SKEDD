@@ -128,7 +128,7 @@ class Position(db.Model):
     assigned_shifts = db.relationship('Shift',
                                       backref='Position', lazy='dynamic')
     # Organization associated with shift
-    oranization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     # Users many to many relationship with position
     assigned_users = db.relationship('User', secondary=claimed,
                                      backref=db.backref('Position', lazy='dynamic'))

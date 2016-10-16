@@ -9,15 +9,16 @@ import datetime
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
 from source import app, db, bcrypt
 from flask_login import login_required
-from forms import CreateForm, InviteForm, JoinForm
+from forms import CreateForm, InviteForm, JoinForm, PositionForm
 
-from models import User, Organization, Membership
+from models import User, Organization, Membership, Position
 from decorators import check_confirmed
 from source.token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
 
 import datetime
 from source.email import send_email
 from source.decorators import check_confirmed
+
 ################
 #    config    #
 ################
@@ -84,10 +85,9 @@ def organization(key):
     return render_template('main/organization.html', organization=org)
 
 
-
-#@main_blueprint.route('/invite', methods=['GET', 'POST'])
-#@login_required
-#def invite():
+# @main_blueprint.route('/invite', methods=['GET', 'POST'])
+# @login_required
+# def invite():
 #    if request.method == 'GET':
 #        return render_template('main/invite.html', form=InviteForm())
 #    else:
@@ -108,7 +108,6 @@ def invite(key):
     org = Organization.query.filter_by(id=key).first()
     form = InviteForm(request.form)
     if form.validate_on_submit():
-
         user = User(
             first_name=form.first_name.data,
             last_name=form.last_name.data,
@@ -138,7 +137,7 @@ def invite(key):
 
         flash('You succesfully invited ' + user.first_name + ' ' + user.last_name + '.', 'success')
 
-        #return redirect(url_for('user.unconfirmed'))
+        # return redirect(url_for('user.unconfirmed'))
 
     return render_template('main/invite.html', form=form, organization=org)
 
@@ -178,6 +177,7 @@ def confirm_invite(key, token):
         return redirect(url_for('main.home'))
     return render_template('main/join.html', form=form, organization=org)
 
+
 @main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', })
 @login_required
 def position(key, key2):
@@ -202,14 +202,18 @@ def create_position(key):
         return render_template('main/create_position.html', form=CreateForm())
     else:
         org = Organization.query.filter_by(id=key).first()
+        form = PositionForm(request.form)
+        if form.validate_on_submit():
 
-        if org.owner.id != g.user.id:
-            return render_template('errors/403_organization.html'), 403
+            if org.owner.id != g.user.id:
+                return render_template('errors/403_organization.html'), 403
 
-        title = request.form['name']
-        pos = Position(title=title, organization_id=org.id)
-        db.session.add(pos)
-        org.owned_positions.append(pos)
-        db.session.commit()
+            title = form.name.data
+            pos = Position(title=title, organization_id=org.id)
+            db.session.add(pos)
+            org.owned_positions.append(pos)
+            db.session.commit()
 
-        return redirect('/organization/' + str(org.id) + '/position/' + str(pos.id))
+            return redirect('/organization/' + str(org.id) + '/position/' + str(pos.id))
+        else:
+            return redirect('/organization/' + str(org.id))
