@@ -5,8 +5,28 @@
 <h1>{{ organization.name }}</h1>
 <h2>Owner: {{ organization.owner.first_name }} {{ organization.owner.last_name }}</h2>
 
+<h2>Employees</h2>
+<ul>
+    {% for membership in organization.memberships.all() %}
+    <li>
+        {{ membership.member.first_name }} {{ membership.member.last_name }}
+        {% if not membership.joined %}
+        (invited)
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
 <br>
-
 <a href="/organization/{{ organization.id }}/invite">Invite people to this organization</a>
-
+{% if organization.owned_positions %}
+<ul class="list-group">
+    {% for pos in organization.owned_positions.all() %}
+    <li class="list-group-item"><a href="/organization/{{ organization.id }}/position/{{pos.id}}">{{ pos.title }}</a></li>
+    {% endfor %}
+    <a class="btn btn-info" href="/organization/{{ organization.id }}/create_position" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create New Position</a>
+</ul>
+{% else %}
+Looks like you don't have any positions, would you like to <a href="/organization/{{ organization.id }}/create_position">create one</a>?
+{% endif %}
 {% endblock %}

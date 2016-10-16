@@ -9,12 +9,12 @@ import datetime
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
 from source import app, db, bcrypt
 from flask_login import login_required, login_user, logout_user
-from forms import CreateForm, InviteForm, JoinForm
+from forms import CreateForm, InviteForm, JoinForm, PositionForm
 
-from models import User, Organization, Membership
+from models import User, Organization, Membership, Position
 from decorators import check_confirmed
 
-from source.token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
+from token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
 
 import datetime
 from source.email import send_email
@@ -84,23 +84,6 @@ def organization(key):
         return render_template('errors/403_organization_owner.html'), 403
 
     return render_template('main/organization.html', organization=org)
-
-
-#
-# @main_blueprint.route('/invite', methods=['GET', 'POST'])
-# @login_required
-# def invite():
-#    if request.method == 'GET':
-#        return render_template('main/invite.html', form=InviteForm())
-#    else:
-#        name = request.form['name']
-#        owner = g.user
-#
-#        db.session.add(org)
-#        db.session.commit()
-#
-#        return redirect('/organization/' + str(org.id))
-#
 
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
@@ -184,3 +167,44 @@ def confirm_invite(key, token):
     except:
         flash('The confirmation link is invalid or has expired.', 'danger')
         return redirect(url_for('main.home'))
+
+
+@main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', })
+@login_required
+def position(key, key2):
+    org = Organization.query.filter_by(id=key).first()
+
+    if org.owner.id != g.user.id:
+        return render_template('errors/403_organization.html'), 403
+
+    pos = Position.query.filter_by(id=key2).first()
+    return render_template('main/position.html', position=pos)
+
+
+@main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
+@login_required
+def create_position(key):
+    if request.method == 'GET':
+        org = Organization.query.filter_by(id=key).first()
+
+        if org.owner.id != g.user.id:
+            return render_template('errors/403_organization.html'), 403
+
+        return render_template('main/create_position.html', form=CreateForm())
+    else:
+        org = Organization.query.filter_by(id=key).first()
+        form = PositionForm(request.form)
+        if form.validate_on_submit():
+
+            if org.owner.id != g.user.id:
+                return render_template('errors/403_organization.html'), 403
+
+            title = form.name.data
+            pos = Position(title=title, organization_id=org.id)
+            db.session.add(pos)
+            org.owned_positions.append(pos)
+            db.session.commit()
+
+            return redirect('/organization/' + str(org.id) + '/position/' + str(pos.id))
+        else:
+            return redirect('/organization/' + str(org.id))
