@@ -82,7 +82,25 @@ def organization(key):
     if org.owner.id != g.user.id:
         return render_template('errors/403_organization_owner.html'), 403
 
-    return render_template('main/organization.html', organization=org)
+    #fix this later
+    memberslist = ["3", "4"]
+
+    return render_template('main/organization.html', organization=org, memberslist=memberslist)
+
+@main_blueprint.route('/organization/<key1>/manager_member_profile/<key2>', methods=['GET', ])
+@login_required
+#add owns_org 
+def manger_members_profile(key1, key2):
+
+    org = Organization.query.filter_by(id=key).first()
+
+    if org.owner.id != g.user.id:
+        return render_template('errors/403_organization.html'), 403
+
+    mem = Membership.query.filter_by(id=key2).first()
+
+    return render_template('main/manager_member_profile.html', position=mem, organization=org)
+
 
 @main_blueprint.route('/shifts', methods=['GET', 'POST'])
 @login_required
