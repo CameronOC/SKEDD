@@ -5,23 +5,29 @@
 <h1>{{ organization.name }}</h1>
 <h2>Owner: {{ organization.owner.first_name }} {{ organization.owner.last_name }}</h2>
 
-<h2>Employees</h2>
-<ul>
-    {% for membership in organization.memberships.all() %}
-    <li>
-        {{ membership.member.first_name }} {{ membership.member.last_name }}
-        {% if not membership.joined %}
-        (invited)
-        {% endif %}
-        {% if membership.joined %}
-        <a href="/organization/{{ organization.id }}/manager_member_profile/{{ memberslist[0] }}"> edit </a>
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
+{% if organization.owner.id == g.user.id %}
+    <h2>Employees</h2>
+    <ul>
+        {% for membership in organization.memberships.all() %}
+        <li>
+            {{ membership.member.first_name }} {{ membership.member.last_name }}
+            {% if not membership.joined %}
+            (invited)
+            {% endif %}
+            {% if membership.joined %}
+            <a href="/organization/{{ organization.id }}/manager_member_profile/{{ membership.member.id }}"> edit </a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
 
 <br>
 <a href="/organization/{{ organization.id }}/invite">Invite people to this organization</a>
+
+{% else %}
+{% endif %}
+
 {% if organization.owned_positions %}
 <ul class="list-group">
     {% for pos in organization.owned_positions.all() %}

@@ -4,6 +4,7 @@
 from flask_wtf import Form
 from wtforms import StringField, PasswordField, SelectField, DateTimeField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
+from models import User, Position
 
 
 class CreateForm(Form):
@@ -48,6 +49,10 @@ class JoinForm(Form):
         ]
     )
 
+#this form probably needs to be editted but its not throwing a error so ill keep it like it is for now
+class ClaimPositionForm(Form):
+    user_id = User.id
+    position_id = Position.id
 
 class PositionForm(Form):
     name = StringField('title', validators=[DataRequired(), Length(min=1, max=50)])

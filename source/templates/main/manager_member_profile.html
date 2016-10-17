@@ -2,7 +2,15 @@
 
 {% block content %}
 
-<h1> {{user.first_name}} {{user.last_name}} </h1>
+<h1>{{user.first_name}} {{user.last_name}}'s Profile: </h1>
+
+<p>First name: {{user.first_name}}</p>
+<p>Last name: {{user.last_name}}</p>
+<p>Email: {{user.email}}</p>
+
+<h3>Positions in {{organization.name}}: </h3>
+
+<p> {{organization.owned_positions}} </p>
 
 <!--
 
@@ -15,6 +23,8 @@ display the members shifts for those positions
 give this member a position in a organization?
 
 fire/remove the member from the organization
+
+maybe display the perfered schedule times
 
 -->
 

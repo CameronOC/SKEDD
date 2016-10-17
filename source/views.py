@@ -79,13 +79,11 @@ def create():
 def organization(key):
     org = Organization.query.filter_by(id=key).first()
 
-    if org.owner.id != g.user.id:
-        return render_template('errors/403_organization_owner.html'), 403
+    #make the check in the html not here
+    #if org.owner.id != g.user.id:
+    #    return render_template('errors/403_organization_owner.html'), 403
 
-    #this needs to be a dictionary of all the members in that org i believe
-    memberslist = ["3", "4"]
-
-    return render_template('main/organization.html', organization=org, memberslist=memberslist)
+    return render_template('main/organization.html', organization=org)
 
 @main_blueprint.route('/organization/<key1>/manager_member_profile/<key2>', methods=['GET', ])
 @login_required
@@ -99,6 +97,9 @@ def manger_members_profile(key1, key2):
 
     user = User.query.filter_by(id=key2).first()
 
+    #I think this will be needed to also display the users positions
+    #pos = Position.query.filter_by(id=key3).first()
+    #return render_template('main/manager_member_profile.html', user=user, organization=org, position=pos)
     return render_template('main/manager_member_profile.html', user=user, organization=org)
 
 
@@ -205,13 +206,14 @@ def confirm_invite(key, token):
         return redirect(url_for('main.home'))
 
 
-@main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', })
+@main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', 'POST'})
 @login_required
 def position(key, key2):
     org = Organization.query.filter_by(id=key).first()
 
-    if org.owner.id != g.user.id:
-        return render_template('errors/403_organization.html'), 403
+    #wrong
+    #if org.owner.id != g.user.id:
+    #    return render_template('errors/403_organization.html'), 403
 
     pos = Position.query.filter_by(id=key2).first()
     return render_template('main/position.html', position=pos, organization=org)
