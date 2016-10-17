@@ -97,12 +97,9 @@ def manger_members_profile(key1, key2):
     if org.owner.id != g.user.id:
         return render_template('errors/403_organization.html'), 403
 
-    #too make sure theyre a member
-    mem = Membership.query.filter_by(id=key2).first()
-    #too view the positions i think ill have to add this
-    #pos = Position.query.filter_by(id=key3).first()
+    user = User.query.filter_by(id=key2).first()
 
-    return render_template('main/manager_member_profile.html', member=mem, organization=org)
+    return render_template('main/manager_member_profile.html', user=user, organization=org)
 
 
 @main_blueprint.route('/shifts', methods=['GET', 'POST'])

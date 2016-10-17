@@ -90,6 +90,11 @@ class Shift(db.Model):
     assigned_position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
 
 
+#m_o_o = db.Table('m_o_o',
+#    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+#    db.Column('position_id', db.Integer, db.ForeignKey('.id'))
+#)
+
 class Membership(db.Model):
     __tablename__ = 'organization_members'
 
@@ -136,7 +141,6 @@ claimed = db.Table('claimed',
                    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
                    db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
                    )
-
 
 class Position(db.Model):
     __tablename__ = "positions"
