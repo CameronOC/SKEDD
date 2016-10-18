@@ -8,9 +8,14 @@
 <p>Last name: {{user.last_name}}</p>
 <p>Email: {{user.email}}</p>
 
-<h3>Positions in {{organization.name}}: </h3>
+<h3>Position(s) in {{organization.name}}: </h3>
 
-<p> {{organization.owned_positions}} </p>
+{% for pos in organization.owned_positions %}
+  <p>{{ pos.title }}
+  {% for person in pos.assigned_users%}
+  	{{ person.first_name }} {{ person.last_name}}</p>
+  {%endfor%}
+{% endfor %}
 
 <!--
 

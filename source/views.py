@@ -97,10 +97,24 @@ def manger_members_profile(key1, key2):
 
     user = User.query.filter_by(id=key2).first()
 
-    #I think this will be needed to also display the users positions
-    #pos = Position.query.filter_by(id=key3).first()
-    #return render_template('main/manager_member_profile.html', user=user, organization=org, position=pos)
     return render_template('main/manager_member_profile.html', user=user, organization=org)
+
+#@main_blueprint.route('/organization/<key1>/manager_member_profile/<key2>/addusertoposition', methods=['GET', 'POST'])
+#@login_required
+##adds a user to a position
+#def addusertoposition(key1, key2):
+#    org = Organization.query.filter_by(id=key1).first()
+#
+#    if org.owner.id != g.user.id:
+#        return render_template('errors/403_organization.html'), 403
+#
+#    user = User.query.filter_by(id=key2).first()
+#    
+#    assigned_user = Position.assigned_users()
+#    db.session.add()
+#    db.session.commit()
+#
+#    return redirect('/organization/<key1>/manager_member_profile/<key2>/addusertoposition')
 
 
 @main_blueprint.route('/shifts', methods=['GET', 'POST'])

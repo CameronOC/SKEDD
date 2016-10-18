@@ -7,6 +7,11 @@ from source import db, bcrypt
 from sqlalchemy import UniqueConstraint
 
 
+claimed = db.Table('claimed',
+                   db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+                   db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
+                   )
+
 class User(db.Model):
     __tablename__ = "users"
 
@@ -90,11 +95,6 @@ class Shift(db.Model):
     assigned_position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
 
 
-#m_o_o = db.Table('m_o_o',
-#    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-#    db.Column('position_id', db.Integer, db.ForeignKey('.id'))
-#)
-
 class Membership(db.Model):
     __tablename__ = 'organization_members'
 
@@ -137,11 +137,6 @@ class Organization(db.Model):
         return '<name: {}>'.format(self.name)
 
 
-claimed = db.Table('claimed',
-                   db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-                   db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
-                   )
-
 class Position(db.Model):
     __tablename__ = "positions"
 
@@ -153,8 +148,13 @@ class Position(db.Model):
     # Organization associated with shift
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     # Users many to many relationship with position
-    assigned_users = db.relationship('User', secondary=claimed,
-                                     backref=db.backref('Position', lazy='dynamic'))
+    assigned_users = db.relationship(
+        'User', 
+        secondary=claimed,
+        backref=db.backref('Position', lazy='dynamic'))
+
+    #def assign_user():
+        #idk if i have to do this
 
     def __init__(self, title, organization_id):
         self.title = title

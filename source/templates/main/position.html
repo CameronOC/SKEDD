@@ -6,17 +6,11 @@
 
 <h1>{{ position.title }}</h1>
 
-{% if position.assigned_users.user_id == NULL%}
-<!--
-	this button needs to be fixed but i believe the logic for the if statement it correct
--->
-	<a class="btn btn-success" action="ClaimPositionForm" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Claim Position</a>
-
-{% else %}
-
-	<p> hello {{ position.assigned_users.user_id }} {{position.assigned_users.position_id}} </p>
-
-{%endif%}
+<p> assigned user: 
+{% for person in position.assigned_users%} 
+{{ person.first_name }} {{ person.last_name}}
+{%endfor%}
+</p>
 
 <br>
 
