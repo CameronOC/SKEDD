@@ -69,7 +69,7 @@ class Shift(db.Model):
     assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # relationship with position
-    #position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
+    assigned_position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
 
     def __init__(self, assigned_user_id, day, start_time, end_time):
         self.assigned_user_id = assigned_user_id
@@ -82,12 +82,6 @@ class Shift(db.Model):
 
         zero = datetime.datetime.strptime('00:00', '%H:%M')	# zero o'clock datetime to add timedelta object to (end_time - start_time)
         self.duration = zero + (self.end_time - self.start_time)
-
-    # relationship with user
-    assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
-    # relationship with Position
-    assigned_position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
 
 
 class Membership(db.Model):
