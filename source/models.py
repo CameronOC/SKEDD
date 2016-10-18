@@ -84,7 +84,7 @@ class Shift(db.Model):
         self.duration = zero + (self.end_time - self.start_time)
 
     # relationship with user
-    assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # relationship with Position
     assigned_position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
@@ -95,6 +95,7 @@ class Membership(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     joined = db.Column(db.Boolean, default=False, nullable=False)
+    is_owner = db.Column(db.Boolean, default=False, nullable=False)
 
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
@@ -102,9 +103,11 @@ class Membership(db.Model):
     # makes it so that a user can't be a member of an organization multiple times
     UniqueConstraint('member_id', 'organization_id')
 
-    def __init__(self, member, organization):
+    def __init__(self, member, organization, is_owner=False, joined=False):
         self.member_id = member.id
         self.organization_id = organization.id
+        self.is_owner = is_owner
+        self.joined = joined
 
     def __repr__(self):
         return '<Organization: {}, Member: {}, joined: {}>'.format(self.organization_id, self.member_id, self.joined)

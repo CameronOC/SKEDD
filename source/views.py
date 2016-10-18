@@ -53,7 +53,7 @@ def landing():
 @check_confirmed
 def home():
     orgs = g.user.orgs_owned.all()
-    memberships = g.user.memberships.all()
+    memberships = g.user.memberships.filter_by(is_owner=False).all()
     return render_template('main/home.html', organizations=orgs, memberships=memberships)
 
 
@@ -64,11 +64,19 @@ def create():
         return render_template('main/create.html', form=CreateForm())
     else:
         name = request.form['name']
-        owner = g.user
 
-        org = Organization(name=name, owner=owner)
+        org = Organization(name=name, owner=g.user)
 
         db.session.add(org)
+        db.session.commit()
+
+        membership = Membership(
+            member=g.user,
+            organization=org,
+            is_owner=True,
+            joined=True
+        )
+        db.session.add(membership)
         db.session.commit()
 
         return redirect('/organization/' + str(org.id))
