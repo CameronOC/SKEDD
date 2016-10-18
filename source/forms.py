@@ -9,15 +9,18 @@ from wtforms.validators import DataRequired, Email, Length, EqualTo
 class CreateForm(Form):
     name = StringField('name', validators=[DataRequired(), Length(min=1, max=50)])
     
-class ShiftDay(Form):
-    position = StringField('position', validators=[DataRequired(), Length(min=1, max=20)])
+class ShiftForm(Form, orgKey):
+	user = SelectField('assigned_user', 
+	                    choices=[(c.first_name+' '+c.last_name, c.id) for c in User.memberships.any(organization_id=orgKey)])
+	
     day = SelectField('day', choices=[	('Monday', 'Monday'),
-            ('Tuesday', 'Tuesday'),
-            ('Wednesday', 'Wednesday'),
-            ('Thursday', 'Thursday'),
-            ('Friday', 'Friday'),
-            ('Saturday', 'Saturday'),
-            ('Sunday', 'Sunday')])
+                                        ('Tuesday', 'Tuesday'),
+                                        ('Wednesday', 'Wednesday'),
+                                        ('Thursday', 'Thursday'),
+                                        ('Friday', 'Friday'),
+                                        ('Saturday', 'Saturday'),
+                                        ('Sunday', 'Sunday')])
+            
     start_time = DateTimeField('StartTime', format='%H:%M')
     end_time = DateTimeField('EndTime', format='%H:%M')
     am_or_pm = SelectField('AMorPM', choices=[('AM', 'AM'), ('PM', 'PM')])

@@ -8,11 +8,12 @@
 {% if shifts %}
 <ul class="list-group">
     {% for shift in shifts %}
-    <li class="list-group-item"><a href="/organization/{{ org.id }}/position/{{pos.id}}/shift">{{ pos.title }}</a></li>
+    <li class="list-group-item"><a href="/organization/{{ organization.id }}/position/{{position.id}}/shift">{{ position.title }}</a></li>
     {% endfor %}
     <a class="btn btn-info" href="/position" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create Shift</a>
 </ul>
 {% else %}
-Looks like you don't have any shifts, would you like to <a href="/create">create one</a>?
+Looks like you don't have any shifts, would you like to
+				<a href="/organization/{{ organization.id }}/position/{{position.id}}/shift/create">create one</a>?
 {% endif %}
 {% endblock %}

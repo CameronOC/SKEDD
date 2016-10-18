@@ -8,7 +8,7 @@ import datetime
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
 from source import app, db, bcrypt
 from flask_login import login_required, login_user, logout_user
-from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftDay
+from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 
 from models import User, Organization, Membership, Position, Shift
 from decorators import check_confirmed
@@ -84,25 +84,24 @@ def organization(key):
 
     return render_template('main/organization.html', organization=org)
 
-@main_blueprint.route('/shifts', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<orgKey>/position/<posKey>/shift/create', methods=['GET', 'POST'])
 @login_required
-def shift():
-    if request.method == 'GET':
-        shifts = Shift.query.all()
-        return render_template('main/shifts.html', shifts=shifts, form=ShiftDay())
-    else:
-        position = request.form['position']			# figure out what to do with this later
-        assigned_user_id = g.user.id				# and this
-        day = request.form['day']
-        start_time = datetime.datetime.strptime(request.form['start_time'], '%H:%M')
-        end_time = datetime.datetime.strptime(request.form['end_time'], '%H:%M')
-
-        shift = Shift(assigned_user_id=assigned_user_id, day=day, start_time=start_time, end_time=end_time)
-
-        db.session.add(shift)
-        db.session.commit()
-
-        return redirect('/shifts')
+def shift(orgKey, posKey):
+	if request.method == 'GET':
+		return render_template('main/create_shift.html', form=ShiftForm(orgKey))
+	else:
+	    assigned_user_id = g.user.id				# figure out what to do with this
+	    #assigned_user_id = User.query.filter_by(id=request.form['user']).first()
+	    day = request.form['day']
+	    start_time = datetime.datetime.strptime(request.form['start_time'], '%H:%M')
+	    end_time = datetime.datetime.strptime(request.form['end_time'], '%H:%M')
+	
+	    shift = Shift(position_id=posKey, assigned_user_id=assigned_user_id, day=day, start_time=start_time, end_time=end_time)
+	
+	    db.session.add(shift)
+	    db.session.commit()
+	
+	    return redirect('/organization/<orgKey>/position/<posKey>')
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
