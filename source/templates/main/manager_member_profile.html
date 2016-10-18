@@ -8,7 +8,7 @@
 <p>Last name: {{user.last_name}}</p>
 <p>Email: {{user.email}}</p>
 
-<h3>Positions in {{organization.name}} assigned to {{user.first_name}}: </h3>
+<h3>Positions in {{organization.name}} </h3>
 
 {% for pos in organization.owned_positions %}
   {% for person in pos.assigned_users%}
@@ -16,10 +16,32 @@
 
   		<p><b>{{ pos.title }}</b> assigned to: {{ person.first_name }} {{ person.last_name}} <a href="/organization/{{ organization.id }}"> edit </a></p>
 
+  		<td>
+  			<form action="{{ url_for('unassign') }}" method="post">
+    		<input type="hidden" name="unassignuserid" value="{{ user.id }}"/>
+    		<input type="hidden" name="unassignposid" value="{{ pos.id }}"/>
+    		<input type="submit" class="btn btn-xs btn-danger" value="Unassign"/>
+  			</form>
+		</td>
+
   	{% endif %}
   {% endfor %}
-  	{% if not pos.assigned_users %}
- 		<a href="/organization/{{ organization.id }}"> <b>{{pos.title}}</b> assign {{user.first_name}} to this position </a></p>
+  	{% if not pos.assigned_users %} <!-- This checks to see if the pos.assigned_users list is empty -->
+ 		
+ 		<p><b>{{pos.title}}</b> assign {{user.first_name}} to this position
+
+ 		<td>
+  			<form action="{{ url_for('assign') }}" method="post">
+    		<input type="hidden" name="assignuserid" value="{{ user.id }}"/>
+    		<input type="hidden" name="assignposid" value="{{ pos.id }}"/>
+    		<input type="submit" class="btn btn-xs btn-danger" value="Assign"/>
+  			</form>
+		</td>
+
+		</p>
+
+
+
 	{% endif %}
 {% endfor %}
 
