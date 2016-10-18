@@ -153,9 +153,6 @@ class Position(db.Model):
         secondary=claimed,
         backref=db.backref('Position', lazy='dynamic'))
 
-    #def assign_user():
-        #idk if i have to do this
-
     def __init__(self, title, organization_id):
         self.title = title
         self.organization_id = organization_id

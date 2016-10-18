@@ -8,6 +8,7 @@
     {% for org in organizations %}
     <li class="list-group-item"><a href="/organization/{{ org.id }}">{{ org.name }}</a></li>
     {% endfor %}
+    <br>
     <a class="btn btn-success" href="/create" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create New Organization</a>
 </ul>
 {% else %}

@@ -52,12 +52,16 @@
     {% endfor %}
     
     <br>
-    
+    {% if organization.owner.id == g.user.id %}
     <a class="btn btn-success" href="/organization/{{ organization.id }}/create_position" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create New Position</a>
+    {%endif%}
 
 </ul>
 
 {% else %}
 Looks like you don't have any positions, would you like to <a href="/organization/{{ organization.id }}/create_position">create one</a>?
 {% endif %}
+
+<a href="/home">Go back</a>
+
 {% endblock %}
