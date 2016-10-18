@@ -99,39 +99,6 @@ def manger_members_profile(key1, key2):
 
     return render_template('main/manager_member_profile.html', user=user, organization=org)
 
-@app.route('/assign', methods=['POST'])
-@login_required
-def assign():
-    #get the user
-    myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
-    #get the position
-    mypos = Position.query.filter_by(id=request.form["assignposid"]).first_or_404()
-    #append the assigned_users table
-    mypos.assigned_users.append(myuser)
-    #commit it to the database
-    db.session.commit()
-    #preferably redirect to the same page
-    
-    #i dont know the command to redirect the manager back to the page they were just on
-    return render_template('main/index.html')
-
-@app.route('/unassign', methods=['POST'])
-@login_required
-def unassign():
-    #get the user
-    myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
-    #get the position
-    mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
-    #remove the user from the table
-    mypos.assigned_users.remove(myuser)
-    #commit the changes to the database
-    db.session.commit()
-
-    #still dont know the command to redirect to the previous page
-    return render_template('main/index.html')
-
-
-
 @main_blueprint.route('/shifts', methods=['GET', 'POST'])
 @login_required
 def shift():
@@ -275,3 +242,35 @@ def create_position(key):
             return redirect('/organization/' + str(org.id) + '/position/' + str(pos.id))
         else:
             return redirect('/organization/' + str(org.id))
+
+@app.route('/assign', methods=['POST'])
+@login_required
+def assign():
+    #get the user
+    myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
+    #get the position
+    mypos = Position.query.filter_by(id=request.form["assignposid"]).first_or_404()
+    #get org to redirect back to the previous page
+    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
+    #append the assigned_users table
+    mypos.assigned_users.append(myuser)
+    #commit it to the database
+    db.session.commit()
+    #redirects to the page before
+    return render_template('main/manager_member_profile.html', user=myuser, organization=org)
+
+@app.route('/unassign', methods=['POST'])
+@login_required
+def unassign():
+    #get the user
+    myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
+    #get the position
+    mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
+    #get org to redirect back to the previous page
+    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
+    #remove the user from the table
+    mypos.assigned_users.remove(myuser)
+    #commit the changes to the database
+    db.session.commit()
+    #redirects to the page before
+    return render_template('main/manager_member_profile.html', user=myuser, organization=org)

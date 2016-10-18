@@ -32,11 +32,31 @@
 
 {% if organization.owned_positions %}
 <ul class="list-group">
+    
     {% for pos in organization.owned_positions.all() %}
-    <li class="list-group-item"><a href="/organization/{{ organization.id }}/position/{{pos.id}}">{{ pos.title }}</a></li>
+
+    <li class="list-group-item"><a href="/organization/{{ organization.id }}/position/{{pos.id}}">{{ pos.title }}</a>
+    <p> 
+    
+        {% for person in pos.assigned_users%}  
+        
+            {{ person.first_name }} {{ person.last_name}}</p>
+    
+        {% endfor %}
+        {% if not pos.assigned_users %}
+            <p>unassigned</p>
+        {% endif %}
+
+    </li>
+
     {% endfor %}
+    
+    <br>
+    
     <a class="btn btn-success" href="/organization/{{ organization.id }}/create_position" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create New Position</a>
+
 </ul>
+
 {% else %}
 Looks like you don't have any positions, would you like to <a href="/organization/{{ organization.id }}/create_position">create one</a>?
 {% endif %}
