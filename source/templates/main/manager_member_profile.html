@@ -8,30 +8,45 @@
 <p>Last name: {{user.last_name}}</p>
 <p>Email: {{user.email}}</p>
 
-<h3>Position(s) in {{organization.name}}: </h3>
+<h3>Positions in {{organization.name}} assigned to {{user.first_name}}: </h3>
 
 {% for pos in organization.owned_positions %}
-  <p>{{ pos.title }}
   {% for person in pos.assigned_users%}
-  	{{ person.first_name }} {{ person.last_name}}</p>
-  {%endfor%}
+  	{% if person.first_name == user.first_name %}
+
+  		<p><b>{{ pos.title }}</b> assigned to: {{ person.first_name }} {{ person.last_name}} <a href="/organization/{{ organization.id }}"> edit </a></p>
+
+  	{% endif %}
+  {% endfor %}
+  	{% if not pos.assigned_users %}
+ 		<a href="/organization/{{ organization.id }}"> <b>{{pos.title}}</b> assign {{user.first_name}} to this position </a></p>
+	{% endif %}
 {% endfor %}
 
 <!--
 
-update the database so that i can get the names from it
-
-display the members position/positions in that organization
+display the position/positions in that organization assigned to the user
 
 display the members shifts for those positions
 
-give this member a position in a organization?
+give this member a position in a organization
 
 fire/remove the member from the organization
 
-maybe display the perfered schedule times
+maybe display the perfered schedule 
+
+{% for pos in organization.owned_positions %}
+  <p><b>{{ pos.title }}</b>
+  {% for person in pos.assigned_users%}
+  	assigned to: {{ person.first_name }} {{ person.last_name}}</p>
+  	{% if person.first_name == user.first_name %}
+  		<a href="/organization/{{ organization.id }}">Go back</a>
+  	{% endif %}
+  {% endfor %}
+{% endfor %}
 
 -->
+
 
 <br>
 <a href="/organization/{{ organization.id }}">Go back</a>
