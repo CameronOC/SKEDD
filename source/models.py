@@ -75,13 +75,11 @@ class Shift(db.Model):
         self.assigned_user_id = assigned_user_id
         self.position_id = position_id
         self.day = day
-        #self.start_time = datetime.datetime.now()
-        #self.end_time = datetime.datetime.now()
         self.start_time = start_time
         self.end_time = end_time
 
         zero = datetime.datetime.strptime('00:00', '%H:%M')	# zero o'clock datetime to add timedelta object to (end_time - start_time)
-        self.duration = zero + (self.end_time - self.start_time)
+        self.duration = zero + (self.end_time - self.start_time) # this is how we convert from timedelta obj to datetime obj
 
 
 class Membership(db.Model):
