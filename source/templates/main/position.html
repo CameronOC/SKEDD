@@ -9,10 +9,8 @@
 <ul class="list-group">
     {% for shift in shifts %}
     <li class="list-group-item">
-        <a href="/organization/{{ organization.id }}/position/{{position.id}}/shift">
-            {{ shift.user.first_name }} {{ shift.user.last_name }} on {{ shift.day }}; 
-            {{ shift.start_time.hour }}:{{ shift.start_time.minute }} - {{ shift.end_time.hour }}:{{ shift.end_time.minute }}
-        </a>
+        {{ shift.user.first_name }} {{ shift.user.last_name }} on {{ shift.day }}; 
+        {{ shift.start_time.hour }}:{{ shift.start_time.minute }} - {{ shift.end_time.hour }}:{{ shift.end_time.minute }}
     </li>
     {% endfor %}
     <a class="btn btn-info" href="/organization/{{ organization.id }}/position/{{position.id}}/shift/create">
