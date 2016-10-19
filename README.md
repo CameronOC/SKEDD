@@ -38,3 +38,7 @@ for running tests:
 ### Run
 
     python manage.py runserver
+
+## To run all tests
+    cd SKEDD
+    nosetests
