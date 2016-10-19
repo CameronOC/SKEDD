@@ -12,8 +12,7 @@ from source.models import User
 # from project.email import send_email
 from source import db, bcrypt
 from .forms import LoginForm, RegisterForm, ChangePasswordForm
-from source.token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
-
+from source.utils.token import generate_confirmation_token, confirm_token
 import datetime
 from source.email import send_email
 from source.decorators import check_confirmed

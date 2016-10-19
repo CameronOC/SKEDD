@@ -1,10 +1,7 @@
-# project/util.py
+from flask_testing import TestCase
 
-
-from flask.ext.testing import TestCase
-
-from project import app, db
-from project.models import User
+from source import app, db
+from source.models import User
 
 
 class BaseTestCase(TestCase):
@@ -15,7 +12,7 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         db.create_all()
-        user = User(email="ad@min.com", password="admin_user", paid=False)
+        user = User(email="ad@min.com", password="admin_user", first_name='local', last_name='admin')
         db.session.add(user)
         db.session.commit()
 
