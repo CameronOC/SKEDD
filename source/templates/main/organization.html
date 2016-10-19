@@ -7,7 +7,7 @@
 
 <h2>Employees</h2>
 <ul>
-    {% for membership in organization.memberships.all() %}
+    {% for membership in organization.memberships.filter_by(is_owner=False).all() %}
     <li>
         {{ membership.member.first_name }} {{ membership.member.last_name }}
         {% if not membership.joined %}
