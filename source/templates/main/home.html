@@ -2,19 +2,28 @@
 <link rel="stylesheet" href="../../static/font-awesome.min.css">
 {% block content %}
 
-<h1>Organizations</h1>
+<div class="HOME_organizations">
+<h1 class="HOME_Org-title">Organizations</h1>
 {% if organizations %}
 <ul class="list-group">
     {% for org in organizations %}
-    <li class="list-group-item"><a href="/organization/{{ org.id }}">{{ org.name }}</a></li>
+    <li class="list-group-item">
+        <a class="list-group-item-single" href="/organization/{{ org.id }}">{{ org.name }}</a>
+    </li>
     {% endfor %}
-    <a class="btn btn-info" href="/create" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create New Organization</a>
+    <a class="HOME_create-org" href="/create" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create Organization
+    </a>
 </ul>
 {% else %}
-Looks like you don't have any organizations, would you like to <a href="/create">create one</a>?
+<a href="/create" class="HOME_create-org" role="button" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create Organization</a>
 {% endif %}
+</div>
 
-<h1>Memberships</h1>
+
+
+
+<div class="HOME_memberships">
+<h1 class="HOME_Mem-title">Memberships</h1>
 {% if memberships %}
 <ul>
     {% for membership in memberships %}
@@ -29,6 +38,7 @@ Looks like you don't have any organizations, would you like to <a href="/create"
     {% endfor %}
 </ul>
 {% else %}
-Looks like you aren't a member of any organizations, please wait for an invitation!
+<p class="HOME_Mem-txt">Looks like you aren't a member of any organizations, please wait for an invitation!</p>
 {% endif %}
+</div>
 {% endblock %}

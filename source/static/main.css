@@ -2,6 +2,18 @@
 @import url("index.css");
 @import url("register.css");
 @import url("login.css");
+@import url("unconfirmed.css");
+@import url("home.css");
+@import url("create.css");
+@import url("organization.css");
+/*
+CSS Outline
+Window Color Background: #333333;
+Window Color Background Gradient Range:  #262626 / #404040;
+Text Header Shadow:  #1a1a1a;
+
+
+*/
 
 body {
   padding-top: 70px;
