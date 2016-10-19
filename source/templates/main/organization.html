@@ -15,13 +15,8 @@
     </li>
     {% endfor %}
 </ul>
-<a class="ORGANIZATION_invite" href="/organization/{{ organization.id }}/invite" role="button" type="submit" >Invite people to this organization</a>
-<h1>{{ organization.name }}</h1>
-<h2>Owner: {{ organization.owner.first_name }} {{ organization.owner.last_name }}</h2>
-
 
 {% if organization.owner.id == g.user.id %}
-    <h2>Employees</h2>
     <ul>
         {% for membership in organization.memberships.all() %}
         <li>
@@ -36,9 +31,8 @@
         {% endfor %}
     </ul>
 
+<a class="ORGANIZATION_invite" href="/organization/{{ organization.id }}/invite" role="button" type="submit" >Invite people to this organization</a>
 
-<br>
-<a href="/organization/{{ organization.id }}/invite">Invite people to this organization</a>
 <br>
 {% else %}
 {% endif %}
