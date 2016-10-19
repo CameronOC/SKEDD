@@ -1,0 +1,56 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+
+<h1>{{user.first_name}} {{user.last_name}}'s Profile: </h1>
+
+<p>First name: {{user.first_name}}</p>
+<p>Last name: {{user.last_name}}</p>
+<p>Email: {{user.email}}</p>
+
+<h3>Positions assigned to {{user.first_name}}</h3>
+
+{% for pos in organization.owned_positions %}
+  {% for person in pos.assigned_users%}
+  	{% if person.first_name == user.first_name %}
+
+  		<p><b>{{ pos.title }}</b> assigned to: {{ person.first_name }} {{ person.last_name}} </p>
+
+  		<td>
+  			<form action="{{ url_for('unassign') }}" method="post">
+    		<input type="hidden" name="unassignuserid" value="{{ user.id }}"/>
+    		<input type="hidden" name="unassignposid" value="{{ pos.id }}"/>
+    		<input type="hidden" name="org" value="{{organization.id}}">
+    		<input type="submit" class="btn btn-xs btn-danger" value="Unassign"/>
+  			</form>
+		</td>
+
+  	{% endif %}
+  {% endfor %}
+{% endfor %}
+
+<br>
+
+<form action=" {{ url_for('assign') }} " method='post'>    
+  <h3> Positions in {{organization.name}} </h3>
+    <select class="dropdownmenu" name='position'>
+      {%for pos in organization.owned_positions %}
+        <option value='{{pos.title}}'> {{pos.title}} </option>
+      {%endfor%}         
+    </select>
+
+  <input type="hidden" name="assignuserid" value="{{ user.id }}"/>
+  <input type="hidden" name="org" value="{{organization.id}}">
+  <input type="submit" class="btn btn-xs btn-danger" value="assign"/>
+</form>
+
+<br>
+
+<h3> Shifts </h3>
+<p> To my understanding this is suppose to be a calender so im not going to bother displaying anything here </p>
+
+<br>
+<a href="/organization/{{ organization.id }}">Go back</a>
+
+{% endblock %}

@@ -3,8 +3,13 @@
 
 import datetime
 
-from source import db, bcrypt
+from project import db, bcrypt
 from sqlalchemy import UniqueConstraint
+
+claimed = db.Table('claimed',
+                   db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+                   db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
+                   )
 
 
 class User(db.Model):
@@ -56,7 +61,6 @@ class User(db.Model):
 
 
 class Shift(db.Model):
-
     __tablename__ = "shifts"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -78,8 +82,10 @@ class Shift(db.Model):
         self.start_time = start_time
         self.end_time = end_time
 
-        zero = datetime.datetime.strptime('00:00', '%H:%M')	# zero o'clock datetime to add timedelta object to (end_time - start_time)
-        self.duration = zero + (self.end_time - self.start_time) # this is how we convert from timedelta obj to datetime obj
+        zero = datetime.datetime.strptime('00:00',
+                                          '%H:%M')  # zero o'clock datetime to add timedelta object to (end_time - start_time)
+        self.duration = zero + (
+        self.end_time - self.start_time)  # this is how we convert from timedelta obj to datetime obj
 
 
 class Membership(db.Model):
@@ -95,9 +101,9 @@ class Membership(db.Model):
     # makes it so that a user can't be a member of an organization multiple times
     UniqueConstraint('member_id', 'organization_id')
 
-    def __init__(self, member, organization, is_owner=False, joined=False):
-        self.member_id = member.id
-        self.organization_id = organization.id
+    def __init__(self, member_id, organization_id, is_owner=False, joined=False):
+        self.member_id = member_id
+        self.organization_id = organization_id
         self.is_owner = is_owner
         self.joined = joined
 
@@ -119,18 +125,12 @@ class Organization(db.Model):
     owned_positions = db.relationship('Position',
                                       backref='Organization', lazy='dynamic')
 
-    def __init__(self, name, owner):
+    def __init__(self, name, owner_id):
         self.name = name
-        self.owner_id = owner.id
+        self.owner_id = owner_id
 
     def __repr__(self):
         return '<name: {}>'.format(self.name)
-
-
-claimed = db.Table('claimed',
-                   db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-                   db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
-                   )
 
 
 class Position(db.Model):
@@ -144,8 +144,10 @@ class Position(db.Model):
     # Organization associated with shift
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     # Users many to many relationship with position
-    assigned_users = db.relationship('User', secondary=claimed,
-                                     backref=db.backref('Position', lazy='dynamic'))
+    assigned_users = db.relationship(
+        'User',
+        secondary=claimed,
+        backref=db.backref('Position', lazy='dynamic'))
 
     def __init__(self, title, organization_id):
         self.title = title

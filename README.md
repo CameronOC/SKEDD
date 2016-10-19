@@ -8,17 +8,25 @@
 
 ## Set Environment Variables
 
-    export APP_SETTINGS="source.config.DevelopmentConfig"
-export  DATABASE_URL='postgresql:///discover_flask_dev'	
-	If necessary:
-	
-	export APP_MAIL_USERNAME="skedd.mail@gmail.com"
+Email server:
+
+    export APP_MAIL_USERNAME="skedd.mail@gmail.com"
 	export APP_MAIL_PASSWORD="cumulonimbus"
+
+for development:
+
+    export APP_SETTINGS="project.config.DevelopmentConfig"
+
+for running tests:
+
+    export APP_SETTINGS="project.config.TestingConfig"
 	
 ## For Windows
-		setx APP_SETTINGS "source.config.DevelopmentConfig"
-        setx APP_MAIL_USERNAME "skedd.mail@gmail.com"
-	    setx APP_MAIL_PASSWORD "cumulonimbus"
+
+	setx APP_SETTINGS "project.config.DevelopmentConfig"
+    setx APP_MAIL_USERNAME "skedd.mail@gmail.com"
+	setx APP_MAIL_PASSWORD "cumulonimbus"
+
 ### Create DB
 
     python manage.py create_db
@@ -30,3 +38,7 @@ export  DATABASE_URL='postgresql:///discover_flask_dev'
 ### Run
 
     python manage.py runserver
+
+## To run all tests
+    cd SKEDD
+    nosetests

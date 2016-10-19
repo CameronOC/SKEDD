@@ -9,8 +9,8 @@ import datetime
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
-from source import app, db
-from source.models import User
+from project import app, db
+from project.models import User
 
 
 app.config.from_object(os.environ['APP_SETTINGS'])

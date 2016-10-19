@@ -1,0 +1,14 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<div class="UNCONFIRMED_window">
+		<h1 class="UNCONFIRMED_greeting">Welcome to SKEDD</h1>
+		<p class="UNCONFIRMED_text">You have not confirmed your account.</p>
+			<ul>
+				<li>Please check your inbox (and your spam folder)</li>
+			</ul>
+
+		<a href="{{ url_for('user.resend_confirmation') }}" class="UNCONFIRMED_resend" role="button" type="submit">Resend Confirmation</a>
+</div>
+
+{% endblock %}

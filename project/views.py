@@ -3,21 +3,17 @@
 #################
 #### imports ####
 #################
+
 import datetime
 
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
-from source import app, db, bcrypt
-from flask_login import login_required, login_user, logout_user
+from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
-
 from models import User, Organization, Membership, Position, Shift
-from decorators import check_confirmed
-
-from token import generate_confirmation_token, confirm_token, generate_invitation_token, confirm_invitation_token
-
-import datetime
-from source.email import send_email
-from source.decorators import check_confirmed
+from project import app, db, bcrypt
+from project.decorators import check_confirmed
+from project.email import send_email
+from project.utils.token import confirm_token, generate_invitation_token
 
 ################
 #    config    #
@@ -60,19 +56,20 @@ def home():
 @main_blueprint.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
+
     if request.method == 'GET':
         return render_template('main/create.html', form=CreateForm())
     else:
         name = request.form['name']
 
-        org = Organization(name=name, owner=g.user)
+        org = Organization(name=name, owner_id=g.user.id)
 
         db.session.add(org)
         db.session.commit()
 
         membership = Membership(
-            member=g.user,
-            organization=org,
+            member_id=g.user.id,
+            organization_id=org.id,
             is_owner=True,
             joined=True
         )
@@ -87,10 +84,26 @@ def create():
 def organization(key):
     org = Organization.query.filter_by(id=key).first()
 
+    # make the check in the html not here
+    # if org.owner.id != g.user.id:
+    #    return render_template('errors/403_organization_owner.html'), 403
+
+    return render_template('main/organization.html', organization=org)
+
+
+@main_blueprint.route('/organization/<key1>/member/<key2>', methods=['GET', ])
+@login_required
+# add owns_org
+def manger_members_profile(key1, key2):
+    org = Organization.query.filter_by(id=key1).first()
+
     if org.owner.id != g.user.id:
         return render_template('errors/403_organization_owner.html'), 403
 
-    return render_template('main/organization.html', organization=org)
+    user = User.query.filter_by(id=key2).first()
+
+    return render_template('main/member.html', user=user, organization=org)
+
 
 @main_blueprint.route('/organization/<orgKey>/position/<posKey>/shift/create', methods=['GET', 'POST'])
 @login_required
@@ -99,20 +112,22 @@ def shift(orgKey, posKey):
         form = ShiftForm()
         memberships = Membership.query.filter_by(organization_id=orgKey).all()
         for c in memberships:
-            form.user.choices.append((c.member.id, c.member.first_name+' '+c.member.last_name))
+            form.user.choices.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
         return render_template('main/create_shift.html', form=form)
     else:
         assigned_user_id = request.form['user']
         day = request.form['day']
         start_time = datetime.datetime.strptime(request.form['start_time'], '%H:%M')
         end_time = datetime.datetime.strptime(request.form['end_time'], '%H:%M')
-	
-        shift = Shift(position_id=posKey, assigned_user_id=assigned_user_id, day=day, start_time=start_time, end_time=end_time)
-	
+
+        shift = Shift(position_id=posKey, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
+                      end_time=end_time)
+
         db.session.add(shift)
         db.session.commit()
-	
+
         return redirect(url_for('main.position', key=orgKey, key2=posKey))
+
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
@@ -143,8 +158,8 @@ def invite(key):
             return render_template('main/invite.html', form=form, organization=org)
 
         membership = Membership(
-            member=user,
-            organization=org
+            member_id=user.id,
+            organization_id=org.id
         )
         db.session.add(membership)
         db.session.commit()
@@ -201,13 +216,14 @@ def confirm_invite(key, token):
         return redirect(url_for('main.home'))
 
 
-@main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', })
+@main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', 'POST'})
 @login_required
 def position(key, key2):
     org = Organization.query.filter_by(id=key).first()
 
-    if org.owner.id != g.user.id:
-        return render_template('errors/403_organization.html'), 403
+    # wrong
+    # if org.owner.id != g.user.id:
+    #    return render_template('errors/403_organization.html'), 403
 
     pos = Position.query.filter_by(id=key2).first()
     shifts = pos.assigned_shifts.all()
@@ -221,7 +237,7 @@ def create_position(key):
         org = Organization.query.filter_by(id=key).first()
 
         if org.owner.id != g.user.id:
-            return render_template('errors/403_organization.html'), 403
+            return render_template('errors/403_organization_owner.html'), 403
 
         return render_template('main/create_position.html', form=CreateForm())
     else:
@@ -230,7 +246,7 @@ def create_position(key):
         if form.validate_on_submit():
 
             if org.owner.id != g.user.id:
-                return render_template('errors/403_organization.html'), 403
+                return render_template('errors/403_organization_owner.html'), 403
 
             title = form.name.data
             pos = Position(title=title, organization_id=org.id)
@@ -241,3 +257,41 @@ def create_position(key):
             return redirect('/organization/' + str(org.id) + '/position/' + str(pos.id))
         else:
             return redirect('/organization/' + str(org.id))
+
+
+@app.route('/assign', methods=['POST'])
+@login_required
+def assign():
+    # get the user
+    myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
+    # get the position
+    mypos = Position.query.filter_by(title=request.form['position']).first_or_404()
+    # get org to redirect back to the previous page
+    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
+    # if this user already exists return flash
+    if myuser in mypos.assigned_users:
+        flash('This persons position is already assigned to ' + mypos.title, 'danger')
+        return render_template('main/member.html', user=myuser, organization=org)
+    # append the assigned_users table
+    mypos.assigned_users.append(myuser)
+    # commit it to the database
+    db.session.commit()
+    # redirects to the page before
+    return render_template('main/member.html', user=myuser, organization=org)
+
+
+@app.route('/unassign', methods=['POST'])
+@login_required
+def unassign():
+    # get the user
+    myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
+    # get the position
+    mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
+    # get org to redirect back to the previous page
+    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
+    # remove the user from the table
+    mypos.assigned_users.remove(myuser)
+    # commit the changes to the database
+    db.session.commit()
+    # redirects to the page before
+    return render_template('main/member.html', user=myuser, organization=org)
