@@ -170,6 +170,8 @@ def confirm_invite(key, token):
         if user.confirmed:
             membership.joined = True
             db.session.commit()
+            if g.user is None or g.user.id != user.id:
+                login_user(user)
             flash('You have now joined ' + org.name, 'success')
             return redirect(url_for('main.home'))
         elif form.validate_on_submit():
@@ -179,6 +181,8 @@ def confirm_invite(key, token):
             user.confirmed_on = datetime.datetime.now()
             membership.joined = True
             db.session.commit()
+            if g.user is None or g.user.id != user.id:
+                login_user(user)
             flash('You have now joined ' + org.name, 'success')
             return redirect(url_for('main.home'))
         else:
