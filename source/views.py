@@ -85,7 +85,7 @@ def organization(key):
 
     return render_template('main/organization.html', organization=org)
 
-@main_blueprint.route('/organization/<key1>/manager_member_profile/<key2>', methods=['GET', ])
+@main_blueprint.route('/organization/<key1>/member/<key2>', methods=['GET', ])
 @login_required
 #add owns_org 
 def manger_members_profile(key1, key2):
@@ -97,7 +97,7 @@ def manger_members_profile(key1, key2):
 
     user = User.query.filter_by(id=key2).first()
 
-    return render_template('main/manager_member_profile.html', user=user, organization=org)
+    return render_template('main/member.html', user=user, organization=org)
 
 @main_blueprint.route('/shifts', methods=['GET', 'POST'])
 @login_required
@@ -257,7 +257,7 @@ def assign():
     #commit it to the database
     db.session.commit()
     #redirects to the page before
-    return render_template('main/manager_member_profile.html', user=myuser, organization=org)
+    return render_template('main/member.html', user=myuser, organization=org)
 
 @app.route('/unassign', methods=['POST'])
 @login_required
@@ -273,4 +273,4 @@ def unassign():
     #commit the changes to the database
     db.session.commit()
     #redirects to the page before
-    return render_template('main/manager_member_profile.html', user=myuser, organization=org)
+    return render_template('main/member.html', user=myuser, organization=org)

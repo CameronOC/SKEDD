@@ -15,7 +15,7 @@
             (invited)
             {% endif %}
             {% if membership.joined %}
-            <a href="/organization/{{ organization.id }}/manager_member_profile/{{ membership.member.id }}"> edit </a>
+            <a href="/organization/{{ organization.id }}/member/{{ membership.member.id }}"> edit </a>
             {% endif %}
         </li>
         {% endfor %}
@@ -40,7 +40,7 @@
     
         {% for person in pos.assigned_users%}  
         
-            {{ person.first_name }} {{ person.last_name}}  {%if organization.owner.id == g.user.id%}<a href="/organization/{{ organization.id }}/manager_member_profile/{{ person.id }}"> edit </a>{%endif%} </p>
+            {{ person.first_name }} {{ person.last_name}}  {%if organization.owner.id == g.user.id%}<a href="/organization/{{ organization.id }}/member/{{ person.id }}"> edit </a>{%endif%} </p>
     
         {% endfor %}
         {% if not pos.assigned_users %}
