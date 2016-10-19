@@ -34,7 +34,7 @@
 
 <form action=" {{ url_for('assign') }} " method='post'>    
   <h3> Positions in {{organization.name}} </h3>
-    <select name='position'>
+    <select class="dropdownmenu" name='position'>
       {%for pos in organization.owned_positions %}
         <option value='{{pos.title}}'> {{pos.title}} </option>
       {%endfor%}         
@@ -49,28 +49,6 @@
 
 <h3> Shifts </h3>
 <p> To my understanding this is suppose to be a calender so im not going to bother displaying anything here </p>
-<!--
-
-display the position/positions in that organization assigned to the user
-
-display the members shifts for those positions
-
-give this member a position in a organization
-
-fire/remove the member from the organization
-
-maybe display the perfered schedule 
-
-{% for pos in organization.owned_positions %}
-  <p><b>{{ pos.title }}</b>
-  {% for person in pos.assigned_users%}
-  	assigned to: {{ person.first_name }} {{ person.last_name}}</p>
-  	{% if person.first_name == user.first_name %}
-  		<a href="/organization/{{ organization.id }}">Go back</a>
-  	{% endif %}
-  {% endfor %}
-{% endfor %}
--->
 
 <br>
 <a href="/organization/{{ organization.id }}">Go back</a>

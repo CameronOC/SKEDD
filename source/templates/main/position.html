@@ -6,11 +6,11 @@
 
 <h1>{{ position.title }}</h1>
 
-<p> assigned user: 
+<p> Assigned user(s): </p>
 {% for person in position.assigned_users%} 
-{{ person.first_name }} {{ person.last_name}}
+<p>{{ person.first_name }} {{ person.last_name}} <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> edit </a> </p>
 {%endfor%}
-</p>
+
 
 <br>
 
@@ -24,6 +24,7 @@
         </a>
     </li>
     {% endfor %}
+    <br>
     <a class="btn btn-info" href="/organization/{{ organization.id }}/position/{{position.id}}/shift/create">
          <i class="fa fa-plus" aria-hidden="true"></i> 
          Create Shift
