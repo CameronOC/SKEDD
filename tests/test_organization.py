@@ -1,8 +1,8 @@
 from flask_testing import TestCase
 
-from source import app, db
-from source.models import User, Organization, Membership
-from source.utils.organization import create_organization
+from project import app, db
+from project.models import User, Organization, Membership
+from project.utils.organization import create_organization
 
 
 class BaseTestCase(TestCase):

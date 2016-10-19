@@ -10,10 +10,10 @@ from flask import render_template, Blueprint, request, session, g, redirect, url
 from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
-from source import app, db, bcrypt
-from source.decorators import check_confirmed
-from source.email import send_email
-from source.utils.token import confirm_token, generate_invitation_token
+from project import app, db, bcrypt
+from project.decorators import check_confirmed
+from project.email import send_email
+from project.utils.token import confirm_token, generate_invitation_token
 
 ################
 #    config    #

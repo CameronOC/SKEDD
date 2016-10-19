@@ -1,5 +1,5 @@
-from source import db
-from source.models import Organization, User, Membership
+from project import db
+from project.models import Organization, User, Membership
 
 
 def create_organization(name, owner_id):

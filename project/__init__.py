@@ -39,8 +39,8 @@ db = SQLAlchemy(app)
 #### blueprints ####
 ####################
 
-from source.views import main_blueprint
-from source.user.views import user_blueprint
+from project.views import main_blueprint
+from project.user.views import user_blueprint
 app.register_blueprint(main_blueprint)
 app.register_blueprint(user_blueprint)
 
@@ -49,7 +49,7 @@ app.register_blueprint(user_blueprint)
 #### flask-login ####
 ####################
 
-from source.models import User
+from project.models import User
 
 login_manager.login_view = "user.login"
 login_manager.login_message_category = "danger"

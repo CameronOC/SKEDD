@@ -3,7 +3,7 @@
 
 import datetime
 
-from source import db, bcrypt
+from project import db, bcrypt
 from sqlalchemy import UniqueConstraint
 
 claimed = db.Table('claimed',
