@@ -40,7 +40,7 @@
     
         {% for person in pos.assigned_users%}  
         
-            {{ person.first_name }} {{ person.last_name}}</p>
+            {{ person.first_name }} {{ person.last_name}}  {%if organization.owner.id == g.user.id%}<a href="/organization/{{ organization.id }}/manager_member_profile/{{ person.id }}"> edit </a>{%endif%} </p>
     
         {% endfor %}
         {% if not pos.assigned_users %}
