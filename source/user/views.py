@@ -5,10 +5,8 @@
 #### imports ####
 #################
 
-from flask import render_template, Blueprint, url_for, \
-    redirect, flash, request
-from flask_login import login_user, logout_user, \
-    login_required, current_user
+from flask import render_template, Blueprint, url_for, redirect, flash, request, g
+from flask_login import login_user, logout_user, login_required, current_user
 
 from source.models import User
 # from project.email import send_email
@@ -114,6 +112,8 @@ def confirm_email(token):
             user.confirmed_on = datetime.datetime.now()
             db.session.add(user)
             db.session.commit()
+            if g.user is None or g.user.id != user.id:
+                login_user(user)
             flash('You have confirmed your account. Thank You!', 'success')
     except:
         flash('The confirmation link is invalid or has expired.', 'danger')

@@ -5,6 +5,7 @@
 <h1>{{ organization.name }}</h1>
 <h2>Owner: {{ organization.owner.first_name }} {{ organization.owner.last_name }}</h2>
 
+
 {% if organization.owner.id == g.user.id %}
     <h2>Employees</h2>
     <ul>
