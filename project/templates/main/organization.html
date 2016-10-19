@@ -5,16 +5,6 @@
 <h1 class="ORGANIZATION_name">{{ organization.name }}</h1>
 <h2 class="ORGANIZATION_owner"><strong>Owner:</strong> {{ organization.owner.first_name }} {{ organization.owner.last_name }}</h2>
 <h2 class="ORGANIZATION_employees"><strong>Employees:</strong></h2>
-<ul>
-    {% for membership in organization.memberships.filter_by(is_owner=False).all() %}
-    <li>
-        {{ membership.member.first_name }} {{ membership.member.last_name }}
-        {% if not membership.joined %}
-        (invited)
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
 
 {% if organization.owner.id == g.user.id %}
     <ul>
@@ -35,6 +25,16 @@
 
 <br>
 {% else %}
+<ul>
+    {% for membership in organization.memberships.filter_by(is_owner=False).all() %}
+    <li>
+        {{ membership.member.first_name }} {{ membership.member.last_name }}
+        {% if not membership.joined %}
+        (invited)
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
 {% endif %}
 
 <br>

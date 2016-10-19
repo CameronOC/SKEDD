@@ -8,14 +8,14 @@
 from flask import render_template, Blueprint, url_for, redirect, flash, request, g
 from flask_login import login_user, logout_user, login_required, current_user
 
-from source.models import User
+from project.models import User
 # from project.email import send_email
-from source import db, bcrypt
+from project import db, bcrypt
 from .forms import LoginForm, RegisterForm, ChangePasswordForm
-from source.utils.token import generate_confirmation_token, confirm_token
+from project.utils.token import generate_confirmation_token, confirm_token
 import datetime
-from source.email import send_email
-from source.decorators import check_confirmed
+from project.email import send_email
+from project.decorators import check_confirmed
 ################
 #### config ####
 ################

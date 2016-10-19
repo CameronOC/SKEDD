@@ -10,10 +10,10 @@ from flask import render_template, Blueprint, request, session, g, redirect, url
 from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
-from source import app, db, bcrypt
-from source.decorators import check_confirmed
-from source.email import send_email
-from source.utils.token import confirm_token, generate_invitation_token
+from project import app, db, bcrypt
+from project.decorators import check_confirmed
+from project.email import send_email
+from project.utils.token import confirm_token, generate_invitation_token
 
 ################
 #    config    #
@@ -56,19 +56,20 @@ def home():
 @main_blueprint.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
+
     if request.method == 'GET':
         return render_template('main/create.html', form=CreateForm())
     else:
         name = request.form['name']
 
-        org = Organization(name=name, owner=g.user)
+        org = Organization(name=name, owner_id=g.user.id)
 
         db.session.add(org)
         db.session.commit()
 
         membership = Membership(
-            member=g.user,
-            organization=org,
+            member_id=g.user.id,
+            organization_id=org.id,
             is_owner=True,
             joined=True
         )
@@ -97,7 +98,7 @@ def manger_members_profile(key1, key2):
     org = Organization.query.filter_by(id=key1).first()
 
     if org.owner.id != g.user.id:
-        return render_template('errors/403_organization.html'), 403
+        return render_template('errors/403_organization_owner.html'), 403
 
     user = User.query.filter_by(id=key2).first()
 
@@ -157,8 +158,8 @@ def invite(key):
             return render_template('main/invite.html', form=form, organization=org)
 
         membership = Membership(
-            member=user,
-            organization=org
+            member_id=user.id,
+            organization_id=org.id
         )
         db.session.add(membership)
         db.session.commit()
@@ -236,7 +237,7 @@ def create_position(key):
         org = Organization.query.filter_by(id=key).first()
 
         if org.owner.id != g.user.id:
-            return render_template('errors/403_organization.html'), 403
+            return render_template('errors/403_organization_owner.html'), 403
 
         return render_template('main/create_position.html', form=CreateForm())
     else:
@@ -245,7 +246,7 @@ def create_position(key):
         if form.validate_on_submit():
 
             if org.owner.id != g.user.id:
-                return render_template('errors/403_organization.html'), 403
+                return render_template('errors/403_organization_owner.html'), 403
 
             title = form.name.data
             pos = Position(title=title, organization_id=org.id)

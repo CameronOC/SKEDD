@@ -2,7 +2,7 @@
 
 from flask.ext.mail import Message
 
-from source import app, mail
+from project import app, mail
 
 
 def send_email(to, subject, template):

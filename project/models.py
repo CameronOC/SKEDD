@@ -3,7 +3,7 @@
 
 import datetime
 
-from source import db, bcrypt
+from project import db, bcrypt
 from sqlalchemy import UniqueConstraint
 
 claimed = db.Table('claimed',
@@ -101,9 +101,9 @@ class Membership(db.Model):
     # makes it so that a user can't be a member of an organization multiple times
     UniqueConstraint('member_id', 'organization_id')
 
-    def __init__(self, member, organization, is_owner=False, joined=False):
-        self.member_id = member.id
-        self.organization_id = organization.id
+    def __init__(self, member_id, organization_id, is_owner=False, joined=False):
+        self.member_id = member_id
+        self.organization_id = organization_id
         self.is_owner = is_owner
         self.joined = joined
 
@@ -125,9 +125,9 @@ class Organization(db.Model):
     owned_positions = db.relationship('Position',
                                       backref='Organization', lazy='dynamic')
 
-    def __init__(self, name, owner):
+    def __init__(self, name, owner_id):
         self.name = name
-        self.owner_id = owner.id
+        self.owner_id = owner_id
 
     def __repr__(self):
         return '<name: {}>'.format(self.name)
