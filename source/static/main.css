@@ -20,3 +20,8 @@ body {
   background-color: #2da325;
 }
 
+select.dropdownmenu
+{
+   height: 50px;
+   overflow: auto;
+}

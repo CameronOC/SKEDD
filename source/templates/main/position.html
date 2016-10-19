@@ -5,6 +5,15 @@
 <a href="/organization/{{ organization.id }}">Return to {{ organization.name }} home</a> <br>
 
 <h1>{{ position.title }}</h1>
+
+<p> Assigned user(s): </p>
+{% for person in position.assigned_users%} 
+<p>{{ person.first_name }} {{ person.last_name}} <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> edit </a> </p>
+{%endfor%}
+
+
+<br>
+
 {% if shifts %}
 <ul class="list-group">
     {% for shift in shifts %}
@@ -15,6 +24,7 @@
         </a>
     </li>
     {% endfor %}
+    <br>
     <a class="btn btn-info" href="/organization/{{ organization.id }}/position/{{position.id}}/shift/create">
          <i class="fa fa-plus" aria-hidden="true"></i> 
          Create Shift
