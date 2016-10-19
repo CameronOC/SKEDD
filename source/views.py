@@ -97,7 +97,7 @@ def manger_members_profile(key1, key2):
     org = Organization.query.filter_by(id=key1).first()
 
     if org.owner.id != g.user.id:
-        return render_template('errors/403_organization.html'), 403
+        return render_template('errors/403_organization_owner.html'), 403
 
     user = User.query.filter_by(id=key2).first()
 
@@ -236,7 +236,7 @@ def create_position(key):
         org = Organization.query.filter_by(id=key).first()
 
         if org.owner.id != g.user.id:
-            return render_template('errors/403_organization.html'), 403
+            return render_template('errors/403_organization_owner.html'), 403
 
         return render_template('main/create_position.html', form=CreateForm())
     else:
@@ -245,7 +245,7 @@ def create_position(key):
         if form.validate_on_submit():
 
             if org.owner.id != g.user.id:
-                return render_template('errors/403_organization.html'), 403
+                return render_template('errors/403_organization_owner.html'), 403
 
             title = form.name.data
             pos = Position(title=title, organization_id=org.id)
