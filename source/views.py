@@ -56,19 +56,20 @@ def home():
 @main_blueprint.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
+
     if request.method == 'GET':
         return render_template('main/create.html', form=CreateForm())
     else:
         name = request.form['name']
 
-        org = Organization(name=name, owner=g.user)
+        org = Organization(name=name, owner_id=g.user.id)
 
         db.session.add(org)
         db.session.commit()
 
         membership = Membership(
-            member=g.user,
-            organization=org,
+            member_id=g.user.id,
+            organization_id=org.id,
             is_owner=True,
             joined=True
         )
@@ -157,8 +158,8 @@ def invite(key):
             return render_template('main/invite.html', form=form, organization=org)
 
         membership = Membership(
-            member=user,
-            organization=org
+            member_id=user.id,
+            organization_id=org.id
         )
         db.session.add(membership)
         db.session.commit()
