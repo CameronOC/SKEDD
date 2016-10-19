@@ -8,7 +8,7 @@ import datetime
 from flask import render_template, Blueprint, request, session, g, redirect, url_for, flash
 from source import app, db, bcrypt
 from flask_login import login_required, login_user, logout_user
-from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftDay
+from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 
 from models import User, Organization, Membership, Position, Shift
 from decorators import check_confirmed
@@ -92,25 +92,27 @@ def organization(key):
 
     return render_template('main/organization.html', organization=org)
 
-@main_blueprint.route('/shifts', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<orgKey>/position/<posKey>/shift/create', methods=['GET', 'POST'])
 @login_required
-def shift():
+def shift(orgKey, posKey):
     if request.method == 'GET':
-        shifts = Shift.query.all()
-        return render_template('main/shifts.html', shifts=shifts, form=ShiftDay())
+        form = ShiftForm()
+        memberships = Membership.query.filter_by(organization_id=orgKey).all()
+        for c in memberships:
+            form.user.choices.append((c.member.id, c.member.first_name+' '+c.member.last_name))
+        return render_template('main/create_shift.html', form=form)
     else:
-        position = request.form['position']			# figure out what to do with this later
-        assigned_user_id = g.user.id				# and this
+        assigned_user_id = request.form['user']
         day = request.form['day']
         start_time = datetime.datetime.strptime(request.form['start_time'], '%H:%M')
         end_time = datetime.datetime.strptime(request.form['end_time'], '%H:%M')
-
-        shift = Shift(assigned_user_id=assigned_user_id, day=day, start_time=start_time, end_time=end_time)
-
+	
+        shift = Shift(position_id=posKey, assigned_user_id=assigned_user_id, day=day, start_time=start_time, end_time=end_time)
+	
         db.session.add(shift)
         db.session.commit()
-
-        return redirect('/shifts')
+	
+        return redirect(url_for('main.position', key=orgKey, key2=posKey))
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
@@ -176,6 +178,8 @@ def confirm_invite(key, token):
         if user.confirmed:
             membership.joined = True
             db.session.commit()
+            if g.user is None or g.user.id != user.id:
+                login_user(user)
             flash('You have now joined ' + org.name, 'success')
             return redirect(url_for('main.home'))
         elif form.validate_on_submit():
@@ -185,6 +189,8 @@ def confirm_invite(key, token):
             user.confirmed_on = datetime.datetime.now()
             membership.joined = True
             db.session.commit()
+            if g.user is None or g.user.id != user.id:
+                login_user(user)
             flash('You have now joined ' + org.name, 'success')
             return redirect(url_for('main.home'))
         else:
@@ -204,7 +210,8 @@ def position(key, key2):
         return render_template('errors/403_organization.html'), 403
 
     pos = Position.query.filter_by(id=key2).first()
-    return render_template('main/position.html', position=pos, organization=org)
+    shifts = pos.assigned_shifts.all()
+    return render_template('main/position.html', position=pos, organization=org, shifts=shifts)
 
 
 @main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])

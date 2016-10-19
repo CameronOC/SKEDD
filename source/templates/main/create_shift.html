@@ -15,17 +15,18 @@
 <!-- Collect information about a shift -->
 <form action="" method="post" name="create">
   {{ form.csrf_token }}
-  <!-- Text field for entering position -->
+  <!-- Spinner for selecting assigned user -->
   <p>
-    {{ form.position(placeholder="Position") }}
+    {{ form.user(placeholder="User") }}
     <span class="error">
-      {% if form.position.errors %}
-        {% for error in form.position.errors %}
+      {% if form.day.errors %}
+        {% for error in form.day.errors %}
           {{ error }}
         {% endfor %}
       {% endif %}
     </span>
   </p>
+
   <!-- Spinner for selecting day of the week -->
   <p>
     {{ form.day(placeholder="Day") }}
