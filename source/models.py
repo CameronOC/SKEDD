@@ -6,11 +6,11 @@ import datetime
 from source import db, bcrypt
 from sqlalchemy import UniqueConstraint
 
-
 claimed = db.Table('claimed',
                    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
                    db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
                    )
+
 
 class User(db.Model):
     __tablename__ = "users"
@@ -61,7 +61,6 @@ class User(db.Model):
 
 
 class Shift(db.Model):
-
     __tablename__ = "shifts"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -83,8 +82,10 @@ class Shift(db.Model):
         self.start_time = start_time
         self.end_time = end_time
 
-        zero = datetime.datetime.strptime('00:00', '%H:%M')	# zero o'clock datetime to add timedelta object to (end_time - start_time)
-        self.duration = zero + (self.end_time - self.start_time) # this is how we convert from timedelta obj to datetime obj
+        zero = datetime.datetime.strptime('00:00',
+                                          '%H:%M')  # zero o'clock datetime to add timedelta object to (end_time - start_time)
+        self.duration = zero + (
+        self.end_time - self.start_time)  # this is how we convert from timedelta obj to datetime obj
 
 
 class Membership(db.Model):
@@ -144,7 +145,7 @@ class Position(db.Model):
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     # Users many to many relationship with position
     assigned_users = db.relationship(
-        'User', 
+        'User',
         secondary=claimed,
         backref=db.backref('Position', lazy='dynamic'))
 

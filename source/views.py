@@ -87,17 +87,17 @@ def create():
 def organization(key):
     org = Organization.query.filter_by(id=key).first()
 
-    #make the check in the html not here
-    #if org.owner.id != g.user.id:
+    # make the check in the html not here
+    # if org.owner.id != g.user.id:
     #    return render_template('errors/403_organization_owner.html'), 403
 
     return render_template('main/organization.html', organization=org)
 
+
 @main_blueprint.route('/organization/<key1>/member/<key2>', methods=['GET', ])
 @login_required
-#add owns_org 
+# add owns_org
 def manger_members_profile(key1, key2):
-
     org = Organization.query.filter_by(id=key1).first()
 
     if org.owner.id != g.user.id:
@@ -115,20 +115,22 @@ def shift(orgKey, posKey):
         form = ShiftForm()
         memberships = Membership.query.filter_by(organization_id=orgKey).all()
         for c in memberships:
-            form.user.choices.append((c.member.id, c.member.first_name+' '+c.member.last_name))
+            form.user.choices.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
         return render_template('main/create_shift.html', form=form)
     else:
         assigned_user_id = request.form['user']
         day = request.form['day']
         start_time = datetime.datetime.strptime(request.form['start_time'], '%H:%M')
         end_time = datetime.datetime.strptime(request.form['end_time'], '%H:%M')
-	
-        shift = Shift(position_id=posKey, assigned_user_id=assigned_user_id, day=day, start_time=start_time, end_time=end_time)
-	
+
+        shift = Shift(position_id=posKey, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
+                      end_time=end_time)
+
         db.session.add(shift)
         db.session.commit()
-	
+
         return redirect(url_for('main.position', key=orgKey, key2=posKey))
+
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
@@ -222,8 +224,8 @@ def confirm_invite(key, token):
 def position(key, key2):
     org = Organization.query.filter_by(id=key).first()
 
-    #wrong
-    #if org.owner.id != g.user.id:
+    # wrong
+    # if org.owner.id != g.user.id:
     #    return render_template('errors/403_organization.html'), 403
 
     pos = Position.query.filter_by(id=key2).first()
@@ -259,34 +261,40 @@ def create_position(key):
         else:
             return redirect('/organization/' + str(org.id))
 
+
 @app.route('/assign', methods=['POST'])
 @login_required
 def assign():
-    #get the user
+    # get the user
     myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
-    #get the position
+    # get the position
     mypos = Position.query.filter_by(title=request.form['position']).first_or_404()
-    #get org to redirect back to the previous page
+    # get org to redirect back to the previous page
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    #append the assigned_users table
+    # if this user already exists return flash
+    if myuser in mypos.assigned_users:
+        flash('This persons position is already assigned to ' + mypos.title, 'danger')
+        return render_template('main/member.html', user=myuser, organization=org)
+    # append the assigned_users table
     mypos.assigned_users.append(myuser)
-    #commit it to the database
+    # commit it to the database
     db.session.commit()
-    #redirects to the page before
+    # redirects to the page before
     return render_template('main/member.html', user=myuser, organization=org)
+
 
 @app.route('/unassign', methods=['POST'])
 @login_required
 def unassign():
-    #get the user
+    # get the user
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
-    #get the position
+    # get the position
     mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
-    #get org to redirect back to the previous page
+    # get org to redirect back to the previous page
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    #remove the user from the table
+    # remove the user from the table
     mypos.assigned_users.remove(myuser)
-    #commit the changes to the database
+    # commit the changes to the database
     db.session.commit()
-    #redirects to the page before
+    # redirects to the page before
     return render_template('main/member.html', user=myuser, organization=org)
