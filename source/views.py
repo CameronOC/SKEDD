@@ -265,7 +265,7 @@ def assign():
     #get the user
     myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
     #get the position
-    mypos = Position.query.filter_by(id=request.form["assignposid"]).first_or_404()
+    mypos = Position.query.filter_by(title=request.form['position']).first_or_404()
     #get org to redirect back to the previous page
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
     #append the assigned_users table

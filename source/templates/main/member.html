@@ -2,13 +2,14 @@
 
 {% block content %}
 
+
 <h1>{{user.first_name}} {{user.last_name}}'s Profile: </h1>
 
 <p>First name: {{user.first_name}}</p>
 <p>Last name: {{user.last_name}}</p>
 <p>Email: {{user.email}}</p>
 
-<h3>Open positions in {{organization.name}} or positions assigned to {{user.first_name}}</h3>
+<h3>Positions assigned to {{user.first_name}}</h3>
 
 {% for pos in organization.owned_positions %}
   {% for person in pos.assigned_users%}
@@ -27,23 +28,27 @@
 
   	{% endif %}
   {% endfor %}
-  	{% if not pos.assigned_users %} <!-- This checks to see if the pos.assigned_users list is empty -->
- 		
- 		<p><b>{{pos.title}}</b> assign {{user.first_name}} to this position
-
- 		<td>
-  			<form action="{{ url_for('assign') }}" method="post">
-    		<input type="hidden" name="assignuserid" value="{{ user.id }}"/>
-    		<input type="hidden" name="assignposid" value="{{ pos.id }}"/>
-    		<input type="hidden" name="org" value="{{organization.id}}">
-    		<input type="submit" class="btn btn-xs btn-danger" value="Assign"/>
-  			</form>
-		</td>
-
-		</p>
-	{% endif %}
 {% endfor %}
 
+<br>
+
+<form action=" {{ url_for('assign') }} " method='post'>    
+  <h3> Positions in {{organization.name}} </h3>
+    <select name='position'>
+      {%for pos in organization.owned_positions %}
+        <option value='{{pos.title}}'> {{pos.title}} </option>
+      {%endfor%}         
+    </select>
+
+  <input type="hidden" name="assignuserid" value="{{ user.id }}"/>
+  <input type="hidden" name="org" value="{{organization.id}}">
+  <input type="submit" class="btn btn-xs btn-danger" value="assign"/>
+</form>
+
+<br>
+
+<h3> Shifts </h3>
+<p> To my understanding this is suppose to be a calender so im not going to bother displaying anything here </p>
 <!--
 
 display the position/positions in that organization assigned to the user
