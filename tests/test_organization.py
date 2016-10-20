@@ -75,7 +75,6 @@ class TestOrganization(TestCase):
         """
 
         org = org_utils.get_organization(1)
-        print org.name
         assert org.id == 1
         assert org.owner_id == 1
         assert org.name == 'Test'
@@ -88,7 +87,9 @@ class TestOrganization(TestCase):
         Tests getting a position by ID
         :return:
         """
-        
+        position = org_utils.get_position(1)
+        assert position.id == self.position.id
+        assert position.title == self.position.title
 
 
     def test_create_organization(self):
@@ -105,3 +106,10 @@ class TestOrganization(TestCase):
         assert membership.organization_id == organization.id
         assert membership.joined == True
         assert membership.is_owner == True
+
+
+    def test_invite_member(self):
+        """
+        Test sending an invite to join an organization to a user and create a dummy account if needed
+        :return:
+        """
