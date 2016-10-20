@@ -78,19 +78,6 @@ def organization(key):
     return render_template('main/organization.html', organization=org)
 
 
-@main_blueprint.route('/organization/<key1>/member/<key2>', methods=['GET', ])
-@login_required
-@check_confirmed
-@owns_organization
-# add owns_org
-def manager_members_profile(key1, key2):
-    org = utils.organization.get_organization(key)
-
-    user = User.query.filter_by(id=key2).first()
-
-    return render_template('main/member.html', user=user, organization=org)
-
-
 @main_blueprint.route('/organization/<orgKey>/position/<posKey>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
@@ -195,6 +182,19 @@ def create_position(key):
             return redirect('/organization/' + str(org.id))
 
 
+@main_blueprint.route('/organization/<key>/member/<key2>', methods=['GET', ])
+@login_required
+@check_confirmed
+@owns_organization
+# add owns_org
+def manager_members_profile(key, key2):
+    org = utils.organization.get_organization(key)
+
+    user = User.query.filter_by(id=key2).first()
+
+    return render_template('main/member.html', user=user, organization=org)
+
+
 @app.route('/assign', methods=['POST'])
 @login_required
 @check_confirmed
@@ -214,7 +214,7 @@ def assign():
     # commit it to the database
     db.session.commit()
     # redirects to the page before
-    return render_template('main/member.html', user=myuser, organization=org)
+    return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
 
 
 @app.route('/unassign', methods=['POST'])
@@ -232,4 +232,4 @@ def unassign():
     # commit the changes to the database
     db.session.commit()
     # redirects to the page before
-    return render_template('main/member.html', user=myuser, organization=org)
+    return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
