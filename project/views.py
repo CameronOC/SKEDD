@@ -121,37 +121,41 @@ def invite(key):
 
 @main_blueprint.route('/organization/<key>/join/<token>', methods=['GET', 'POST'])
 def confirm_invite(key, token):
-    try:
-        email = confirm_token(token)
-        user = User.query.filter_by(email=email).first_or_404()
-        org = Organization.query.filter_by(id=key).first()
-        membership = user.memberships.filter_by(organization_id=org.id).first_or_404()
-        form = JoinForm(request.form)
+    email = confirm_token(token)
+    user = User.query.filter_by(email=email).first_or_404()
+    org = utils.organization.get_organization(key)
+    membership = user.memberships.filter_by(organization_id=org.id).first_or_404()
 
-        if user.confirmed:
-            membership.joined = True
-            db.session.commit()
-            if g.user is None or g.user.id != user.id:
-                login_user(user)
-            flash('You have now joined ' + org.name, 'success')
-            return redirect(url_for('main.home'))
-        elif form.validate_on_submit():
-            # will need error handling
-            user.password = bcrypt.generate_password_hash(form.password.data)
-            user.confirmed = True
-            user.confirmed_on = datetime.datetime.now()
-            membership.joined = True
-            db.session.commit()
-            if g.user is None or g.user.id != user.id:
-                login_user(user)
-            flash('You have now joined ' + org.name, 'success')
-            return redirect(url_for('main.home'))
-        else:
-            return render_template('main/join.html', form=form, organization=org)
-
-    except:
-        flash('The confirmation link is invalid or has expired.', 'danger')
+    if not user.confirmed:
+        return redirect('/organization/' + key + '/setup/' + token)
+    else:
+        membership.joined = True
+        db.session.commit()
+        if g.user is None or g.user.id != user.id:
+            login_user(user)
+        flash('You have now joined ' + org.name, 'success')
         return redirect(url_for('main.home'))
+
+@main_blueprint.route('/organization/<key>/setup/<token>', methods=['GET', 'POST'])
+def setup_account(key, token):
+    form = JoinForm()
+    email = confirm_token(token)
+    user = User.query.filter_by(email=email).first_or_404()
+    org = utils.organization.get_organization(key)
+    membership = user.memberships.filter_by(organization_id=org.id).first_or_404()
+    if form.validate_on_submit():
+        # will need error handling
+        user.password = bcrypt.generate_password_hash(form.password.data)
+        user.confirmed = True
+        user.confirmed_on = datetime.datetime.now()
+        membership.joined = True
+        db.session.commit()
+        if g.user is None or g.user.id != user.id:
+            login_user(user)
+        flash('You have now joined ' + org.name, 'success')
+        return redirect(url_for('main.home'))
+    else:
+        return render_template('main/setup.html', form=form, organization=org)
 
 
 @main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', 'POST'})

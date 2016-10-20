@@ -3,7 +3,7 @@ from project.models import Organization, User, Membership
 from project.email import send_email
 from project.utils.token import confirm_token, generate_invitation_token
 
-from flask import render_template, flash, url_for
+from flask import render_template, flash, url_for, g
 
 def create_organization(name, owner_id):
     """
@@ -39,18 +39,23 @@ def get_organization(id):
     return Organization.query.get(id)
 
 
-def is_in_org(org, user):
+def get_membership(org, user):
     """
     Checks if a user is in an organization
     :param organization_id:
     :param user_id:
     :return:
     """
-    membership = Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
+    return Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
 
-    if membership is not None:
-        return True
-    return False
+
+def confirm_user(user, password=None):
+    if password is not None:
+        user.password = bcrypt.generate_password_hash(form.password.data)
+    user.confirmed = True
+    user.confirmed_on = datetime.datetime.now()
+    db.session.commit()
+
 
 
 def invite_member(org, email, first_name, last_name):
@@ -73,7 +78,9 @@ def invite_member(org, email, first_name, last_name):
 
     db.session.commit()
 
-    if is_in_org(org, user):
+    membership = get_membership(org, user)
+
+    if membership is not None:
         flash('This person is already a member of ' + org.name, 'danger')
     else:
         membership = Membership(
@@ -96,3 +103,13 @@ def invite_member(org, email, first_name, last_name):
         flash('You succesfully invited ' + user.first_name + ' ' + user.last_name + '.', 'success')
 
     return membership
+
+
+def confirm_invite(membership):
+    """
+    Confirms an invitation to an organization, if valid
+    :param key:
+    :param token:
+    :return:
+    """
+    return None
