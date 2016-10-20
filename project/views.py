@@ -11,11 +11,10 @@ from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
 from project import app, db, bcrypt
-from project.decorators import check_confirmed
+from decorators import check_confirmed, owns_organization
 from project.email import send_email
-
-import project.utils.organization as org_utils
-from project.utils.token import confirm_token, generate_invitation_token
+import utils.organization
+from utils.token import confirm_token, generate_invitation_token
 
 ################
 #    config    #
@@ -60,7 +59,7 @@ def home():
 def create():
     form = CreateForm(request.form)
     if form.validate_on_submit():
-        org, membership = org_utils.create_organization(form.name.data, g.user.id)
+        org, membership = utils.organization.create_organization(form.name.data, g.user.id)
         return redirect('/organization/' + str(org.id))
 
     return render_template('main/create.html', form=CreateForm())
@@ -69,18 +68,16 @@ def create():
 @main_blueprint.route('/organization/<key>', methods=['GET', ])
 @login_required
 def organization(key):
-    org = org_utils.get_organization(key)
+    org = utils.organization.get_organization(key)
     return render_template('main/organization.html', organization=org)
 
 
 @main_blueprint.route('/organization/<key1>/member/<key2>', methods=['GET', ])
 @login_required
+@owns_organization
 # add owns_org
 def manager_members_profile(key1, key2):
-    org = Organization.query.filter_by(id=key1).first()
-
-    if org.owner.id != g.user.id:
-        return render_template('errors/403_organization_owner.html'), 403
+    org = utils.organization.get_organization(key)
 
     user = User.query.filter_by(id=key2).first()
 
@@ -114,53 +111,12 @@ def shift(org_key, pos_key):
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
 def invite(key):
-    # get the organization to invite users to
-    org = Organization.query.filter_by(id=key).first()
+    org = utils.organization.get_organization(key)
     form = InviteForm(request.form)
     if form.validate_on_submit():
+        utils.organization.invite_member(org, invite_form)
 
-        user = User.query.filter_by(email=form.email.data).first()
-
-        if user is None:
-            user = User(
-                first_name=form.first_name.data,
-                last_name=form.last_name.data,
-                email=form.email.data,
-                password="temp",
-                confirmed=False
-            )
-            db.session.add(user)
-
-        db.session.commit()
-
-        membership = Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
-
-        if membership is not None or user.id == org.owner.id:
-            flash('This person is already a member of ' + org.name, 'danger')
-            return render_template('main/invite.html', form=form, organization=org)
-
-        membership = Membership(
-            member_id=user.id,
-            organization_id=org.id
-        )
-        db.session.add(membership)
-        db.session.commit()
-
-        token = generate_invitation_token(user.email)
-
-        confirm_url = url_for('main.confirm_invite', key=org.id, token=token, _external=True)
-
-        html = render_template('emails/invitation.html', confirm_url=confirm_url, user=user, organization=org)
-
-        subject = "You've been invited to use SKEDD"
-
-        send_email(user.email, subject, html)
-
-        flash('You succesfully invited ' + user.first_name + ' ' + user.last_name + '.', 'success')
-
-        # return redirect(url_for('user.unconfirmed'))
-
-    return render_template('main/invite.html', form=form, organization=org)
+    return render_template('main/invite.html', form=InviteForm(), organization=org)
 
 
 @main_blueprint.route('/organization/<key>/join/<token>', methods=['GET', 'POST'])
@@ -201,7 +157,7 @@ def confirm_invite(key, token):
 @main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', 'POST'})
 @login_required
 def position(key, key2):
-    org = Organization.query.filter_by(id=key).first()
+    org = utils.organization.get_organization(key)
 
     pos = Position.query.filter_by(id=key2).first()
     shifts = pos.assigned_shifts.all()
@@ -210,22 +166,16 @@ def position(key, key2):
 
 @main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
 @login_required
+@owns_organization
 def create_position(key):
     if request.method == 'GET':
         org = Organization.query.filter_by(id=key).first()
-
-        if org.owner.id != g.user.id:
-            return render_template('errors/403_organization_owner.html'), 403
-
         return render_template('main/create_position.html', form=CreateForm())
+
     else:
         org = Organization.query.filter_by(id=key).first()
         form = PositionForm(request.form)
         if form.validate_on_submit():
-
-            if org.owner.id != g.user.id:
-                return render_template('errors/403_organization_owner.html'), 403
-
             title = form.name.data
             pos = Position(title=title, organization_id=org.id)
             db.session.add(pos)

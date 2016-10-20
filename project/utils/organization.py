@@ -39,14 +39,27 @@ def get_organization(id):
     return Organization.query.get(id)
 
 
-def invite_member(organization_id, email, first_name, last_name):
+def is_in_org(org, user):
+    """
+    Checks if a user is in an organization
+    :param organization_id:
+    :param user_id:
+    :return:
+    """
+    membership = Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
+
+    if membership is not None:
+        return True
+    return False
+
+
+def invite_member(org, invite_form):
     """
     Invite a user to the organization id, creating a dummy account if needed
     :param organization_id:
     :return:
     """
     user = User.query.filter_by(email=email.data).first()
-    org = Organization.query.filter_by(id=organization_id).first()
 
     if user is None:
         user = User(
@@ -60,25 +73,26 @@ def invite_member(organization_id, email, first_name, last_name):
 
     db.session.commit()
 
-    membership = Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
-
-    if membership is not None or user.id == org.owner.id:
+    if is_in_org(org, user):
         flash('This person is already a member of ' + org.name, 'danger')
-        return render_template('main/invite.html', form=form, organization=org)
+    else:
+        membership = Membership(
+            member_id=user.id,
+            organization_id=org.id
+        )
+        db.session.add(membership)
+        db.session.commit()
 
-    membership = Membership(
-        member_id=user.id,
-        organization_id=org.id
-    )
-    db.session.add(membership)
-    db.session.commit()
+        token = generate_invitation_token(user.email)
 
-    token = generate_invitation_token(user.email)
+        confirm_url = url_for('main.confirm_invite', key=org.id, token=token, _external=True)
 
-    confirm_url = url_for('main.confirm_invite', key=org.id, token=token, _external=True)
+        html = render_template('emails/invitation.html', confirm_url=confirm_url, user=user, organization=org)
 
-    html = render_template('emails/invitation.html', confirm_url=confirm_url, user=user, organization=org)
+        subject = "You've been invited to use SKEDD"
 
-    subject = "You've been invited to use SKEDD"
+        send_email(user.email, subject, html)
 
-    send_email(user.email, subject, html)
+        flash('You succesfully invited ' + user.first_name + ' ' + user.last_name + '.', 'success')
+
+    return membership
