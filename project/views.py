@@ -49,6 +49,10 @@ def landing():
 @login_required
 @check_confirmed
 def home():
+    """
+    Renders a user's home page
+    :return:
+    """
     orgs = g.user.orgs_owned.all()
     memberships = g.user.memberships.filter_by(is_owner=False).all()
     return render_template('main/home.html', organizations=orgs, memberships=memberships)
@@ -56,6 +60,7 @@ def home():
 
 @main_blueprint.route('/create', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def create():
     form = CreateForm(request.form)
     if form.validate_on_submit():
@@ -67,6 +72,7 @@ def create():
 
 @main_blueprint.route('/organization/<key>', methods=['GET', ])
 @login_required
+@check_confirmed
 def organization(key):
     org = utils.organization.get_organization(key)
     return render_template('main/organization.html', organization=org)
@@ -74,6 +80,7 @@ def organization(key):
 
 @main_blueprint.route('/organization/<key1>/member/<key2>', methods=['GET', ])
 @login_required
+@check_confirmed
 @owns_organization
 # add owns_org
 def manager_members_profile(key1, key2):
@@ -86,6 +93,7 @@ def manager_members_profile(key1, key2):
 
 @main_blueprint.route('/organization/<orgKey>/position/<posKey>/shift/create', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def shift(org_key, pos_key):
     if request.method == 'GET':
         form = ShiftForm()
@@ -110,6 +118,7 @@ def shift(org_key, pos_key):
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def invite(key):
     org = utils.organization.get_organization(key)
     form = InviteForm(request.form)
@@ -121,45 +130,39 @@ def invite(key):
 
 @main_blueprint.route('/organization/<key>/join/<token>', methods=['GET', 'POST'])
 def confirm_invite(key, token):
-    email = confirm_token(token)
-    user = User.query.filter_by(email=email).first_or_404()
-    org = utils.organization.get_organization(key)
-    membership = user.memberships.filter_by(organization_id=org.id).first_or_404()
 
-    if not user.confirmed:
+    membership = utils.organization.membership_from_key_token(key, token)
+    if membership is None:
+        flash('Invalid or expired confirmation link', 'danger')
+        return redirect(url_for('main.home'))
+
+    if not membership.member.confirmed:
         return redirect('/organization/' + key + '/setup/' + token)
+
     else:
-        membership.joined = True
-        db.session.commit()
-        if g.user is None or g.user.id != user.id:
-            login_user(user)
-        flash('You have now joined ' + org.name, 'success')
+        utils.organization.confirm_invite(membership)
         return redirect(url_for('main.home'))
 
 @main_blueprint.route('/organization/<key>/setup/<token>', methods=['GET', 'POST'])
 def setup_account(key, token):
     form = JoinForm()
-    email = confirm_token(token)
-    user = User.query.filter_by(email=email).first_or_404()
-    org = utils.organization.get_organization(key)
-    membership = user.memberships.filter_by(organization_id=org.id).first_or_404()
+
+    membership = utils.organization.membership_from_key_token(key, token)
+    if membership is None:
+        flash('Invalid or expired confirmation link', 'danger')
+        return redirect(url_for('main.home'))
+
     if form.validate_on_submit():
-        # will need error handling
-        user.password = bcrypt.generate_password_hash(form.password.data)
-        user.confirmed = True
-        user.confirmed_on = datetime.datetime.now()
-        membership.joined = True
-        db.session.commit()
-        if g.user is None or g.user.id != user.id:
-            login_user(user)
-        flash('You have now joined ' + org.name, 'success')
+        utils.organization.confirm_user(membership.member, form.password.data)
+        utils.organization.confirm_invite(membership)
         return redirect(url_for('main.home'))
     else:
-        return render_template('main/setup.html', form=form, organization=org)
+        return render_template('main/setup.html', form=form, organization=membership.organization)
 
 
 @main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', 'POST'})
 @login_required
+@check_confirmed
 def position(key, key2):
     org = utils.organization.get_organization(key)
 
@@ -170,6 +173,7 @@ def position(key, key2):
 
 @main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 @owns_organization
 def create_position(key):
     if request.method == 'GET':
@@ -193,6 +197,7 @@ def create_position(key):
 
 @app.route('/assign', methods=['POST'])
 @login_required
+@check_confirmed
 def assign():
     # get the user
     myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
@@ -214,6 +219,7 @@ def assign():
 
 @app.route('/unassign', methods=['POST'])
 @login_required
+@check_confirmed
 def unassign():
     # get the user
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
