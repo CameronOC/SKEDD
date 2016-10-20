@@ -10,7 +10,7 @@ def create_organization(name, owner_id):
     :param name:
     :return:
     """
-    org = Organization(name, owner_id)
+    org = Organization(name=name, owner_id=owner_id)
     db.session.add(org)
     db.session.commit()
 
@@ -24,3 +24,13 @@ def create_organization(name, owner_id):
     db.session.commit()
 
     return org, membership
+
+
+def get_organization(id):
+    """
+    gets an organization by id and returns the object or None
+    if it doesn't exist
+    :param id:
+    :return:
+    """
+    return Organization.query.get(id)
