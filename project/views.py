@@ -114,7 +114,7 @@ def invite(key):
     org = utils.organization.get_organization(key)
     form = InviteForm(request.form)
     if form.validate_on_submit():
-        utils.organization.invite_member(org, invite_form)
+        utils.organization.invite_member(org, form.email.data, form.first_name.data, form.last_name.data)
 
     return render_template('main/invite.html', form=InviteForm(), organization=org)
 

@@ -53,19 +53,19 @@ def is_in_org(org, user):
     return False
 
 
-def invite_member(org, invite_form):
+def invite_member(org, email, first_name, last_name):
     """
     Invite a user to the organization id, creating a dummy account if needed
     :param organization_id:
     :return:
     """
-    user = User.query.filter_by(email=email.data).first()
+    user = User.query.filter_by(email=email).first()
 
     if user is None:
         user = User(
-            first_name=first_name.data,
-            last_name=last_name.data,
-            email=email.data,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
             password="temp",
             confirmed=False
         )
