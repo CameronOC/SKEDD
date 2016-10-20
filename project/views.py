@@ -13,6 +13,8 @@ from models import User, Organization, Membership, Position, Shift
 from project import app, db, bcrypt
 from project.decorators import check_confirmed
 from project.email import send_email
+
+import project.utils.organization as org_utils
 from project.utils.token import confirm_token, generate_invitation_token
 
 ################
@@ -56,45 +58,25 @@ def home():
 @main_blueprint.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
-
-    if request.method == 'GET':
-        return render_template('main/create.html', form=CreateForm())
-    else:
-        name = request.form['name']
-
-        org = Organization(name=name, owner_id=g.user.id)
-
-        db.session.add(org)
-        db.session.commit()
-
-        membership = Membership(
-            member_id=g.user.id,
-            organization_id=org.id,
-            is_owner=True,
-            joined=True
-        )
-        db.session.add(membership)
-        db.session.commit()
-
+    form = CreateForm(request.form)
+    if form.validate_on_submit():
+        org, membership = org_utils.create_organization(form.name.data, g.user.id)
         return redirect('/organization/' + str(org.id))
+
+    return render_template('main/create.html', form=CreateForm())
 
 
 @main_blueprint.route('/organization/<key>', methods=['GET', ])
 @login_required
 def organization(key):
-    org = Organization.query.filter_by(id=key).first()
-
-    # make the check in the html not here
-    # if org.owner.id != g.user.id:
-    #    return render_template('errors/403_organization_owner.html'), 403
-
+    org = org_utils.get_organization(key)
     return render_template('main/organization.html', organization=org)
 
 
 @main_blueprint.route('/organization/<key1>/member/<key2>', methods=['GET', ])
 @login_required
 # add owns_org
-def manger_members_profile(key1, key2):
+def manager_members_profile(key1, key2):
     org = Organization.query.filter_by(id=key1).first()
 
     if org.owner.id != g.user.id:
@@ -107,10 +89,10 @@ def manger_members_profile(key1, key2):
 
 @main_blueprint.route('/organization/<orgKey>/position/<posKey>/shift/create', methods=['GET', 'POST'])
 @login_required
-def shift(orgKey, posKey):
+def shift(org_key, pos_key):
     if request.method == 'GET':
         form = ShiftForm()
-        memberships = Membership.query.filter_by(organization_id=orgKey).all()
+        memberships = Membership.query.filter_by(organization_id=org_key).all()
         for c in memberships:
             form.user.choices.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
         return render_template('main/create_shift.html', form=form)
@@ -120,13 +102,13 @@ def shift(orgKey, posKey):
         start_time = datetime.datetime.strptime(request.form['start_time'], '%H:%M')
         end_time = datetime.datetime.strptime(request.form['end_time'], '%H:%M')
 
-        shift = Shift(position_id=posKey, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
+        shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
                       end_time=end_time)
 
         db.session.add(shift)
         db.session.commit()
 
-        return redirect(url_for('main.position', key=orgKey, key2=posKey))
+        return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
@@ -220,10 +202,6 @@ def confirm_invite(key, token):
 @login_required
 def position(key, key2):
     org = Organization.query.filter_by(id=key).first()
-
-    # wrong
-    # if org.owner.id != g.user.id:
-    #    return render_template('errors/403_organization.html'), 403
 
     pos = Position.query.filter_by(id=key2).first()
     shifts = pos.assigned_shifts.all()
