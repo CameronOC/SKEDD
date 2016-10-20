@@ -29,8 +29,5 @@ def owns_organization(fn):
 
         if org.owner.id != g.user.id:
             abort(render_template('errors/403_organization_owner.html'), 403)
-        # Do something with value...
-        if key == '2':
-            abort(400)
         return fn(*args, **kwargs)
     return decorated_view
