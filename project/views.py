@@ -78,7 +78,7 @@ def organization(key):
     return render_template('main/organization.html', organization=org)
 
 
-@main_blueprint.route('/organization/<orgKey>/position/<posKey>/shift/create', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 def shift(org_key, pos_key):
