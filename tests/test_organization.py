@@ -113,3 +113,7 @@ class TestOrganization(TestCase):
         Test sending an invite to join an organization to a user and create a dummy account if needed
         :return:
         """
+        
+
+    
+
