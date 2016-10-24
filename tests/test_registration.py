@@ -37,6 +37,8 @@ class BaseTestCase(TestCase):
         db.session.remove()
         db.drop_all()
 
+class TestResistration(BaseTestCase):
+
     def test_check_success_register_form(self):
         """
         Test that correct data lets a user register
@@ -74,11 +76,13 @@ class BaseTestCase(TestCase):
         )
         self.assertFalse(form.validate())
 
+class TestLogin(BaseTestCase):
+
     def test_check_login(self):
         """
         Tests if user can login with valid info
         """
-        form = LoginForm(email='ad@min.com', password='admin_user')
+        form = LoginForm(email='test@test.com', password='test_user')
         self.assertTrue(form.validate())
 
     def test_check_invalid_email(self):
@@ -87,6 +91,8 @@ class BaseTestCase(TestCase):
         """
         form = LoginForm(email='unknown', password='unkown')
         self.assertFalse(form.validate())
+
+class TestChangePassword(BaseTestCase):
 
     def test_check_success_change_password(self):
         """
@@ -108,6 +114,8 @@ class BaseTestCase(TestCase):
         """
         form = ChangePasswordForm(password='123', confirm='123')
         self.assertFalse(form.validate())
+
+class TestTokens(BaseTestCase):
 
     def test_confirm_token_route_valid_token(self):
         """
@@ -194,4 +202,3 @@ class BaseTestCase(TestCase):
         db.session.commit()
         token = generate_invitation_token('test@test5.com')
         self.assertFalse(confirm_invitation_token(token, -1))
-

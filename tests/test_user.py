@@ -12,7 +12,7 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         db.create_all()
-        user = User(email="ad@min.com", password="admin_user", first_name='local', last_name='admin')
+        user = User(email="ad@min.com", password="admin_user", first_name='local', last_name='admin', confirmed = True)
         db.session.add(user)
         db.session.commit()
 
@@ -20,9 +20,5 @@ class BaseTestCase(TestCase):
         db.session.remove()
         db.drop_all()
 
-class TestUserForms(BaseTestCase):
-    pass
-
-
-class TestUserViews(BaseTestCase):
+class TestUser(BaseTestCase):
     pass
