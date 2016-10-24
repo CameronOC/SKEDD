@@ -108,8 +108,24 @@ class TestOrganization(TestCase):
         assert membership.is_owner == True
 
 
-    def test_invite_member(self):
+    def test_invite__unconfirmed_member(self):
         """
-        Test sending an invite to join an organization to a user and create a dummy account if needed
+        Test sending an invite to join an organization to a user that has not already
+        created an account
         :return:
         """
+        membership = org_utils.invite_member(self.organization, 'invitee@org.com', 'Alice', 'Green')
+
+        user = membership.member
+        org = membership.organization
+
+        assert membership.joined == False
+
+        assert user.email == 'invitee@org.com'
+        assert user.first_name == 'Alice'
+        assert user.last_name == 'Green'
+        assert user.confirmed == False
+
+        assert org.id == self.organization.id
+        assert org.name == self.organization.name
+        assert org.owner_id == self.organization.owner_id

@@ -1,6 +1,6 @@
 import datetime
 from project import db, bcrypt
-from project.models import Organization, User, Membership
+from project.models import Organization, User, Membership, Position
 from project.email import send_email
 from project.utils.token import confirm_token, generate_invitation_token
 
@@ -49,6 +49,13 @@ def get_organization(id):
     """
     return Organization.query.get(id)
 
+def get_position(id):
+    """
+    Gets a position object based on id
+    :param id:
+    :return:
+    """
+    return Position.query.get(id)
 
 def get_membership(org, user):
     """
