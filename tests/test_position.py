@@ -34,11 +34,6 @@ class BaseTestCase(TestCase):
 
         organization, membership = create_organization('Test-Org', owner.id)
 
-        assert organization.name == 'Test-Org'
-        assert organization.owner_id == owner.id
-        assert membership.member_id == owner.id
-        assert membership.organization_id == organization.id
-        assert membership.joined == True
-        assert membership.is_owner == True
+        
 
 
