@@ -1,7 +1,8 @@
 from flask_testing import TestCase
 
 from project import app, db
-from project.models import Position
+from project.models import User
+from project.utils.organization import create_organization
 
 
 class BaseTestCase(TestCase):
@@ -12,10 +13,32 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         db.create_all()
-        position = Position(title="position", organization_id="1")
-        db.session.add(position)
+        user = User(email="ad@min.com", password="admin_user", first_name='local', last_name='admin', confirmed=True)
+        db.session.add(user)
         db.session.commit()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+
+    def test_create_position(self):
+        owner = User(
+            email='owner@organization.com',
+            first_name='Organization',
+            last_name='Owner',
+            password='password',
+            confirmed=True
+        )
+        db.session.add(owner)
+        db.session.commit()
+
+        organization, membership = create_organization('Test-Org', owner.id)
+
+        assert organization.name == 'Test-Org'
+        assert organization.owner_id == owner.id
+        assert membership.member_id == owner.id
+        assert membership.organization_id == organization.id
+        assert membership.joined == True
+        assert membership.is_owner == True
+
+
