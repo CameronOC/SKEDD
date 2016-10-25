@@ -1,6 +1,6 @@
 import datetime
 from project import db, bcrypt
-from project.models import Organization, User, Membership
+from project.models import Organization, User, Membership, Shift
 from project.email import send_email
 from project.utils.token import confirm_token, generate_invitation_token
 
@@ -149,3 +149,26 @@ def confirm_invite(membership):
     if g.user is None or g.user.id != membership.member.id:
         login_user(membership.member)
     flash('You have now joined ' + membership.organization.name, 'success')
+    
+# USED IN VIEWS.SHIFT()
+def create_shift(pos_key, assigned_user_id, day, start_time, end_time):
+    # create shift with parameters
+    shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
+                    end_time=end_time)
+    
+    # add shift to database
+    db.session.add(shift)
+    db.session.commit()
+    
+# USED IN VIEWS.SHIFT()
+def gather_members_for_shift(org_key):
+    # filter users by members of current org in current position
+    eligible_members = Membership.query.filter_by(organization_id=org_key).all()
+    # create list to fill in SelectField
+    users = []
+    users.append((None, '--'))
+    for c in eligible_members:
+        # use 'member' backref in user-membership relationship
+        users.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
+    
+    return users

@@ -82,24 +82,14 @@ def organization(key):
 @login_required
 @check_confirmed
 def shift(org_key, pos_key):
+    form = ShiftForm(request.form)
     if request.method == 'GET':
-        form = ShiftForm()
-        memberships = Membership.query.filter_by(organization_id=org_key).all()
-        for c in memberships:
-            form.user.choices.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
+        # fill in SelectField for choosing a user to assign a shift to (when creating the shift)
+        form.user.choices = utils.organization.gather_members_for_shift(org_key)
         return render_template('main/create_shift.html', form=form)
-    else:
-        assigned_user_id = request.form['user']
-        day = request.form['day']
-        start_time = datetime.datetime.strptime(request.form['start_time'], '%H:%M')
-        end_time = datetime.datetime.strptime(request.form['end_time'], '%H:%M')
-
-        shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
-                      end_time=end_time)
-
-        db.session.add(shift)
-        db.session.commit()
-
+    else:        
+        utils.organization.create_shift(pos_key, form.user.data, form.day.data, 
+                                        form.start_time.data, form.end_time.data)
         return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 

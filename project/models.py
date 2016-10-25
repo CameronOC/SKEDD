@@ -70,7 +70,7 @@ class Shift(db.Model):
     duration = db.Column(db.DateTime, nullable=False)
 
     # relationship with user
-    assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # relationship with position
     position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
