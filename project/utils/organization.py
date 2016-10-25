@@ -156,3 +156,4 @@ def confirm_invite(membership):
     if g.user is None or g.user.id != membership.member.id:
         login_user(membership.member)
     flash('You have now joined ' + membership.organization.name, 'success')
+    return membership

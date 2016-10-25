@@ -95,6 +95,7 @@ def organization(key):
 @main_blueprint.route('/organization/<orgKey>/position/<posKey>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
+@owns_organization
 def shift(org_key, pos_key):
     """
     Creates a new shift.  Shifts can be assigned to a user or left empty at
@@ -128,6 +129,7 @@ def shift(org_key, pos_key):
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
+@owns_organization
 def invite(key):
     """
     Invites a user to the organization.  If the user does not already exist, will create
@@ -226,6 +228,7 @@ def manager_members_profile(key, key2):
 @app.route('/assign', methods=['POST'])
 @login_required
 @check_confirmed
+@owns_organization
 def assign():
     # get the user
     myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
@@ -248,6 +251,7 @@ def assign():
 @app.route('/unassign', methods=['POST'])
 @login_required
 @check_confirmed
+@owns_organization
 def unassign():
     # get the user
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
