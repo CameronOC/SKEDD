@@ -113,3 +113,8 @@ class TestOrganization(TestCase):
         Test sending an invite to join an organization to a user and create a dummy account if needed
         :return:
         """
+        org = org_utils.get_organization(1)
+        mem = org_utils.invite_member(org=org, email='test@test.com', first_name='test', last_name='test')
+        assert mem.organization_id == org.id
+        assert mem.joined == False
+        assert mem.is_owner == False
