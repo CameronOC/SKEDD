@@ -6,10 +6,10 @@ import datetime
 from project import db, bcrypt
 from sqlalchemy import UniqueConstraint
 
-claimed = db.Table('claimed',
-                   db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-                   db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
-                   )
+position_assignments = db.Table('position_assignments',
+                                db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+                                db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
+                                )
 
 
 class User(db.Model):
@@ -145,7 +145,7 @@ class Position(db.Model):
     # Users many to many relationship with position
     assigned_users = db.relationship(
         'User',
-        secondary=claimed,
+        secondary=position_assignments,
         backref=db.backref('Position', lazy='dynamic'))
 
     def __init__(self, title, organization_id):
