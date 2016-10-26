@@ -1,0 +1,60 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<h1>Update a Shift</h1>
+<br>
+<!-- Fill in information about a shift -->
+<form action="" method="post" name="create">
+  {{ form.csrf_token }}
+  <!-- Spinner for selecting assigned user -->
+  <p>
+    Employee: {{ form.assigned_user_id(placeholder="User") }}
+    <span class="error">
+      {% if form.assigned_user_id.errors %}
+        {% for error in form.assigned_user_id.errors %}
+          <!-- {{ error }} -->
+        {% endfor %}
+      {% endif %}
+    </span>
+  </p>
+
+  <!-- Spinner for selecting day of the week -->
+  <p>
+    Day: {{ form.day(placeholder="Day") }}
+    <span class="error">
+      {% if form.day.errors %}
+        {% for error in form.day.errors %}
+          {{ error }}
+        {% endfor %}
+      {% endif %}
+    </span>
+  </p>
+  <!-- Text field for entering starting time -->
+  <p>
+	{{ form.start_time(placeholder="Starting Time (hh:mm)") }}
+	{{ form.am_or_pm }}
+    <span class="error">
+      {% if form.start_time.errors %}
+        {% for error in form.start_time.errors %}
+          {{ error }}
+        {% endfor %}
+      {% endif %}
+    </span>
+  </p>
+  <!-- Text field for entering ending time -->
+  <p>
+	{{ form.end_time(placeholder="Ending Time (hh:mm)") }}
+	{{ form.am_or_pm }}
+    <span class="error">
+      {% if form.end_time.errors %}
+        {% for error in form.end_time.errors %}
+          {{ error }}
+        {% endfor %}
+      {% endif %}
+    </span>
+  </p>
+  <button class="btn btn-success" type="submit">Update</button>
+</form>
+
+{% endblock %}
