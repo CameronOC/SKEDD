@@ -205,4 +205,5 @@ class TestOrganization(TestCase):
         membership = org_utils.confirm_invite(self.john_membership)
 
         assert membership is not None
+        assert mem.is_owner == False
         assert membership.joined
