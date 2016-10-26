@@ -42,6 +42,10 @@ def load_user():
 
 @main_blueprint.route('/')
 def landing():
+    """
+    A landing page with information about skedd, as well as log in and sign up links
+    :return:
+    """
     return render_template('main/index.html')
 
 
@@ -62,6 +66,10 @@ def home():
 @login_required
 @check_confirmed
 def create():
+    """
+    Creates a new organization belonging to the currently signed in user
+    :return:
+    """
     form = CreateForm(request.form)
     if form.validate_on_submit():
         org, membership = utils.organization.create_organization(form.name.data, g.user.id)
@@ -74,6 +82,12 @@ def create():
 @login_required
 @check_confirmed
 def organization(key):
+    """
+    The home page for an organization. displays relevant positions
+    and members information.
+    :param key:
+    :return:
+    """
     org = utils.organization.get_organization(key)
     return render_template('main/organization.html', organization=org)
 
@@ -81,7 +95,16 @@ def organization(key):
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
+@owns_organization
 def shift(org_key, pos_key):
+    """
+    Creates a new shift.  Shifts can be assigned to a user or left empty at
+    initialization, but are always related to a position, which is in turn
+    related
+    :param org_key:
+    :param pos_key:
+    :return:
+    """
     if request.method == 'GET':
         form = ShiftForm()
         memberships = Membership.query.filter_by(organization_id=org_key).all()
@@ -106,7 +129,14 @@ def shift(org_key, pos_key):
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
+@owns_organization
 def invite(key):
+    """
+    Invites a user to the organization.  If the user does not already exist, will create
+    a temporary user that can be confirmed by the invitee through an activation link
+    :param key:
+    :return:
+    """
     org = utils.organization.get_organization(key)
     form = InviteForm(request.form)
     if form.validate_on_submit():
@@ -198,6 +228,7 @@ def manager_members_profile(key, key2):
 @app.route('/assign', methods=['POST'])
 @login_required
 @check_confirmed
+@owns_organization
 def assign():
     # get the user
     myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
@@ -220,6 +251,7 @@ def assign():
 @app.route('/unassign', methods=['POST'])
 @login_required
 @check_confirmed
+@owns_organization
 def unassign():
     # get the user
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
