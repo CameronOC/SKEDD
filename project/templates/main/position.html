@@ -17,9 +17,10 @@
 {% if shifts %}
 <ul class="list-group">
     {% for shift in shifts %}
-    <li class="list-group-item">
+    <li class="list-group-item"> 
         {{ shift.user.first_name }} {{ shift.user.last_name }} on {{ shift.day }}; 
         {{ shift.start_time.hour }}:{{ shift.start_time.minute }} - {{ shift.end_time.hour }}:{{ shift.end_time.minute }}
+        <a href="/organization/{{ organization.id }}/position/{{position.id}}/shift/{{shift.id}}/edit"> edit </a>
     </li>
     {% endfor %}
     <br>

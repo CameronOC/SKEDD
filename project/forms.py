@@ -14,7 +14,7 @@ class CreateForm(Form):
     name = StringField('name', validators=[DataRequired(), Length(min=1, max=50)])
     
 class ShiftForm(Form):
-    user = SelectField('users', choices=[])
+    assigned_user_id = SelectField('users', choices=[])
 
     day = SelectField('day', choices=[  ('Monday', 'Monday'), 
                                         ('Tuesday', 'Tuesday'), 

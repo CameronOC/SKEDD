@@ -56,6 +56,14 @@ def get_position(id):
     :return:
     """
     return Position.query.get(id)
+    
+def get_shift(id):
+    """
+    Gets a shift object based on id
+    :param id:
+    :return:
+    """
+    return Shift.query.get(id)
 
 def get_membership(org, user):
     """
@@ -65,7 +73,6 @@ def get_membership(org, user):
     :return:
     """
     return Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
-
 
 def confirm_user(user, password=None):
     if password is not None:
@@ -158,8 +165,16 @@ def confirm_invite(membership):
     flash('You have now joined ' + membership.organization.name, 'success')
     return membership
     
-# USED IN VIEWS.SHIFT()
 def create_shift(pos_key, assigned_user_id, day, start_time, end_time):
+    """
+    Creates a new shift object
+    :param pos_key:
+    :param assigned_user_id:
+    :param day:
+    :param start_time:
+    :param end_time:
+    :return:
+    """
     # create shift with parameters
     shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
                     end_time=end_time)
@@ -167,9 +182,15 @@ def create_shift(pos_key, assigned_user_id, day, start_time, end_time):
     # add shift to database
     db.session.add(shift)
     db.session.commit()
+    return shift
     
-# USED IN VIEWS.SHIFT()
 def gather_members_for_shift(org_key):
+    """
+    Creates a formatted list of users in an organization
+    to use in ShiftForm.user
+    :param org_key:
+    :return:
+    """
     # filter users by members of current org in current position
     eligible_members = Membership.query.filter_by(organization_id=org_key).all()
     # create list to fill in SelectField
@@ -180,3 +201,27 @@ def gather_members_for_shift(org_key):
         users.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
     
     return users
+
+def update_shift(shift, pos_key, assigned_user_id, day, start_time, end_time):
+    """
+    Updates an existing shift
+    :param shift:
+    :param pos_key:
+    :param assigned_user_id:
+    :param day:
+    :param start_time:
+    :param end_time
+    :return:
+    """
+    curr_shift = get_shift(shift.id)
+    curr_shift.position_id = pos_key
+    curr_shift.assigned_user_id = assigned_user_id
+    curr_shift.day = day
+    curr_shift.start_time = start_time
+    curr_shift.end_time = end_time
+    db.session.commit()
+
+
+
+
+

@@ -4,6 +4,7 @@ from project import app, db
 from project.models import User, Organization, Membership, Position, Shift
 import project.utils.organization as org_utils
 # from project.utils.organization import create_organization, get_organization
+import datetime
 
 
 class TestOrganization(TestCase):
@@ -57,12 +58,24 @@ class TestOrganization(TestCase):
 
         db.session.add(position)
         db.session.commit()
+        
+        shift = Shift(
+            position_id = position.id,
+            assigned_user_id = None,
+            day = 'Monday',
+            start_time = datetime.datetime.now(),
+            end_time = datetime.datetime.now()
+        )
+        
+        db.session.add(shift)
+        db.session.commit
 
         self.owner = user
         self.john = john
         self.john_membership = john_membership
         self.organization = org
         self.position = position
+        self.shift = shift
 
     def tearDown(self):
         db.session.remove()
@@ -102,7 +115,6 @@ class TestOrganization(TestCase):
         Tests creating a new organization and assigning it an owner
         :return:
         """
-
         organization, membership = org_utils.create_organization(name='Test-Org', owner_id=self.owner.id)
         assert organization is not None
         assert membership is not None
@@ -205,5 +217,75 @@ class TestOrganization(TestCase):
         membership = org_utils.confirm_invite(self.john_membership)
 
         assert membership is not None
-        assert mem.is_owner == False
+        assert membership.is_owner == False
         assert membership.joined
+        
+    def test_create_shift(self):
+        """
+        Tests creating a new shift
+        :return:
+        """
+        new_pos = Position(title='Test 2', organization_id=self.organization.id)
+        db.session.add(new_pos)
+        db.session.commit()
+        
+        start_time = datetime.datetime.now()
+        end_time = datetime.datetime.now()
+        
+        shift = org_utils.create_shift(new_pos.id, self.john.id, 'Wednesday', start_time, end_time)
+        
+        assert shift is not None
+        assert shift.position_id == new_pos.id
+        assert shift.assigned_user_id == self.john.id
+        assert shift.day == 'Wednesday'
+        assert shift.start_time == start_time
+        assert shift.end_time == end_time
+    
+    def test_get_shift(self):
+        """
+        Tests getting a shift by ID
+        :return:
+        """
+        shift = org_utils.get_shift(1)
+        assert shift is not None
+        assert shift.id == self.shift.id
+        assert shift.position_id == self.shift.position_id
+        assert shift.assigned_user_id == self.shift.assigned_user_id
+        assert shift.day == self.shift.day
+        assert shift.start_time == self.shift.start_time
+        assert shift.end_time == self.shift.end_time
+        
+        shift = org_utils.get_position(2)
+        assert shift is None
+        
+    def test_update_shift(self):
+        """
+        Tests updating a shift
+        :return:
+        """
+        shift = org_utils.get_shift(1)
+        
+        new_pos = Position(title='Test 3', organization_id=self.organization.id)
+        db.session.add(new_pos)
+        db.session.commit()
+        
+        start_time = datetime.datetime.now()
+        end_time = datetime.datetime.now()
+        
+        org_utils.update_shift(shift, new_pos.id, self.john.id, 'Tuesday', 
+                                start_time, end_time)
+        
+        # re-query, compare fields
+        shift = org_utils.get_shift(1)
+        assert shift.position_id == new_pos.id
+        assert shift.assigned_user_id == self.john.id
+        assert shift.day == 'Tuesday'
+        assert shift.start_time == start_time
+        assert shift.end_time == end_time   
+        
+        # reset fields for future tests
+        org_utils.update_shift(shift, self.shift.position_id, self.shift.user.id,
+                                 self.shift.day, self.shift.start_time, self.shift.end_time)
+        
+        
+        
