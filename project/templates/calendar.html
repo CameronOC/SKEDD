@@ -12,7 +12,39 @@
     <script src='../static/calendar/fullcalendar.min.js'></script>
     <script>
 
+        var id = 3;
+
         $(document).ready(function() {
+
+            var createEvent = document.getElementById('createEvent');
+            var cancelCreate = document.getElementById('cancelCreate');
+
+            createEvent.addEventListener('click', function() {
+
+                var newEvent = {
+                    title: $('#createPosition').val(),
+                    start: $('#start').text(),
+                    end: $('#end').text(),
+                    description: $('#createDescription').val(),
+                    assigned: $('#createAssigned').val(),
+                };
+                $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
+                hideCreateModal();
+
+            }, false);
+
+            cancelCreate.addEventListener('click', function() {
+                hideCreateModal();
+            }, false);
+
+
+            function hideCreateModal() {
+                $('#createShiftModal').modal('hide');
+                $('#position').val('');
+                $('#createDescription').val('');
+                $('#createAssigned').val('');
+
+            };
 
             $('#calendar').fullCalendar({
                 header: {
@@ -23,6 +55,8 @@
                 defaultView: 'agendaWeek',
                 allDaySlot: false,
                 editable: true,
+                selectable: true,
+                selectHelper: true,
                 events: [
                     {
                         title: 'Line Cook',
@@ -47,6 +81,11 @@
                     $('#end-time').html(event.end.toString());
                     $('#eventUrl').attr('href',event.url);
                     $('#fullCalModal').modal('show');
+                },
+                select: function(start, end, allDay) {
+                    $('#start').html(start.toString());
+                    $('#end').html(end.toString());
+                    $('#createShiftModal').modal('show');
                 }
             });
 
@@ -87,6 +126,28 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="createShiftModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="createModalTitle" class="modal-title">New Shift</h4>
+                </div>
+                <div id="createModalBody" class="modal-body">
+                    <input type="text" class="form-control" id="createPosition" placeholder="Position"> <br>
+                    <input type="text" class="form-control" id="createAssigned" placeholder="Assign To..."> <br>
+                    <textarea class="form-control" rows="5" id="createDescription" placeholder="Description...">
+                    </textarea> <br>
+                    Start: <span id="start"></span> <br>
+                    End: <span id="end"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="cancelCreate">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="createEvent">Create</button>
                 </div>
             </div>
         </div>
