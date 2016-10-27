@@ -8,7 +8,9 @@
 
 <p> Assigned user(s): </p>
 {% for person in position.assigned_users%} 
-<p>{{ person.first_name }} {{ person.last_name}} <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> edit </a> </p>
+    <p>
+    <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> {{ person.first_name }} {{ person.last_name}} </a>
+    </p>
 {%endfor%}
 
 

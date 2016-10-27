@@ -205,8 +205,6 @@ def create_position(key):
 @main_blueprint.route('/organization/<key>/member/<key2>', methods=['GET', ])
 @login_required
 @check_confirmed
-@owns_organization
-# add owns_org
 def manager_members_profile(key, key2):
     org = utils.organization.get_organization(key)
 
@@ -218,7 +216,7 @@ def manager_members_profile(key, key2):
 @app.route('/assign', methods=['POST'])
 @login_required
 @check_confirmed
-@owns_organization
+#@owns_organization
 def assign():
     # get the user
     myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
@@ -241,7 +239,7 @@ def assign():
 @app.route('/unassign', methods=['POST'])
 @login_required
 @check_confirmed
-@owns_organization
+#@owns_organization
 def unassign():
     # get the user
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
