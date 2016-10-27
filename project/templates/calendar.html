@@ -12,39 +12,41 @@
     <script src='../static/calendar/fullcalendar.min.js'></script>
     <script>
 
-        var id = 3;
 
         $(document).ready(function() {
 
             var createEvent = document.getElementById('createEvent');
             var cancelCreate = document.getElementById('cancelCreate');
 
+            var currentId = 3;
+
             createEvent.addEventListener('click', function() {
 
-                var newEvent = {
-                    title: $('#createPosition').val(),
-                    start: $('#start').text(),
-                    end: $('#end').text(),
-                    description: $('#createDescription').val(),
-                    assigned: $('#createAssigned').val(),
-                };
-                $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
-                hideCreateModal();
+                var eventlist = $("#calendar").fullCalendar('clientEvents', 3);
+
+                evento = eventlist[0];
+
+                evento.title = $('#createPosition').val();
+                evento.description = $('#createDescription').val();
+                evento.assigned = $('#createAssigned').val();
+
+                $('#calendar').fullCalendar('updateEvent', evento);
+                $('#createShiftModal').modal('hide');
+
 
             }, false);
 
             cancelCreate.addEventListener('click', function() {
-                hideCreateModal();
+                $('#calendar').fullCalendar( 'removeEvents', currentId);
+                $('#createShiftModal').modal('hide');
             }, false);
 
-
-            function hideCreateModal() {
-                $('#createShiftModal').modal('hide');
-                $('#position').val('');
-                $('#createDescription').val('');
-                $('#createAssigned').val('');
-
-            };
+            $(document).on('hidden.bs.modal', '#createShiftModal', function () {
+                console.log('Fired at start of hide event!');
+                $('#position').value = '';
+                $('#createDescription').value = '';
+                $('#createAssigned').value = '';
+            });
 
             $('#calendar').fullCalendar({
                 header: {
@@ -83,9 +85,18 @@
                     $('#fullCalModal').modal('show');
                 },
                 select: function(start, end, allDay) {
+
+                    var newEvent = {
+                        start: start,
+                        end: end,
+                        id: currentId,
+                    };
+                    $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
+
                     $('#start').html(start.toString());
                     $('#end').html(end.toString());
                     $('#createShiftModal').modal('show');
+
                 }
             });
 
