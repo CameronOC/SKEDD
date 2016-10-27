@@ -15,13 +15,30 @@
 
         $(document).ready(function() {
 
-            var createEvent = document.getElementById('createEvent');
-            var cancelCreate = document.getElementById('cancelCreate');
 
-            var currentId = 3;
+            /*
+            *
+            * Code that applies to both modals
+            *
+            */
+            var nextId
+            $('.modal').on('hidden.bs.modal', function(){
+                console.log('it works');
+                $(this).find("input,textarea").val('').end();
+            });
 
-            createEvent.addEventListener('click', function() {
-                var eventlist = $("#calendar").fullCalendar('clientEvents', currentId);
+            /*
+            *
+            * Code to Create new Events
+            *
+            */
+            var nextId = 3;
+
+            $('#createSubmit').on('click', function() {
+
+                var tempId = parseInt($('#createShiftId').text());
+
+                var eventlist = $("#calendar").fullCalendar('clientEvents', tempId);
 
                 evento = eventlist[0];
 
@@ -31,22 +48,53 @@
 
                 $('#calendar').fullCalendar('updateEvent', evento);
                 $('#createShiftModal').modal('hide');
-                currentId = currentId + 1;
-            }, false);
-
-            cancelCreate.addEventListener('click', function() {
-                $('#calendar').fullCalendar( 'removeEvents', currentId);
-                $('#createShiftModal').modal('hide');
-            }, false);
-
-            $.clearFormFields = function(area) {
-                $(area).find('input[type="text"],input[type="email"],textarea,select').val('');
-            };
-
-            $('#createShiftModal').on('hidden.bs.modal', function(){
-                console.log('Fired at start of hide event!');
-                $(this).find("input,textarea").val('').end();
+                nextId = nextId + 1;
             });
+
+            $('#createCancel').on('click', function() {
+
+                var tempId = parseInt($('#createShiftId').text());
+                $('#calendar').fullCalendar( 'removeEvents', tempId);
+                $('#createShiftModal').modal('hide');
+            });
+
+
+
+            /*
+            *
+            * Code to Edit Events
+            *
+            */
+
+             $('#editSubmit').on('click', function() {
+
+                var tempId = parseInt($('#editShiftId').text());
+
+                var eventlist = $("#calendar").fullCalendar('clientEvents', tempId);
+
+                evento = eventlist[0];
+
+                evento.title = $('#editPosition').val();
+                evento.description = $('#editDescription').val();
+                evento.assigned = $('#editAssigned').val();
+
+                $('#calendar').fullCalendar('updateEvent', evento);
+                $('#editShiftModal').modal('hide');
+                nextId = nextId + 1;7
+            });
+
+            $('#editDelete').on('click', function() {
+
+                var tempId = parseInt($('#editShiftId').text());
+                $('#calendar').fullCalendar( 'removeEvents', tempId);
+                $('#editShiftModal').modal('hide');
+            });
+
+            /*
+            *
+            * Initialize Calendar
+            *
+            */
 
             $('#calendar').fullCalendar({
                 header: {
@@ -66,6 +114,7 @@
                         end: '2016-10-26T14:00:00',
                         description: 'Prepare ingredients and assemble dishes.',
                         assigned: 'Bobby Lyons',
+                        id: 1,
                     },
                     {
                         title: 'Host',
@@ -73,28 +122,31 @@
                         end: '2016-10-26T16:00:00',
                         description: 'Greet customers, show them to their tables, provide silverware and menus.',
                         assigned: 'Cameron Johnson',
+                        id: 2,
                     }
                 ],
                 eventClick:  function(event, jsEvent, view) {
-                    $('#modalTitle').html(event.title);
-                    $('#description').html(event.description);
-                    $('#assigned').html(event.assigned);
-                    $('#start-time').html(event.start.toString());
-                    $('#end-time').html(event.end.toString());
-                    $('#eventUrl').attr('href',event.url);
-                    $('#fullCalModal').modal('show');
+                    $('#editModalTitle').html(event.title);
+                    $('#editPosition').val(event.title);
+                    $('#editDescription').val(event.description);
+                    $('#editAssigned').val(event.assigned);
+                    $('#editStart').html(event.start.toString());
+                    $('#editEnd').html(event.end.toString());
+                    $('#editShiftId').html(event.id);
+
+                    $('#editShiftModal').modal('show');
                 },
                 select: function(start, end, allDay) {
 
                     var newEvent = {
                         start: start,
                         end: end,
-                        id: currentId,
+                        id: nextId,
                     };
                     $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
-
-                    $('#start').html(start.toString());
-                    $('#end').html(end.toString());
+                    $('#createStart').html(start.toString());
+                    $('#createEnd').html(end.toString());
+                    $('#createShiftId').html(nextId.toString());
                     $('#createShiftModal').modal('show');
 
                 }
@@ -123,42 +175,48 @@
 
 	<div id='calendar'></div>
 
-    <div id="fullCalModal" class="modal fade">
-        <div class="modal-dialog">
+    <div id="createShiftModal" class="modal fade" data-backdrop="static" data-keyboard="false">
+       <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 id="modalTitle" class="modal-title"></h4>
-                </div>
-                <div id="modalBody" class="modal-body">
-                    Assigned to: <span id="assigned"></span> <br>
-                    Description: <span id="description"></span> <br>
-                    Start: <span id="start-time"></span> <br>
-                    End: <span id="end-time"></span> <br>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="createShiftModal" data-backdrop="static" data-keyboard="false" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 id="createModalTitle" class="modal-title">New Shift</h4>
+                    <h4 id="createModalTitle" class="modal-title"></h4>
                 </div>
                 <div id="createModalBody" class="modal-body">
                     <input type="text" class="form-control" id="createPosition" placeholder="Position"> <br>
                     <input type="text" class="form-control" id="createAssigned" placeholder="Assign To..."> <br>
                     <textarea class="form-control" rows="5" id="createDescription" placeholder="Description...">
                     </textarea> <br>
-                    Start: <span id="start"></span> <br>
-                    End: <span id="end"></span>
+                    Start: <span id="createStart"></span> <br>
+                    End: <span id="createEnd"></span>
+                    <h1 id="createShiftId"></h1>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id="cancelCreate">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="createEvent">Create</button>
+                    <button type="button" class="btn btn-default" id="createCancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="createSubmit">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editShiftModal" class="modal fade" data-backdrop="static" data-keyboard="false">
+       <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="editModalTitle" class="modal-title">New Shift</h4>
+                </div>
+                <div id="editModalBody" class="modal-body">
+                    <input type="text" class="form-control" id="editPosition" placeholder="Position"> <br>
+                    <input type="text" class="form-control" id="editAssigned" placeholder="Assign To..."> <br>
+                    <textarea class="form-control" rows="5" id="editDescription" placeholder="Description...">
+                    </textarea> <br>
+                    Start: <span id="editStart"></span> <br>
+                    End: <span id="editEnd"></span>
+                    <h1 id="editShiftId"></h1>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="editDelete">Delete</button>
+                    <button type="button" class="btn btn-default" id="editCancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="editSubmit">Submit</button>
                 </div>
             </div>
         </div>
