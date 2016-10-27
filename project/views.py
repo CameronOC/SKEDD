@@ -92,28 +92,28 @@ def organization(key):
     return render_template('main/organization.html', organization=org)
 
 
-@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 @owns_organization
-def shift(org_key, pos_key):
+def shift(key, pos_key):
     """
     Creates a new shift.  Shifts can be assigned to a user or left empty at
     initialization, but are always related to a position, which is in turn
     related
-    :param org_key:
+    :param key:
     :param pos_key:
     :return:
     """
     form = ShiftForm(request.form)
     if request.method == 'GET':
         # fill in SelectField for choosing a user to assign a shift to (when creating the shift)
-        form.user.choices = utils.organization.gather_members_for_shift(org_key)
+        form.user.choices = utils.organization.gather_members_for_shift(key)
         return render_template('main/create_shift.html', form=form)
-    else:        
-        utils.organization.create_shift(pos_key, form.user.data, form.day.data, 
+    else:
+        utils.organization.create_shift(pos_key, form.user.data, form.day.data,
                                         form.start_time.data, form.end_time.data)
-        return redirect(url_for('main.position', key=org_key, key2=pos_key))
+        return redirect(url_for('main.position', key=key, key2=pos_key))
 
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])

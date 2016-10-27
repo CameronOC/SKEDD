@@ -157,17 +157,17 @@ def confirm_invite(membership):
         login_user(membership.member)
     flash('You have now joined ' + membership.organization.name, 'success')
     return membership
-    
+
 # USED IN VIEWS.SHIFT()
 def create_shift(pos_key, assigned_user_id, day, start_time, end_time):
     # create shift with parameters
     shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
                     end_time=end_time)
-    
+
     # add shift to database
     db.session.add(shift)
     db.session.commit()
-    
+
 # USED IN VIEWS.SHIFT()
 def gather_members_for_shift(org_key):
     # filter users by members of current org in current position
