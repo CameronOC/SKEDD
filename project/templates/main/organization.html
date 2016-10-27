@@ -7,19 +7,21 @@
 <h2 class="ORGANIZATION_employees"><strong>Employees:</strong></h2>
 
 {% if organization.owner.id == g.user.id %}
+    
     <ul>
         {% for membership in organization.memberships.all() %}
         <li>
-            {{ membership.member.first_name }} {{ membership.member.last_name }}
-            {% if not membership.joined %}
-            (invited)
-            {% endif %}
             {% if membership.joined %}
-            <a href="/organization/{{ organization.id }}/member/{{ membership.member.id }}"> edit </a>
+                <a href="/organization/{{ organization.id }}/member/{{ membership.member.id }}"> {{ membership.member.first_name }} {{ membership.member.last_name }} </a>
+            {% endif %}
+            {% if not membership.joined %}
+                {{ membership.member.first_name }} {{ membership.member.last_name }} (invited)
             {% endif %}
         </li>
         {% endfor %}
     </ul>
+
+
 
 <a class="ORGANIZATION_invite" href="/organization/{{ organization.id }}/invite" role="button" type="submit" >Invite people to this organization</a>
 
@@ -28,9 +30,11 @@
 <ul>
     {% for membership in organization.memberships.filter_by(is_owner=False).all() %}
     <li>
-        {{ membership.member.first_name }} {{ membership.member.last_name }}
+        {% if membership.joined %}
+            <a href="/organization/{{ organization.id }}/member/{{ membership.member.id }}"> {{ membership.member.first_name }} {{ membership.member.last_name }} </a>
+        {% endif %}
         {% if not membership.joined %}
-        (invited)
+            {{ membership.member.first_name }} {{ membership.member.last_name }} (invited)
         {% endif %}
     </li>
     {% endfor %}
