@@ -95,7 +95,7 @@ def organization(key):
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
-@owns_organization
+#@owns_organization
 def shift(org_key, pos_key):
     """
     Creates a new shift.  Shifts can be assigned to a user or left empty at
@@ -235,6 +235,29 @@ def assign():
     # redirects to the page before
     return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
 
+@app.route('/assignpos', methods=['POST'])
+@login_required
+@check_confirmed
+#@owns_organization
+def assignpos():
+    # get the user
+    myuser = User.query.filter_by(id=request.form["userid"]).first_or_404()
+    # get the position
+    mypos = Position.query.filter_by(id=request.form['positionid']).first_or_404()
+    # get org to redirect back to the previous page
+    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
+    # if this user already exists return flash
+    if myuser in mypos.assigned_users:
+        flash('This persons position is already assigned to ' + mypos.title, 'danger')
+        return render_template('main/position.html', position=mypos, organization=org)
+    # append the assigned_users table
+    mypos.assigned_users.append(myuser)
+    # commit it to the database
+    db.session.commit()
+    # redirects to the page before
+    return render_template('main/position.html', position=mypos, organization=org)
+
+
 
 @app.route('/unassign', methods=['POST'])
 @login_required
@@ -253,3 +276,21 @@ def unassign():
     db.session.commit()
     # redirects to the page before
     return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
+
+@app.route('/unassignpos', methods=['POST'])
+@login_required
+@check_confirmed
+#@owns_organization
+def unassignpos():
+    # get the user
+    myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
+    # get the position
+    mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
+    # get org to redirect back to the previous page
+    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
+    # remove the user from the table
+    mypos.assigned_users.remove(myuser)
+    # commit the changes to the database
+    db.session.commit()
+    # redirects to the page before
+    return render_template('main/position.html', position=mypos, organization=org)

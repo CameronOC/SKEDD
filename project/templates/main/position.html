@@ -10,8 +10,36 @@
 {% for person in position.assigned_users%} 
     <p>
     <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> {{ person.first_name }} {{ person.last_name}} </a>
+
+    {%if organization.owner_id == g.user.id %}
+        <td>
+            <form action="{{ url_for('unassignpos') }}" method="post">
+            <input type="hidden" name="unassignuserid" value="{{ person.id }}"/>
+            <input type="hidden" name="unassignposid" value="{{ position.id }}"/>
+            <input type="hidden" name="org" value="{{organization.id}}">
+            <input type="submit" class="btn btn-xs btn-danger" value="Unassign"/>
+            </form>
+          </td>
+    {%endif%}
     </p>
 {%endfor%}
+
+
+{%if organization.owner_id == g.user.id %}
+<form action=" {{ url_for('assignpos') }} " method='post'>    
+  <p> Assign members to this position </p>
+    <select class="dropdownmenu" name='userid'>
+      {%for person in organization.memberships.all() %}
+        <option value='{{person.member.id}}'> {{person.member.first_name}} {{person.member.last_name}} </option>
+      {%endfor%}         
+    </select>
+
+  <input type="hidden" name="positionid" value="{{ position.id }}"/>
+  <input type="hidden" name="org" value="{{organization.id}}">
+  <input type="submit" class="btn btn-xs btn-danger" value="assign"/>
+</form>
+{%endif%}
+
 
 
 <br>
