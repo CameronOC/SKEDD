@@ -21,8 +21,7 @@
             var currentId = 3;
 
             createEvent.addEventListener('click', function() {
-
-                var eventlist = $("#calendar").fullCalendar('clientEvents', 3);
+                var eventlist = $("#calendar").fullCalendar('clientEvents', currentId);
 
                 evento = eventlist[0];
 
@@ -32,8 +31,7 @@
 
                 $('#calendar').fullCalendar('updateEvent', evento);
                 $('#createShiftModal').modal('hide');
-
-
+                currentId = currentId + 1;
             }, false);
 
             cancelCreate.addEventListener('click', function() {
@@ -41,11 +39,13 @@
                 $('#createShiftModal').modal('hide');
             }, false);
 
-            $(document).on('hidden.bs.modal', '#createShiftModal', function () {
+            $.clearFormFields = function(area) {
+                $(area).find('input[type="text"],input[type="email"],textarea,select').val('');
+            };
+
+            $('#createShiftModal').on('hidden.bs.modal', function(){
                 console.log('Fired at start of hide event!');
-                $('#position').value = '';
-                $('#createDescription').value = '';
-                $('#createAssigned').value = '';
+                $(this).find("input,textarea").val('').end();
             });
 
             $('#calendar').fullCalendar({
@@ -142,7 +142,7 @@
         </div>
     </div>
 
-    <div id="createShiftModal" class="modal fade">
+    <div id="createShiftModal" data-backdrop="static" data-keyboard="false" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
