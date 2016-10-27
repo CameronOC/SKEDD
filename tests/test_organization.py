@@ -284,7 +284,7 @@ class TestOrganization(TestCase):
         assert shift.end_time == end_time   
         
         # reset fields for future tests
-        org_utils.update_shift(shift, self.shift.position_id, self.shift.user.id,
+        org_utils.update_shift(shift, self.shift.position_id, self.shift.assigned_user_id,
                                  self.shift.day, self.shift.start_time, self.shift.end_time)
         
         
