@@ -49,17 +49,19 @@
 <ul class="list-group">
     
     {% for pos in organization.owned_positions.all() %}
-    <li class="list-group-item"><a href="/organization/{{ organization.id }}/position/{{pos.id}}">{{ pos.title }}</a>
-    <p> 
+    <p>
+    <li class="list-group-item"><a href="/organization/{{ organization.id }}/position/{{pos.id}}">{{ pos.title }}</a> | 
+    {% for person in pos.assigned_users%}  
+          
+            {%if organization.owner.id == g.user.id%}
+                <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> {{ person.first_name }} {{ person.last_name}}  </a>
+            {%endif%} 
+    </p>
     
-        {% for person in pos.assigned_users%}  
-        
-            {{ person.first_name }} {{ person.last_name}}  {%if organization.owner.id == g.user.id%}<a href="/organization/{{ organization.id }}/member/{{ person.id }}"> edit </a>{%endif%} </p>
-    
-        {% endfor %}
-        {% if not pos.assigned_users %}
-            <p>unassigned</p>
-        {% endif %}
+    {% endfor %}
+    {% if not pos.assigned_users %}
+        <p>unassigned</p>
+    {% endif %}
 
     </li>
 
