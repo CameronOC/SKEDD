@@ -14,6 +14,7 @@ from project import app, db, bcrypt
 from decorators import check_confirmed, owns_organization
 from project.email import send_email
 import utils.organization
+from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position
 from utils.token import confirm_token, generate_invitation_token
 
 ################
@@ -216,44 +217,36 @@ def manager_members_profile(key, key2):
 @app.route('/assign', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
 def assign():
-    # get the user
+    # get the user, position, and org
     myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
-    # get the position
     mypos = Position.query.filter_by(title=request.form['position']).first_or_404()
-    # get org to redirect back to the previous page
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
     # if this user already exists return flash
     if myuser in mypos.assigned_users:
         flash('This persons position is already assigned to ' + mypos.title, 'danger')
         return render_template('main/member.html', user=myuser, organization=org)
-    # append the assigned_users table
-    mypos.assigned_users.append(myuser)
-    # commit it to the database
-    db.session.commit()
+
+    assign_member_to_position(myuser, mypos, org)
+
     # redirects to the page before
     return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
 
 @app.route('/assignpos', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
 def assignpos():
-    # get the user
+    # get the user, position, and org
     myuser = User.query.filter_by(id=request.form["userid"]).first_or_404()
-    # get the position
     mypos = Position.query.filter_by(id=request.form['positionid']).first_or_404()
-    # get org to redirect back to the previous page
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
     # if this user already exists return flash
     if myuser in mypos.assigned_users:
         flash('This persons position is already assigned to ' + mypos.title, 'danger')
         return render_template('main/position.html', position=mypos, organization=org)
-    # append the assigned_users table
-    mypos.assigned_users.append(myuser)
-    # commit it to the database
-    db.session.commit()
+
+    assign_member_to_position(myuser, mypos, org)
+    
     # redirects to the page before
     return render_template('main/position.html', position=mypos, organization=org)
 
@@ -262,35 +255,37 @@ def assignpos():
 @app.route('/unassign', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
 def unassign():
-    # get the user
+    # get the user, position, and org
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
-    # get the position
     mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
-    # get org to redirect back to the previous page
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    # remove the user from the table
-    mypos.assigned_users.remove(myuser)
-    # commit the changes to the database
-    db.session.commit()
+    
+    unassign_member_to_position(myuser, mypos, org)
     # redirects to the page before
     return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
 
 @app.route('/unassignpos', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
 def unassignpos():
-    # get the user
+    # get the user, position, and org
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
-    # get the position
     mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
-    # get org to redirect back to the previous page
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    # remove the user from the table
-    mypos.assigned_users.remove(myuser)
-    # commit the changes to the database
-    db.session.commit()
+
+    unassign_member_to_position(myuser, mypos, org)
+    
     # redirects to the page before
     return render_template('main/position.html', position=mypos, organization=org)
+
+@app.route('/deleteposition', methods=['POST'])
+@login_required
+@check_confirmed
+def deleteposition():
+    pos = Position.query.filter_by(id=request.form["deleteposid"]).first_or_404()
+    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
+
+    deletepositions(pos, org)
+
+    return render_template('main/organization.html', organization=org)

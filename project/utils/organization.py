@@ -180,3 +180,28 @@ def gather_members_for_shift(org_key):
         users.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
     
     return users
+
+#used in views.deletepositions
+def deletepositions(posid, orgid):
+    pos = posid
+    org = orgid
+    #remove the position from the org
+    db.session.delete(pos)
+    db.session.commit()
+
+#used in views.assign and views.assignpos
+def assign_member_to_position(userid, posid, orgid):
+    user = userid
+    pos = posid
+    org = orgid
+    #assign the user to an org
+    pos.assigned_users.append(user)
+    db.session.commit()
+
+def unassign_member_to_position(userid, posid, orgid):
+    user = userid
+    pos = posid
+    org = orgid
+    #removes the user from the position
+    pos.assigned_users.remove(user)
+    db.session.commit()
