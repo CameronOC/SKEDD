@@ -109,22 +109,25 @@
                 selectHelper: true,
                 events: [
                     {
-                        title: 'Line Cook',
+                        title: 'Product Owner',
                         start: '2016-10-26T06:00:00',
                         end: '2016-10-26T14:00:00',
-                        description: 'Prepare ingredients and assemble dishes.',
-                        assigned: 'Bobby Lyons',
+                        description: 'Set the Product Backlog for the application',
+                        assigned: 'Chris Kempis',
                         id: 1,
                     },
                     {
-                        title: 'Host',
+                        title: 'Scrum Master',
                         start: '2016-10-26T10:00:00',
                         end: '2016-10-26T16:00:00',
-                        description: 'Greet customers, show them to their tables, provide silverware and menus.',
-                        assigned: 'Cameron Johnson',
+                        description: 'Run Scrum Meetings, update burnup chart and Scrum Board.',
+                        assigned: 'Philip Guther',
                         id: 2,
                     }
                 ],
+                eventRender: function(event, element) {
+                    element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned + "</span>");
+                },
                 eventClick:  function(event, jsEvent, view) {
                     $('#editModalTitle').html(event.title);
                     $('#editPosition').val(event.title);
@@ -182,8 +185,19 @@
                     <h4 id="createModalTitle" class="modal-title"></h4>
                 </div>
                 <div id="createModalBody" class="modal-body">
-                    <input type="text" class="form-control" id="createPosition" placeholder="Position"> <br>
-                    <input type="text" class="form-control" id="createAssigned" placeholder="Assign To..."> <br>
+                    <select class="form-control" id="createPosition">
+                        <option>Product Owner</option>
+                        <option>Scrum Master</option>
+                        <option>Developer</option>
+                    </select> <br>
+                    <select class="form-control" id="createAssigned">
+                        <option>Unassigned</option>
+                        <option>Philip Guther</option>
+                        <option>Bobby Lyons</option>
+                        <option>Robert Pence</option>
+                        <option>Chris Kempis</option>
+                        <option>Cameron Johnson</option>
+                    </select> <br>
                     <textarea class="form-control" rows="5" id="createDescription" placeholder="Description...">
                     </textarea> <br>
                     Start: <span id="createStart"></span> <br>
@@ -205,8 +219,19 @@
                     <h4 id="editModalTitle" class="modal-title">New Shift</h4>
                 </div>
                 <div id="editModalBody" class="modal-body">
-                    <input type="text" class="form-control" id="editPosition" placeholder="Position"> <br>
-                    <input type="text" class="form-control" id="editAssigned" placeholder="Assign To..."> <br>
+                    <select class="form-control" id="editPosition">
+                        <option>Product Owner</option>
+                        <option>Scrum Master</option>
+                        <option>Developer</option>
+                    </select> <br>
+                    <select class="form-control" id="editAssigned">
+                        <option>Unassigned</option>
+                        <option>Philip Guther</option>
+                        <option>Bobby Lyons</option>
+                        <option>Robert Pence</option>
+                        <option>Chris Kempis</option>
+                        <option>Cameron Johnson</option>
+                    </select> <br>
                     <textarea class="form-control" rows="5" id="editDescription" placeholder="Description...">
                     </textarea> <br>
                     Start: <span id="editStart"></span> <br>
