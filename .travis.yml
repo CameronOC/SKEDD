@@ -9,4 +9,5 @@ install:
   - pip install -r requirements.txt
 # command to run tests
 script:
-  - 
+export APP_SETTINGS="project.config.TestingConfig"
+nosetests
