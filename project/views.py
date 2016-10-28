@@ -14,6 +14,7 @@ from project import app, db, bcrypt
 from decorators import check_confirmed, owns_organization
 from project.email import send_email
 import utils.organization
+from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position
 from utils.token import confirm_token, generate_invitation_token
 
 ################
@@ -226,9 +227,9 @@ def assign():
     if myuser in mypos.assigned_users:
         flash('This persons position is already assigned to ' + mypos.title, 'danger')
         return render_template('main/member.html', user=myuser, organization=org)
-    # append the assigned_users table
-    mypos.assigned_users.append(myuser)
-    db.session.commit()
+
+    assign_member_to_position(myuser, mypos, org)
+
     # redirects to the page before
     return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
 
@@ -245,9 +246,8 @@ def assignpos():
     if myuser in mypos.assigned_users:
         flash('This persons position is already assigned to ' + mypos.title, 'danger')
         return render_template('main/position.html', position=mypos, organization=org)
-    # append the assigned_users table
-    mypos.assigned_users.append(myuser)
-    db.session.commit()
+
+    assign_member_to_position(myuser, mypos, org)
     # redirects to the page before
     return render_template('main/position.html', position=mypos, organization=org)
 
@@ -262,9 +262,8 @@ def unassign():
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
     mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    # remove the user from the table
-    mypos.assigned_users.remove(myuser)
-    db.session.commit()
+    
+    unassign_member_to_position(myuser, mypos, org)
     # redirects to the page before
     return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
 
@@ -277,9 +276,9 @@ def unassignpos():
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
     mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    # remove the user from the table
-    mypos.assigned_users.remove(myuser)
-    db.session.commit()
+
+    unassign_member_to_position(myuser, mypos, org)
+    
     # redirects to the page before
     return render_template('main/position.html', position=mypos, organization=org)
 
@@ -290,6 +289,7 @@ def unassignpos():
 def deleteposition():
     pos = Position.query.filter_by(id=request.form["deleteposid"]).first_or_404()
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    org.owned_positions.remove(pos)
-    db.session.commit()
+
+    deletepositions(pos, org)
+
     return render_template('main/organization.html', organization=org)

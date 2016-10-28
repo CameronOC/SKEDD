@@ -55,7 +55,7 @@
     {% for person in pos.assigned_users%}  
           
             {%if organization.owner.id == g.user.id%}
-                <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> {{ person.first_name }} {{ person.first_name}}  </a>
+                <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> {{ person.first_name }} {{ person.last_name}}  </a>
             {%endif%} 
 
     {% endfor %}

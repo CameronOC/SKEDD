@@ -3,6 +3,7 @@ from flask import g
 from project import app, db
 from project.models import User, Organization, Membership, Position, Shift
 import project.utils.organization as org_utils
+#from project.utils.organization import deletepositions
 # from project.utils.organization import create_organization, get_organization
 
 
@@ -58,6 +59,7 @@ class TestOrganization(TestCase):
         db.session.add(position)
         db.session.commit()
 
+
         self.owner = user
         self.john = john
         self.john_membership = john_membership
@@ -93,7 +95,7 @@ class TestOrganization(TestCase):
         assert position.id == self.position.id
         assert position.title == self.position.title
 
-        position = org_utils.get_position(2)
+        position = org_utils.get_position(3)
         assert position is None
 
 
@@ -207,3 +209,30 @@ class TestOrganization(TestCase):
         assert membership is not None
         assert membership.is_owner == False
         assert membership.joined
+
+    def test_assign_member_to_position(self):
+        """
+        Tests that a user is assigned to a position
+        :return:
+        """
+
+
+    def test_unassign_member_to_position(self):
+        """
+        Tests that a user is unassigned from a position
+        :return:
+        """
+
+    def test_deleteposition(self):
+        """
+        Tests that a position is delete from a organization
+        :return:
+        """
+        pos = org_utils.get_position(1)
+        org = org_utils.get_organization(1)
+        assert pos is not None
+
+        org_utils.deletepositions(pos, org)
+
+        pos2 = org_utils.get_position(1)
+        assert pos2 is None
