@@ -217,7 +217,6 @@ def manager_members_profile(key, key2):
 @app.route('/assign', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
 def assign():
     # get the user, position, and org
     myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
@@ -236,7 +235,6 @@ def assign():
 @app.route('/assignpos', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
 def assignpos():
     # get the user, position, and org
     myuser = User.query.filter_by(id=request.form["userid"]).first_or_404()
@@ -248,6 +246,7 @@ def assignpos():
         return render_template('main/position.html', position=mypos, organization=org)
 
     assign_member_to_position(myuser, mypos, org)
+    
     # redirects to the page before
     return render_template('main/position.html', position=mypos, organization=org)
 
@@ -256,7 +255,6 @@ def assignpos():
 @app.route('/unassign', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
 def unassign():
     # get the user, position, and org
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
@@ -270,7 +268,6 @@ def unassign():
 @app.route('/unassignpos', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
 def unassignpos():
     # get the user, position, and org
     myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
@@ -285,7 +282,6 @@ def unassignpos():
 @app.route('/deleteposition', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
 def deleteposition():
     pos = Position.query.filter_by(id=request.form["deleteposid"]).first_or_404()
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()

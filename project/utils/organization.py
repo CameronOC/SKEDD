@@ -186,8 +186,6 @@ def deletepositions(posid, orgid):
     pos = posid
     org = orgid
     #remove the position from the org
-    #org.owned_positions.remove(pos)
-    #org.owned_positions.Position.remove(pos)
     db.session.delete(pos)
     db.session.commit()
 
