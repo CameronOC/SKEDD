@@ -28,7 +28,7 @@
 <br>
 {% else %}
 <ul>
-    {% for membership in organization.memberships.filter_by(is_owner=False).all() %}
+    {% for membership in organization.memberships.all() %}
     <li>
         {% if membership.joined %}
             <a href="/organization/{{ organization.id }}/member/{{ membership.member.id }}"> {{ membership.member.first_name }} {{ membership.member.last_name }} </a>
