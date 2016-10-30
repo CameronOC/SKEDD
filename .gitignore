@@ -7,3 +7,4 @@ dev.sqlite
 *.sqlite-journal
 setup_env.sh
 *.sqlite
+tmp

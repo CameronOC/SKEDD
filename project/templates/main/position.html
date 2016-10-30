@@ -2,14 +2,46 @@
 
 {% block content %}
 
+<div>
+
 <a href="/organization/{{ organization.id }}">Return to {{ organization.name }} home</a> <br>
 
 <h1>{{ position.title }}</h1>
 
 <p> Assigned user(s): </p>
 {% for person in position.assigned_users%} 
-<p>{{ person.first_name }} {{ person.last_name}} <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> edit </a> </p>
+    <p>
+    <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> {{ person.first_name }} {{ person.last_name}} </a>
+
+    {%if organization.owner_id == g.user.id %}
+        <td>
+            <form action="{{ url_for('unassignpos') }}" method="post">
+            <input type="hidden" name="unassignuserid" value="{{ person.id }}"/>
+            <input type="hidden" name="unassignposid" value="{{ position.id }}"/>
+            <input type="hidden" name="org" value="{{organization.id}}">
+            <input type="submit" class="btn btn-xs btn-danger" value="Unassign"/>
+            </form>
+          </td>
+    {%endif%}
+    </p>
 {%endfor%}
+
+
+{%if organization.owner_id == g.user.id %}
+<form action=" {{ url_for('assignpos') }} " method='post'>    
+  <p> Assign members to this position </p>
+    <select class="dropdownmenu" name='userid'>
+      {%for person in organization.memberships.all() %}
+        <option value='{{person.member.id}}'> {{person.member.first_name}} {{person.member.last_name}} </option>
+      {%endfor%}         
+    </select>
+
+  <input type="hidden" name="positionid" value="{{ position.id }}"/>
+  <input type="hidden" name="org" value="{{organization.id}}">
+  <input type="submit" class="btn btn-xs btn-danger" value="assign"/>
+</form>
+{%endif%}
+
 
 
 <br>
@@ -32,4 +64,18 @@
 Looks like you don't have any shifts, would you like to
 				<a href="/organization/{{ organization.id }}/position/{{position.id}}/shift/create">create one</a>?
 {% endif %}
+
+<br>
+<br>
+
+{%if organization.owner_id == g.user.id %}
+  <form action=" {{ url_for('deleteposition') }} " method='post'>
+    <input type="hidden" name="deleteposid" value="{{ position.id }}"/>
+    <input type="hidden" name="org" value="{{organization.id}}">
+    <input type="submit" class="btn btn-xs btn-danger" value="Delete this Position"/>
+  </form>
+{%endif%}
+
+</div>
+
 {% endblock %}

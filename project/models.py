@@ -6,10 +6,10 @@ import datetime
 from project import db, bcrypt
 from sqlalchemy import UniqueConstraint
 
-claimed = db.Table('claimed',
-                   db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-                   db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
-                   )
+position_assignments = db.Table('position_assignments',
+                                db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+                                db.Column('position_id', db.Integer, db.ForeignKey('positions.id'))
+                                )
 
 
 class User(db.Model):
@@ -70,7 +70,7 @@ class Shift(db.Model):
     duration = db.Column(db.DateTime, nullable=False)
 
     # relationship with user
-    assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # relationship with position
     position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
@@ -81,11 +81,10 @@ class Shift(db.Model):
         self.day = day
         self.start_time = start_time
         self.end_time = end_time
-
-        zero = datetime.datetime.strptime('00:00',
-                                          '%H:%M')  # zero o'clock datetime to add timedelta object to (end_time - start_time)
-        self.duration = zero + (
-        self.end_time - self.start_time)  # this is how we convert from timedelta obj to datetime obj
+        # zero o'clock datetime to add timedelta object to (end_time - start_time)
+        zero = datetime.datetime.strptime('00:00','%H:%M')
+        # this is how we convert from timedelta obj to datetime obj  
+        self.duration = zero + (self.end_time - self.start_time)  
 
 
 class Membership(db.Model):
@@ -146,7 +145,7 @@ class Position(db.Model):
     # Users many to many relationship with position
     assigned_users = db.relationship(
         'User',
-        secondary=claimed,
+        secondary=position_assignments,
         backref=db.backref('Position', lazy='dynamic'))
 
     def __init__(self, title, organization_id):

@@ -7,30 +7,35 @@
 <h2 class="ORGANIZATION_employees"><strong>Employees:</strong></h2>
 
 {% if organization.owner.id == g.user.id %}
+    
     <ul>
         {% for membership in organization.memberships.all() %}
         <li>
-            {{ membership.member.first_name }} {{ membership.member.last_name }}
-            {% if not membership.joined %}
-            (invited)
-            {% endif %}
             {% if membership.joined %}
-            <a href="/organization/{{ organization.id }}/member/{{ membership.member.id }}"> edit </a>
+                <a href="/organization/{{ organization.id }}/member/{{ membership.member.id }}"> {{ membership.member.first_name }} {{ membership.member.last_name }} </a>
+            {% endif %}
+            {% if not membership.joined %}
+                {{ membership.member.first_name }} {{ membership.member.last_name }} (invited)
             {% endif %}
         </li>
         {% endfor %}
     </ul>
 
+
+
 <a class="ORGANIZATION_invite" href="/organization/{{ organization.id }}/invite" role="button" type="submit" >Invite people to this organization</a>
 
 <br>
+
 {% else %}
 <ul>
-    {% for membership in organization.memberships.filter_by(is_owner=False).all() %}
+    {% for membership in organization.memberships.all() %}
     <li>
-        {{ membership.member.first_name }} {{ membership.member.last_name }}
+        {% if membership.joined %}
+            <a href="/organization/{{ organization.id }}/member/{{ membership.member.id }}"> {{ membership.member.first_name }} {{ membership.member.last_name }} </a>
+        {% endif %}
         {% if not membership.joined %}
-        (invited)
+            {{ membership.member.first_name }} {{ membership.member.last_name }} (invited)
         {% endif %}
     </li>
     {% endfor %}
@@ -45,19 +50,29 @@
 <ul class="list-group">
     
     {% for pos in organization.owned_positions.all() %}
-    <li class="list-group-item"><a href="/organization/{{ organization.id }}/position/{{pos.id}}">{{ pos.title }}</a>
-    <p> 
-    
-        {% for person in pos.assigned_users%}  
-        
-            {{ person.first_name }} {{ person.last_name}}  {%if organization.owner.id == g.user.id%}<a href="/organization/{{ organization.id }}/member/{{ person.id }}"> edit </a>{%endif%} </p>
-    
-        {% endfor %}
-        {% if not pos.assigned_users %}
-            <p>unassigned</p>
-        {% endif %}
+    <p>
+    <li class="list-group-item"><a href="/organization/{{ organization.id }}/position/{{pos.id}}">{{ pos.title }}</a> | 
+    {% for person in pos.assigned_users%}  
+          
+            {%if organization.owner.id == g.user.id%}
+                <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> {{ person.first_name }} {{ person.last_name}}  </a>
+            {%endif%} 
 
+    {% endfor %}
+
+    {% if not pos.assigned_users %}
+    unassigned
+    {% endif %}
+
+    {% if organization.owner.id == g.user.id %}
+    <form action=" {{ url_for('deleteposition') }} " method='post'>
+        <input type="hidden" name="deleteposid" value="{{ pos.id }}"/>
+        <input type="hidden" name="org" value="{{organization.id}}">
+        <input type="submit" class="btn btn-xs btn-danger" value="Delete Position" />
+    </form>
+    {%endif%}
     </li>
+    </p>
 
     {% endfor %}
     
@@ -70,9 +85,13 @@
 {% else %}
 Looks like you don't have any positions, would you like to <a class="ORGANIZATION_new-position" href="/organization/{{ organization.id }}/create_position" role="button" type="submit">create one</a>?
 {% endif %}
-</div>
 
+
+<br>
 
 <a href="/home">Go back</a>
+
+
+</div>
 
 {% endblock %}
