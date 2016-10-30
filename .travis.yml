@@ -5,6 +5,8 @@ python:
 install:
   - pip install -r requirements.txt
   - export APP_SETTINGS="project.config.TestingConfig"
+  - export APP_MAIL_USERNAME="skedd.mail@gmail.com"
+  - export APP_MAIL_PASSWORD="cumulonimbus"
 # command to run tests
 script:
   - nosetests
