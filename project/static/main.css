@@ -1,5 +1,4 @@
 /* custom styles */
-
 @import url("index.css");
 @import url("register.css");
 @import url("login.css");
@@ -7,7 +6,10 @@
 @import url("home.css");
 @import url("create.css");
 @import url("organization.css");
-
+@import url("profile.css");
+@import url("invite.css");
+@import url("create_position.css");
+@import url("position.css");
 /*
 CSS Outline
 Window Color Background: #333333;
