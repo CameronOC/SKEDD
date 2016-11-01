@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime, timedelta
+import json
 from project import db, bcrypt
 from project.models import Organization, User, Membership, Position, Shift
 from project.email import send_email
@@ -165,7 +166,7 @@ def confirm_invite(membership):
     flash('You have now joined ' + membership.organization.name, 'success')
     return membership
     
-def create_shift(pos_key, assigned_user_id, day, start_time, end_time):
+def create_shift(pos_key, assigned_user_id, day, start_time, end_time, description, repeating):
     """
     Creates a new shift object
     :param pos_key:
@@ -177,7 +178,7 @@ def create_shift(pos_key, assigned_user_id, day, start_time, end_time):
     """
     # create shift with parameters
     shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
-                    end_time=end_time)
+                    end_time=end_time, description=description, repeating=repeating)
     
     # add shift to database
     db.session.add(shift)
@@ -202,7 +203,7 @@ def gather_members_for_shift(org_key):
     
     return users
 
-def update_shift(shift, pos_key, assigned_user_id, day, start_time, end_time):
+def update_shift(shift, pos_key, assigned_user_id, day, start_time, end_time, description, repeating):
     """
     Updates an existing shift
     :param shift:
@@ -219,9 +220,76 @@ def update_shift(shift, pos_key, assigned_user_id, day, start_time, end_time):
     curr_shift.day = day
     curr_shift.start_time = start_time
     curr_shift.end_time = end_time
+    curr_shift.description = description
+    curr_shift.repeating = repeating
+    
+    # zero o'clock datetime to add to timedelta object (end_time - start_time)
+    zero = datetime.strptime('00:00','%H:%M')
+    # calculate duration, convert from timedelta to datetime
+    start_time_DT = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
+    end_time_DT = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S') 
+    curr_shift.duration = zero + (end_time_DT - start_time_DT)
+    
     db.session.commit()
 
+def create_shift_2(dictionary):
+    """
+    creates a shift or multiple shifts based on
+    a dictionary (JSON) argument
+    :param dictionary:
+    :return:
+    """
+    shifts = []
+    main_start_time = datetime.strptime(dictionary['start_time'], '%Y-%m-%dT%H:%M:%S')
+    main_end_time = datetime.strptime(dictionary['end_time'], '%Y-%m-%dT%H:%M:%S')
+    main_repeating = 'repeating' in dictionary
+    shift = create_shift(   dictionary['position_id'],
+                            dictionary['assigned_user_id'],
+                            dictionary['day'],
+                            dictionary['start_time'],
+                            dictionary['end_time'],
+                            dictionary['description'],
+                            main_repeating)
+    shifts.append(shift)
 
+    if 'repeating' in dictionary:
+        main_day_int = main_start_time.weekday()
+        for day_int in dictionary['repeating']:
+            if day_int != main_day_int:
+                day_difference = day_int - main_day_int
+                delta = timedelta(days=day_difference)
+                new_start_time = (main_start_time + delta).strftime('%Y-%m-%dT%H:%M:%S')
+                new_end_time = (main_end_time + delta).strftime('%Y-%m-%dT%H:%M:%S')
+                new_shift = create_shift(	dictionary['position_id'],
+                                            dictionary['assigned_user_id'],
+                                            dictionary['day'],
+                                            new_start_time,
+                                            new_end_time,
+                                            dictionary['description'],
+                                            True)
+                shifts.append(new_shift)
 
+    return shifts
 
+def get_shift_JSON(id):
+    """
+    returns a shift as a JSON dictionary of
+    type str. Convert into dictionary in front
+    end using json.loads equivalent.
+    :param id:
+    :return:
+    """
+    shift = get_shift(id)
+    dict = {'position_id': shift.position_id, 
+            'assigned_user_id': shift.assigned_user_id,
+            'day': shift.day,
+            'start_time': shift.start_time,
+            'end_time': shift.end_time,
+            'description': shift.description,
+            'repeating': shift.repeating,
+            'duration': shift.duration.strftime('%H:%M:%S')}
+            
+    return json.dumps(dict)
+    # can we just return the dictionary?
+    
 

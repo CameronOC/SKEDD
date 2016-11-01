@@ -5,6 +5,7 @@ from project.models import User, Organization, Membership, Position, Shift
 import project.utils.organization as org_utils
 # from project.utils.organization import create_organization, get_organization
 import datetime
+import json
 
 
 class TestOrganization(TestCase):
@@ -63,8 +64,10 @@ class TestOrganization(TestCase):
             position_id = position.id,
             assigned_user_id = None,
             day = 'Monday',
-            start_time = datetime.datetime.now(),
-            end_time = datetime.datetime.now()
+            start_time = '2016-10-26T06:00:00',
+            end_time = '2016-10-26T07:00:00',
+            description = None,
+            repeating = False
         )
         
         db.session.add(shift)
@@ -229,10 +232,10 @@ class TestOrganization(TestCase):
         db.session.add(new_pos)
         db.session.commit()
         
-        start_time = datetime.datetime.now()
-        end_time = datetime.datetime.now()
+        start_time = '2016-10-26T08:00:00'
+        end_time = '2016-10-26T09:00:00'
         
-        shift = org_utils.create_shift(new_pos.id, self.john.id, 'Wednesday', start_time, end_time)
+        shift = org_utils.create_shift(new_pos.id, self.john.id, 'Wednesday', start_time, end_time, 'desc', False)
         
         assert shift is not None
         assert shift.position_id == new_pos.id
@@ -240,6 +243,8 @@ class TestOrganization(TestCase):
         assert shift.day == 'Wednesday'
         assert shift.start_time == start_time
         assert shift.end_time == end_time
+        assert shift.description == 'desc'
+        assert shift.repeating == False
     
     def test_get_shift(self):
         """
@@ -254,8 +259,11 @@ class TestOrganization(TestCase):
         assert shift.day == self.shift.day
         assert shift.start_time == self.shift.start_time
         assert shift.end_time == self.shift.end_time
+        assert shift.duration == self.shift.duration
+        assert shift.description == self.shift.description
+        assert shift.repeating == self.shift.repeating
         
-        shift = org_utils.get_position(2)
+        shift = org_utils.get_shift(2)
         assert shift is None
         
     def test_update_shift(self):
@@ -269,11 +277,12 @@ class TestOrganization(TestCase):
         db.session.add(new_pos)
         db.session.commit()
         
-        start_time = datetime.datetime.now()
-        end_time = datetime.datetime.now()
+        start_time = '2016-10-26T08:00:00'
+        end_time = '2016-10-26T10:30:00'
+
         
         org_utils.update_shift(shift, new_pos.id, self.john.id, 'Tuesday', 
-                                start_time, end_time)
+                                start_time, end_time, 'desc', True)
         
         # re-query, compare fields
         shift = org_utils.get_shift(1)
@@ -281,11 +290,33 @@ class TestOrganization(TestCase):
         assert shift.assigned_user_id == self.john.id
         assert shift.day == 'Tuesday'
         assert shift.start_time == start_time
-        assert shift.end_time == end_time   
+        assert shift.end_time == end_time
+        assert shift.duration.hour == 2
+        assert shift.duration.minute == 30
+        assert shift.description == 'desc'
+        assert shift.repeating == True   
         
         # reset fields for future tests
         org_utils.update_shift(shift, self.shift.position_id, self.shift.assigned_user_id,
-                                 self.shift.day, self.shift.start_time, self.shift.end_time)
+                                 self.shift.day, self.shift.start_time, self.shift.end_time,
+                                 self.shift.description, self.shift.repeating)
         
+    def test_get_shift_JSON(self):
+        """
+        Tests getting a shift as a JSON
+        object
+        :return:
+        """
+        shift = org_utils.get_shift_JSON(1) #string
+        shift_dict = json.loads(shift) # dictionary
         
-        
+        assert shift is not None
+        assert shift_dict is not None
+        assert shift_dict['position_id'] == self.shift.position_id
+        assert shift_dict['assigned_user_id'] == self.shift.assigned_user_id
+        assert shift_dict['day'] == self.shift.day
+        assert shift_dict['start_time'] == self.shift.start_time
+        assert shift_dict['end_time'] == self.shift.end_time
+        assert shift_dict['duration'] == self.shift.duration.strftime('%H:%M:%S')
+        assert shift_dict['description'] == self.shift.description
+        assert shift_dict['repeating'] == self.shift.repeating        
