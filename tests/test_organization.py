@@ -246,6 +246,42 @@ class TestOrganization(TestCase):
         assert shift.description == 'desc'
         assert shift.repeating == False
     
+    def test_create_shift_JSON(self):
+        """
+        Tests creating a new shift from 
+        a dictionary (or JSON)
+        :return:
+        """
+        pos = org_utils.get_position(1)
+        dict = {'position_id': pos.id, 
+                'assigned_user_id': self.john.id,
+                'day': 'Wednesday', 
+                'start_time': '2016-10-26T08:00:00', 
+                'end_time': '2016-10-26T09:00:00', 
+                'description': 'desc',
+                'repeating': [1]}
+        
+        new_shifts = org_utils.create_shift_JSON(dict)
+        
+        assert new_shifts is not None
+        assert len(new_shifts) == 2
+        
+        assert new_shifts[0].position_id == dict['position_id']
+        assert new_shifts[0].assigned_user_id == dict['assigned_user_id']
+        assert new_shifts[0].day == dict['day']
+        assert new_shifts[0].start_time == dict['start_time']
+        assert new_shifts[0].end_time == dict['end_time']
+        assert new_shifts[0].description == dict['description']
+        assert new_shifts[0].repeating == True
+        
+        assert new_shifts[1].position_id == dict['position_id']
+        assert new_shifts[1].assigned_user_id == dict['assigned_user_id']
+        assert new_shifts[1].day == dict['day']
+        assert new_shifts[1].start_time == '2016-10-25T08:00:00'
+        assert new_shifts[1].end_time == '2016-10-25T09:00:00'
+        assert new_shifts[1].description == dict['description']
+        assert new_shifts[1].repeating == True
+    
     def test_get_shift(self):
         """
         Tests getting a shift by ID

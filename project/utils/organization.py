@@ -232,7 +232,7 @@ def update_shift(shift, pos_key, assigned_user_id, day, start_time, end_time, de
     
     db.session.commit()
 
-def create_shift_2(dictionary):
+def create_shift_JSON(dictionary):
     """
     creates a shift or multiple shifts based on
     a dictionary (JSON) argument
@@ -289,7 +289,5 @@ def get_shift_JSON(id):
             'repeating': shift.repeating,
             'duration': shift.duration.strftime('%H:%M:%S')}
             
-    return json.dumps(dict)
-    # can we just return the dictionary?
-    
+    return json.dumps(dict) # can we just return the dictionary?
 
