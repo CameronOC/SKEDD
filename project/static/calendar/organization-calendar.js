@@ -5,6 +5,7 @@ $(document).ready(function() {
     *
     */
     var nextId
+
     $('.modal').on('hidden.bs.modal', function(){
         console.log('it works');
         $(this).find("input,textarea").val('').end();
@@ -25,9 +26,9 @@ $(document).ready(function() {
 
         evento = eventlist[0];
 
-        evento.title = $('#createPosition').val();
-        evento.description = $('#createDescription').val();
-        evento.assigned = $('#createAssigned').val();
+        evento.title = $('#createShiftPosition').val();
+        evento.description = $('#createShiftDescription').val();
+        evento.assigned = $('#createShiftAssigned').val();
 
         $('#calendar').fullCalendar('updateEvent', evento);
         $('#createShiftModal').modal('hide');
@@ -57,9 +58,9 @@ $(document).ready(function() {
 
         evento = eventlist[0];
 
-        evento.title = $('#editPosition').val();
-        evento.description = $('#editDescription').val();
-        evento.assigned = $('#editAssigned').val();
+        evento.title = $('#editShiftPosition').val();
+        evento.description = $('#editShiftDescription').val();
+        evento.assigned = $('#editShiftAssigned').val();
 
         $('#calendar').fullCalendar('updateEvent', evento);
         $('#editShiftModal').modal('hide');
@@ -112,12 +113,12 @@ $(document).ready(function() {
             element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned + "</span>");
         },
         eventClick:  function(event, jsEvent, view) {
-            $('#editModalTitle').html(event.title);
-            $('#editPosition').val(event.title);
-            $('#editDescription').val(event.description);
-            $('#editAssigned').val(event.assigned);
-            $('#editStart').html(event.start.toString());
-            $('#editEnd').html(event.end.toString());
+            $('#editShiftTitle').html(event.title);
+            $('#editShiftPosition').val(event.title);
+            $('#editShiftDescription').val(event.description);
+            $('#editShiftAssigned').val(event.assigned);
+            $('#editShiftStart').html(event.start.toString());
+            $('#editShiftEnd').html(event.end.toString());
             $('#editShiftId').html(event.id);
 
             $('#editShiftModal').modal('show');
@@ -130,12 +131,31 @@ $(document).ready(function() {
                 id: nextId,
             };
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
-            $('#createStart').html(start.toString());
-            $('#createEnd').html(end.toString());
+            $('#createShiftStart').html(start.toString());
+            $('#createShiftEnd').html(end.toString());
             $('#createShiftId').html(nextId.toString());
             $('#createShiftModal').modal('show');
 
         }
+    });
+
+
+    /*
+    *
+    * Code to Create new Position
+    *
+    */
+    var nextId = 3;
+
+    $('#newPosition').on('click', function() {
+        $('#createPositionModal').modal('show');
+    });
+
+    $('#createCancel').on('click', function() {
+
+        var tempId = parseInt($('#createShiftId').text());
+        $('#calendar').fullCalendar( 'removeEvents', tempId);
+        $('#createShiftModal').modal('hide');
     });
 
 });

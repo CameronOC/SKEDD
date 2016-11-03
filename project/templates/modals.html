@@ -1,18 +1,16 @@
-<div id='calendar'></div>
-
 <div id="createShiftModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 id="createModalTitle" class="modal-title"></h4>
+                <h4 id="createShiftTitle" class="modal-title">New Shift</h4>
             </div>
-            <div id="createModalBody" class="modal-body">
-                <select class="form-control" id="createPosition">
+            <div id="createShiftBody" class="modal-body">
+                <select class="form-control" id="createShiftPosition">
                     <option>Product Owner</option>
                     <option>Scrum Master</option>
                     <option>Developer</option>
                 </select> <br>
-                <select class="form-control" id="createAssigned">
+                <select class="form-control" id="createShiftAssigned">
                     <option>Unassigned</option>
                     <option>Philip Guther</option>
                     <option>Bobby Lyons</option>
@@ -20,10 +18,10 @@
                     <option>Chris Kempis</option>
                     <option>Cameron Johnson</option>
                 </select> <br>
-                <textarea class="form-control" rows="5" id="createDescription" placeholder="Description...">
+                <textarea class="form-control" rows="5" id="createShiftDescription" placeholder="Description...">
                 </textarea> <br>
-                Start: <span id="createStart"></span> <br>
-                End: <span id="createEnd"></span>
+                Start: <span id="createShiftStart"></span> <br>
+                End: <span id="createShiftEnd"></span>
                 <h1 id="createShiftId"></h1>
             </div>
             <div class="modal-footer">
@@ -38,15 +36,15 @@
    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 id="editModalTitle" class="modal-title">New Shift</h4>
+                <h4 id="editShiftTitle" class="modal-title"></h4>
             </div>
-            <div id="editModalBody" class="modal-body">
-                <select class="form-control" id="editPosition">
+            <div id="editShiftBody" class="modal-body">
+                <select class="form-control" id="editShiftPosition">
                     <option>Product Owner</option>
                     <option>Scrum Master</option>
                     <option>Developer</option>
                 </select> <br>
-                <select class="form-control" id="editAssigned">
+                <select class="form-control" id="editShiftAssigned">
                     <option>Unassigned</option>
                     <option>Philip Guther</option>
                     <option>Bobby Lyons</option>
@@ -54,16 +52,35 @@
                     <option>Chris Kempis</option>
                     <option>Cameron Johnson</option>
                 </select> <br>
-                <textarea class="form-control" rows="5" id="editDescription" placeholder="Description...">
+                <textarea class="form-control" rows="5" id="editShiftDescription" placeholder="Description...">
                 </textarea> <br>
-                Start: <span id="editStart"></span> <br>
-                End: <span id="editEnd"></span>
+                Start: <span id="editShiftStart"></span> <br>
+                End: <span id="editShiftEnd"></span>
                 <h1 id="editShiftId"></h1>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" id="editDelete">Delete</button>
                 <button type="button" class="btn btn-default" id="editCancel" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="editSubmit">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="createPositionModal" class="modal fade" data-backdrop="static" data-keyboard="false">
+   <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="createPositionTitle" class="modal-title">New Position</h4>
+            </div>
+            <div id="createPositionBody" class="modal-body">
+
+                <textarea class="form-control" rows="5" id="createDescription" placeholder="Description...">
+                </textarea> <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="createPositionCancel" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="createPositionSubmit">Submit</button>
             </div>
         </div>
     </div>
