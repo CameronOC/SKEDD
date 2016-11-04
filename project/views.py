@@ -380,3 +380,7 @@ def deleteposition():
     deletepositions(pos, org)
 
     return render_template('main/organization.html', organization=org)
+
+@app.route('/getusersinorg/<key>')
+def getusersinorg(key):
+    return utils.organization.get_users_for_org_JSON(key)

@@ -295,6 +295,17 @@ def get_all_shifts_JSON(org_id):
 
     return json.dumps(outer)
 
+def get_users_for_org_JSON(org_id):
+    outer = {}
+    members = Membership.query.filter_by(organization_id=org_id).all()
+    for m in members:
+        inner = {   'first_name': m.member.first_name,
+                    'last_name': m.member.last_name,
+                    'email': m.member.email}
+        outer[str(m.member.id)] = inner
+
+    return json.dumps(outer)
+
 
 #used in views.deletepositions
 def deletepositions(posid, orgid):
