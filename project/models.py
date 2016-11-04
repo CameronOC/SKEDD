@@ -64,10 +64,9 @@ class Shift(db.Model):
     __tablename__ = "shifts"
 
     id = db.Column(db.Integer, primary_key=True)
-    day = db.Column(db.String, nullable=False)
-    start_time = db.Column(db.DateTime, nullable=False)
-    end_time = db.Column(db.DateTime, nullable=False)
-    duration = db.Column(db.DateTime, nullable=False)
+    start_time = db.Column(db.String, nullable=False)
+    end_time = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=True)
 
     # relationship with user
     assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
@@ -75,17 +74,13 @@ class Shift(db.Model):
     # relationship with position
     position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
 
-    def __init__(self, position_id, assigned_user_id, day, start_time, end_time):
+    def __init__(self, position_id, assigned_user_id, start_time, end_time, description):
         self.assigned_user_id = assigned_user_id
         self.position_id = position_id
-        self.day = day
         self.start_time = start_time
         self.end_time = end_time
-        # zero o'clock datetime to add timedelta object to (end_time - start_time)
-        zero = datetime.datetime.strptime('00:00','%H:%M')
-        # this is how we convert from timedelta obj to datetime obj  
-        self.duration = zero + (self.end_time - self.start_time)  
-
+        self.description = description
+        
 
 class Membership(db.Model):
     __tablename__ = 'organization_members'

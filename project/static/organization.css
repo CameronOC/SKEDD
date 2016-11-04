@@ -1,13 +1,34 @@
 div.ORGANIZATION_page {
   background: #333333;
   background: linear-gradient(90deg, #262626, #404040);
-  padding: 1px 20px 20px 20px;
+  padding: 20px 20px 20px 20px;
   margin: auto;
 
   border-radius:4px;
   box-shadow:0 4px 10px 4px rgba(0,0,0,0.19);
   margin-bottom: 50px;
-    color: white;
+  color: white;
+}
+
+a.ORGANIZATION_previous-button {
+  text-align: center;
+  background-color: #BA6D00; 
+  border-radius: 4px;
+  border: none;
+  color: white;
+  padding: 10px 10px;
+  text-decoration: none;
+  font-size: 14px;
+  -webkit-transition-duration: 0.4s;
+  transition-duration: 0.4s;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+a.ORGANIZATION_previous-button:hover {
+  background-color: #F5B041;
+  text-decoration: none;
+  color: white;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
 h1.ORGANIZATION_name {
@@ -98,7 +119,7 @@ a.ORGANIZATION_new-position {
   text-decoration: none;
   display: inline-block;
   font-size: 14px;
-  margin-left: 20px;
+  margin-left: 2%;
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);

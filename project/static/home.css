@@ -3,9 +3,9 @@ div.HOME_organizations {
   background: linear-gradient(90deg, #262626, #404040);
   padding: 1px 20px 20px 20px;
   border-radius:4px;
-	box-shadow:0 4px 10px 4px rgba(0,0,0,0.19);
-	color: white;
-	margin-bottom: 50px;
+  box-shadow:0 4px 10px 4px rgba(0,0,0,0.19);
+  color: white;
+  margin-bottom: 50px;
 }
 
 h1.HOME_Org-title {
@@ -25,7 +25,7 @@ a.HOME_create-org {
   text-decoration: none;
   display: inline-block;
   font-size: 14px;
-  margin-left: 20px;
+  margin-left: 5%;
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
@@ -39,9 +39,9 @@ a.HOME_create-org {
 }
 
 li.list-group-item {
-      background: none;
-      border: 0 none;
-      margin: 2%;
+  background: none;
+  border: 0 none;
+  margin: 2%;
 }
 
 a.list-group-item-single {
@@ -73,8 +73,8 @@ div.HOME_memberships {
   padding: 1px 20px 20px 20px;
   margin: auto;
   border-radius:4px;
-	box-shadow:0 4px 10px 4px rgba(0,0,0,0.19);
-	color: white;
+  box-shadow:0 4px 10px 4px rgba(0,0,0,0.19);
+  color: white;
 }
 
 h1.HOME_Mem-title {
@@ -85,5 +85,5 @@ h1.HOME_Mem-title {
 }
 
 p.HOME_Mem-txt {
-	    margin-left: 20px;
+ margin-left: 20px;
 }

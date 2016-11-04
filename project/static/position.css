@@ -1,0 +1,38 @@
+div.POSITION_window {
+	position: relative;
+	background: #333333;
+	background: linear-gradient(90deg, #262626, #404040);
+	padding: 20px 20px 20px 20px;
+	border-radius:4px;
+	box-shadow:0 4px 10px 4px rgba(0,0,0,0.19);
+	color: white;
+	margin:auto;
+}
+
+a.POSITION_return-previous {
+  text-align: center;
+  background-color: #BA6D00; 
+  border-radius: 4px;
+  border: none;
+  color: white;
+  padding: 10px 10px;
+  text-decoration: none;
+  font-size: 14px;
+  -webkit-transition-duration: 0.4s;
+  transition-duration: 0.4s;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+a.POSITION_return-previous:hover {
+  background-color: #F5B041;
+  text-decoration: none;
+  color: white;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+h1.POSITION_title {
+  font-weight:bold;
+  color: white;
+  text-shadow: 2px 2px 4px #1a1a1a;
+  font-size: 32px;
+}

@@ -1,81 +1,35 @@
 {% extends "_base.html" %}
 
 {% block content %}
+<div class="POSITION_window">
+<a class="POSITION_return-previous" href="/organization/{{ organization.id }}" type="submit">Return to {{ organization.name }} home</a> <br>
 
-<div>
+    <h1 class="POSITION_title">{{ position.title }}</h1>
 
-<a href="/organization/{{ organization.id }}">Return to {{ organization.name }} home</a> <br>
+    <p> Assigned user(s): </p>
+    {% for person in position.assigned_users%} 
+    <p>{{ person.first_name }} {{ person.last_name}} <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> edit </a> </p>
+    {%endfor%}
 
-<h1>{{ position.title }}</h1>
-
-<p> Assigned user(s): </p>
-{% for person in position.assigned_users%} 
-    <p>
-    <a href="/organization/{{ organization.id }}/member/{{ person.id }}"> {{ person.first_name }} {{ person.last_name}} </a>
-
-    {%if organization.owner_id == g.user.id %}
-        <td>
-            <form action="{{ url_for('unassignpos') }}" method="post">
-            <input type="hidden" name="unassignuserid" value="{{ person.id }}"/>
-            <input type="hidden" name="unassignposid" value="{{ position.id }}"/>
-            <input type="hidden" name="org" value="{{organization.id}}">
-            <input type="submit" class="btn btn-xs btn-danger" value="Unassign"/>
-            </form>
-          </td>
-    {%endif%}
-    </p>
-{%endfor%}
-
-
-{%if organization.owner_id == g.user.id %}
-<form action=" {{ url_for('assignpos') }} " method='post'>    
-  <p> Assign members to this position </p>
-    <select class="dropdownmenu" name='userid'>
-      {%for person in organization.memberships.all() %}
-        <option value='{{person.member.id}}'> {{person.member.first_name}} {{person.member.last_name}} </option>
-      {%endfor%}         
-    </select>
-
-  <input type="hidden" name="positionid" value="{{ position.id }}"/>
-  <input type="hidden" name="org" value="{{organization.id}}">
-  <input type="submit" class="btn btn-xs btn-danger" value="assign"/>
-</form>
-{%endif%}
-
-
-
-<br>
-
-{% if shifts %}
-<ul class="list-group">
-    {% for shift in shifts %}
-    <li class="list-group-item">
-        {{ shift.user.first_name }} {{ shift.user.last_name }} on {{ shift.day }}; 
-        {{ shift.start_time.hour }}:{{ shift.start_time.minute }} - {{ shift.end_time.hour }}:{{ shift.end_time.minute }}
-    </li>
-    {% endfor %}
     <br>
-    <a class="btn btn-info" href="/organization/{{ organization.id }}/position/{{position.id}}/shift/create">
-         <i class="fa fa-plus" aria-hidden="true"></i> 
-         Create Shift
-    </a>
-</ul>
+
+    {% if shifts %}
+    <ul class="list-group">
+        {% for shift in shifts %}
+        <li class="list-group-item">
+            {{ shift.user.first_name }} {{ shift.user.last_name }} on {{ shift.day }}; 
+            {{ shift.start_time.hour }}:{{ shift.start_time.minute }} - {{ shift.end_time.hour }}:{{ shift.end_time.minute }}
+        </li>
+        {% endfor %}
+        <br>
+        <a class="btn btn-info" href="/organization/{{ organization.id }}/position/{{position.id}}/shift/create">
+           <i class="fa fa-plus" aria-hidden="true"></i> 
+           Create Shift
+       </a>
+   </ul>
 {% else %}
 Looks like you don't have any shifts, would you like to
-				<a href="/organization/{{ organization.id }}/position/{{position.id}}/shift/create">create one</a>?
+<a href="/organization/{{ organization.id }}/position/{{position.id}}/shift/create">create one</a>?
 {% endif %}
-
-<br>
-<br>
-
-{%if organization.owner_id == g.user.id %}
-  <form action=" {{ url_for('deleteposition') }} " method='post'>
-    <input type="hidden" name="deleteposid" value="{{ position.id }}"/>
-    <input type="hidden" name="org" value="{{organization.id}}">
-    <input type="submit" class="btn btn-xs btn-danger" value="Delete this Position"/>
-  </form>
-{%endif%}
-
 </div>
-
 {% endblock %}
