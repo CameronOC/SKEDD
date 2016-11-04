@@ -50,6 +50,7 @@ def get_organization(id):
     """
     return Organization.query.get(id)
 
+
 def get_position(id):
     """
     Gets a position object based on id
@@ -57,7 +58,8 @@ def get_position(id):
     :return:
     """
     return Position.query.get(id)
-    
+
+
 def get_shift(id):
     """
     Gets a shift object based on id
@@ -65,6 +67,7 @@ def get_shift(id):
     :return:
     """
     return Shift.query.get(id)
+
 
 def get_membership(org, user):
     """
@@ -74,6 +77,7 @@ def get_membership(org, user):
     :return:
     """
     return Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
+
 
 def confirm_user(user, password=None):
     if password is not None:
@@ -165,7 +169,8 @@ def confirm_invite(membership):
         login_user(membership.member)
     flash('You have now joined ' + membership.organization.name, 'success')
     return membership
-    
+
+
 def create_shift(pos_key, assigned_user_id, start_time, end_time, description):
     """
     Creates a new shift object
@@ -178,12 +183,13 @@ def create_shift(pos_key, assigned_user_id, start_time, end_time, description):
     # create shift with parameters
     shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, start_time=start_time,
                     end_time=end_time, description=description)
-    
+
     # add shift to database
     db.session.add(shift)
     db.session.commit()
     return shift
-    
+
+
 def gather_members_for_shift(org_key):
     """
     Creates a formatted list of users in an organization
@@ -199,8 +205,9 @@ def gather_members_for_shift(org_key):
     for c in eligible_members:
         # use 'member' backref in user-membership relationship
         users.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
-    
+
     return users
+
 
 def update_shift(shift, pos_key, assigned_user_id, start_time, end_time, description):
     """
@@ -218,12 +225,13 @@ def update_shift(shift, pos_key, assigned_user_id, start_time, end_time, descrip
     curr_shift.start_time = start_time
     curr_shift.end_time = end_time
     curr_shift.description = description
-    
+
     db.session.commit()
+
 
 def create_shifts_JSON(dictionary):
     """
-    creates a month's worth of shifts 
+    creates a month's worth of shifts
     based on a dictionary (JSON) argument
     :param dictionary:
     :return:
@@ -263,11 +271,12 @@ def create_shifts_JSON(dictionary):
 
     return shifts
 
+
 def get_all_shifts_JSON(org_id):
     """
     returns all shifts for each position
-    in an organization as a JSON dictionary 
-    of type str. Convert into list of 
+    in an organization as a JSON dictionary
+    of type str. Convert into list of
     dictionaries using json.loads equivalent.
     :param id:
     :return:
@@ -277,12 +286,39 @@ def get_all_shifts_JSON(org_id):
     for p in positions:
         shifts = Shift.query.filter_by(position_id=p.id).all()
         for s in shifts:
-            inner = {   'position_id': s.position_id, 
+            inner = {   'position_id': s.position_id,
                         'assigned_user_id': s.assigned_user_id,
                         'start_time': s.start_time,
                         'end_time': s.end_time,
                         'description': s.description}
             outer[str(s.id)] = inner
-                                            
+
     return json.dumps(outer)
 
+
+#used in views.deletepositions
+def deletepositions(posid, orgid):
+    pos = posid
+    org = orgid
+    #remove the position from the org
+    db.session.delete(pos)
+    db.session.commit()
+
+
+#used in views.assign and views.assignpos
+def assign_member_to_position(userid, posid, orgid):
+    user = userid
+    pos = posid
+    org = orgid
+    #assign the user to an org
+    pos.assigned_users.append(user)
+    db.session.commit()
+
+
+def unassign_member_to_position(userid, posid, orgid):
+    user = userid
+    pos = posid
+    org = orgid
+    #removes the user from the position
+    pos.assigned_users.remove(user)
+    db.session.commit()
