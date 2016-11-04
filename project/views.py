@@ -107,28 +107,55 @@ def organization_calendar(key):
     return render_template('main/organizationc.html', organization=org)
 
 
-@main_blueprint.route('/organization/<key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
-@owns_organization
-def shift(key, pos_key):
+#@owns_organization
+def create_shift(org_key, pos_key):
     """
     Creates a new shift.  Shifts can be assigned to a user or left empty at
     initialization, but are always related to a position, which is in turn
-    related
-    :param key:
+    related to an organization
+    :param org_key:
     :param pos_key:
     :return:
     """
     form = ShiftForm(request.form)
     if request.method == 'GET':
         # fill in SelectField for choosing a user to assign a shift to (when creating the shift)
-        form.user.choices = utils.organization.gather_members_for_shift(key)
+        form.assigned_user_id.choices = utils.organization.gather_members_for_shift(org_key)
         return render_template('main/create_shift.html', form=form)
     else:
-        utils.organization.create_shift(pos_key, form.user.data, form.day.data,
+        shift = utils.organization.create_shift(pos_key, form.assigned_user_id.data, form.day.data,
+                                                form.start_time.data, form.end_time.data)
+    return redirect(url_for('main.position', key=org_key, key2=pos_key))
+
+
+@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/<shift_key>/edit', methods=['GET', 'POST'])
+@login_required
+@check_confirmed
+#@owns_organization
+def update_shift(org_key, pos_key, shift_key):
+    """
+    Updates an existing shift.
+    :param org_key:
+    :param pos_key:
+    :param shift_key:
+    :return:
+    """
+    shift = utils.organization.get_shift(shift_key)
+    form = ShiftForm(obj=shift)
+    if request.method == 'GET':
+        # fill in SelectField for choosing a user to assign a shift to (when creating the shift)
+        form.assigned_user_id.choices = utils.organization.gather_members_for_shift(org_key)
+        if form.validate():
+            # pre-populate form with current data
+            form.populate_obj(shift)
+        return render_template('main/update_shift.html', form=form)
+    else:
+        utils.organization.update_shift(shift, pos_key, form.assigned_user_id.data, form.day.data,
                                         form.start_time.data, form.end_time.data)
-        return redirect(url_for('main.position', key=key, key2=pos_key))
+    return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
@@ -302,7 +329,6 @@ def assignpos():
     return render_template('main/position.html', position=mypos, organization=org)
 
 
-
 @app.route('/unassign', methods=['POST'])
 @login_required
 @check_confirmed
@@ -319,6 +345,7 @@ def unassign():
     unassign_member_to_position(myuser, mypos, org)
     # redirects to the page before
     return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
+
 
 @app.route('/unassignpos', methods=['POST'])
 @login_required
@@ -337,6 +364,7 @@ def unassignpos():
     
     # redirects to the page before
     return render_template('main/position.html', position=mypos, organization=org)
+
 
 @app.route('/deleteposition', methods=['POST'])
 @login_required

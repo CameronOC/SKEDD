@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime, timedelta
+import json
 from project import db, bcrypt
 from project.models import Organization, User, Membership, Position, Shift
 from project.email import send_email
@@ -49,6 +50,7 @@ def get_organization(id):
     """
     return Organization.query.get(id)
 
+
 def get_position(id):
     """
     Gets a position object based on id
@@ -56,6 +58,16 @@ def get_position(id):
     :return:
     """
     return Position.query.get(id)
+
+
+def get_shift(id):
+    """
+    Gets a shift object based on id
+    :param id:
+    :return:
+    """
+    return Shift.query.get(id)
+
 
 def get_membership(org, user):
     """
@@ -158,18 +170,33 @@ def confirm_invite(membership):
     flash('You have now joined ' + membership.organization.name, 'success')
     return membership
 
-# USED IN VIEWS.SHIFT()
-def create_shift(pos_key, assigned_user_id, day, start_time, end_time):
+
+def create_shift(pos_key, assigned_user_id, start_time, end_time, description):
+    """
+    Creates a new shift object
+    :param pos_key:
+    :param assigned_user_id:
+    :param start_time:
+    :param end_time:
+    :return:
+    """
     # create shift with parameters
-    shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, day=day, start_time=start_time,
-                    end_time=end_time)
+    shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, start_time=start_time,
+                    end_time=end_time, description=description)
 
     # add shift to database
     db.session.add(shift)
     db.session.commit()
+    return shift
 
-# USED IN VIEWS.SHIFT()
+
 def gather_members_for_shift(org_key):
+    """
+    Creates a formatted list of users in an organization
+    to use in ShiftForm.user
+    :param org_key:
+    :return:
+    """
     # filter users by members of current org in current position
     eligible_members = Membership.query.filter_by(organization_id=org_key).all()
     # create list to fill in SelectField
@@ -178,8 +205,96 @@ def gather_members_for_shift(org_key):
     for c in eligible_members:
         # use 'member' backref in user-membership relationship
         users.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
-    
+
     return users
+
+
+def update_shift(shift, pos_key, assigned_user_id, start_time, end_time, description):
+    """
+    Updates an existing shift
+    :param shift:
+    :param pos_key:
+    :param assigned_user_id:
+    :param start_time:
+    :param end_time
+    :return:
+    """
+    curr_shift = get_shift(shift.id)
+    curr_shift.position_id = pos_key
+    curr_shift.assigned_user_id = assigned_user_id
+    curr_shift.start_time = start_time
+    curr_shift.end_time = end_time
+    curr_shift.description = description
+
+    db.session.commit()
+
+
+def create_shifts_JSON(dictionary):
+    """
+    creates a month's worth of shifts
+    based on a dictionary (JSON) argument
+    :param dictionary:
+    :return:
+    """
+    shifts = []
+    main_start_time = datetime.strptime(dictionary['start_time'], '%Y-%m-%dT%H:%M:%S')
+    main_end_time = datetime.strptime(dictionary['end_time'], '%Y-%m-%dT%H:%M:%S')
+    week_ct = 3
+    while week_ct != -1:
+        start_time = (main_start_time + timedelta(weeks=week_ct)).strftime('%Y-%m-%dT%H:%M:%S')
+        end_time = (main_end_time + timedelta(weeks=week_ct)).strftime('%Y-%m-%dT%H:%M:%S')
+        shift = create_shift(   dictionary['position_id'],
+                                dictionary['assigned_user_id'],
+                                start_time,
+                                end_time,
+                                dictionary['description'])
+        shifts.append(shift)
+        week_ct -= 1
+
+    if 'repeating' in dictionary:
+        main_day_int = main_start_time.weekday()
+        for day_int in dictionary['repeating']:
+            week_ct = 3
+            while week_ct != -1:
+                if day_int != main_day_int:
+                    day_difference = day_int - main_day_int
+                    delta = timedelta(days=day_difference, weeks=week_ct)
+                    new_start_time = (main_start_time + delta).strftime('%Y-%m-%dT%H:%M:%S')
+                    new_end_time = (main_end_time + delta).strftime('%Y-%m-%dT%H:%M:%S')
+                    new_shift = create_shift(	dictionary['position_id'],
+                                                dictionary['assigned_user_id'],
+                                                new_start_time,
+                                                new_end_time,
+                                                dictionary['description'])
+                    shifts.append(new_shift)
+                    week_ct -= 1
+
+    return shifts
+
+
+def get_all_shifts_JSON(org_id):
+    """
+    returns all shifts for each position
+    in an organization as a JSON dictionary
+    of type str. Convert into list of
+    dictionaries using json.loads equivalent.
+    :param id:
+    :return:
+    """
+    outer = {}
+    positions = Position.query.filter_by(organization_id=org_id).all()
+    for p in positions:
+        shifts = Shift.query.filter_by(position_id=p.id).all()
+        for s in shifts:
+            inner = {   'position_id': s.position_id,
+                        'assigned_user_id': s.assigned_user_id,
+                        'start_time': s.start_time,
+                        'end_time': s.end_time,
+                        'description': s.description}
+            outer[str(s.id)] = inner
+
+    return json.dumps(outer)
+
 
 #used in views.deletepositions
 def deletepositions(posid, orgid):
@@ -189,6 +304,7 @@ def deletepositions(posid, orgid):
     db.session.delete(pos)
     db.session.commit()
 
+
 #used in views.assign and views.assignpos
 def assign_member_to_position(userid, posid, orgid):
     user = userid
@@ -197,6 +313,7 @@ def assign_member_to_position(userid, posid, orgid):
     #assign the user to an org
     pos.assigned_users.append(user)
     db.session.commit()
+
 
 def unassign_member_to_position(userid, posid, orgid):
     user = userid

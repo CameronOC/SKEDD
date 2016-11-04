@@ -2,10 +2,9 @@
 
 {% block content %}
 
-<h1>Add a Shift</h1>
+<h1>Update a Shift</h1>
 <br>
-
-<!-- Collect information about a shift -->
+<!-- Fill in information about a shift -->
 <form action="" method="post" name="create">
   {{ form.csrf_token }}
   <!-- Spinner for selecting assigned user -->
@@ -14,7 +13,7 @@
     <span class="error">
       {% if form.assigned_user_id.errors %}
         {% for error in form.assigned_user_id.errors %}
-          {{ error }}
+          <!-- {{ error }} -->
         {% endfor %}
       {% endif %}
     </span>
@@ -55,7 +54,7 @@
       {% endif %}
     </span>
   </p>
-  <button class="btn btn-success" type="submit">Submit</button>
+  <button class="btn btn-success" type="submit">Update</button>
 </form>
 
 {% endblock %}
