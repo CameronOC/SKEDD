@@ -239,38 +239,58 @@ def create_shifts_JSON(dictionary):
     shifts = []
     main_start_time = datetime.strptime(dictionary['start_time'], '%Y-%m-%dT%H:%M:%S')
     main_end_time = datetime.strptime(dictionary['end_time'], '%Y-%m-%dT%H:%M:%S')
-    week_ct = 3
-    while week_ct != -1:
-        start_time = (main_start_time + timedelta(weeks=week_ct)).strftime('%Y-%m-%dT%H:%M:%S')
-        end_time = (main_end_time + timedelta(weeks=week_ct)).strftime('%Y-%m-%dT%H:%M:%S')
-        shift = create_shift(   dictionary['position_id'],
-                                dictionary['assigned_user_id'],
-                                start_time,
-                                end_time,
-                                dictionary['description'])
-        shifts.append(shift)
-        week_ct -= 1
 
-    if 'repeating' in dictionary:
+    if 'repeating' in dictionary and dictionary['repeating'] is not None and len(dictionary['repeating']) > 0:
         main_day_int = main_start_time.weekday()
         for day_int in dictionary['repeating']:
             week_ct = 3
-            while week_ct != -1:
-                if day_int != main_day_int:
-                    day_difference = day_int - main_day_int
-                    delta = timedelta(days=day_difference, weeks=week_ct)
-                    new_start_time = (main_start_time + delta).strftime('%Y-%m-%dT%H:%M:%S')
-                    new_end_time = (main_end_time + delta).strftime('%Y-%m-%dT%H:%M:%S')
-                    new_shift = create_shift(	dictionary['position_id'],
-                                                dictionary['assigned_user_id'],
-                                                new_start_time,
-                                                new_end_time,
-                                                dictionary['description'])
-                    shifts.append(new_shift)
-                    week_ct -= 1
-
+            while week_ct >= 0:
+                day_difference = day_int - main_day_int
+                delta = timedelta(days=day_difference, weeks=week_ct)
+                shifts.append(create_shift_helper(
+                    dictionary['position_id'],
+                    dictionary['assigned_user_id'],
+                    dictionary['description'],
+                    main_start_time,
+                    main_end_time,
+                    delta
+                ))
+                week_ct -= 1
+    else:
+        delta = timedelta()
+        shifts.append(create_shift_helper(
+                    dictionary['position_id'],
+                    dictionary['assigned_user_id'],
+                    dictionary['description'],
+                    main_start_time,
+                    main_end_time,
+                    delta
+                ))
     return shifts
 
+
+def create_shift_helper(position_id, assigned_user_id, description, start_time, end_time, delta):
+    """
+    creates a shift and returns the object base on parameters
+    :param position_id:
+    :param assigned_user_id:
+    :param description:
+    :param start_time:
+    :param end_time:
+    :param delta:
+    :return:
+    """
+    new_start_time = (start_time + delta).strftime('%Y-%m-%dT%H:%M:%S')
+    new_end_time = (end_time + delta).strftime('%Y-%m-%dT%H:%M:%S')
+    new_shift = create_shift(position_id,
+                             assigned_user_id,
+                             new_start_time,
+                             new_end_time,
+                             description
+                             )
+    # db.session.add(new_shift)
+    # db.session.commit()
+    return new_shift
 
 def get_all_shifts_JSON(org_id):
     """
@@ -292,6 +312,17 @@ def get_all_shifts_JSON(org_id):
                         'end_time': s.end_time,
                         'description': s.description}
             outer[str(s.id)] = inner
+
+    return json.dumps(outer)
+
+def get_users_for_org_JSON(org_id):
+    outer = {}
+    members = Membership.query.filter_by(organization_id=org_id).all()
+    for m in members:
+        inner = {   'first_name': m.member.first_name,
+                    'last_name': m.member.last_name,
+                    'email': m.member.email}
+        outer[str(m.member.id)] = inner
 
     return json.dumps(outer)
 

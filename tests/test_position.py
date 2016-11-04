@@ -1,39 +1,51 @@
 from flask_testing import TestCase
-
+from flask import g
 from project import app, db
-from project.models import User
-from project.utils.organization import create_organization
+from project.models import User, Organization, Membership, Position, Shift, position_assignments
+import project.utils.organization as org_utils
+from base_test import BaseTest
+#from project.utils.organization import deletepositions
+# from project.utils.organization import create_organization, get_organization
+import datetime
+import json
 
 
-class BaseTestCase(TestCase):
+class TestPosition(BaseTest, TestCase):
 
-    def create_app(self):
-        app.config.from_object('project.config.TestingConfig')
-        return app
-
-    def setUp(self):
-        db.create_all()
-        user = User(email="ad@min.com", password="admin_user", first_name='local', last_name='admin', confirmed=True)
-        db.session.add(user)
-        db.session.commit()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-
-    def test_create_position(self):
-        owner = User(
-            email='owner@organization.com',
-            first_name='Organization',
-            last_name='Owner',
+    def test_assign_member_to_position(self):
+        """
+        Tests that a user is assigned to a position
+        :return:
+        """
+        pos = org_utils.get_position(1)
+        org = org_utils.get_organization(1)
+        user = User(
+            email='member2@organization.com',
+            first_name='Will',
+            last_name='Smith',
             password='password',
             confirmed=True
         )
-        db.session.add(owner)
-        db.session.commit()
+        org_utils.assign_member_to_position(user, pos, org)
+        assigneduser = position_assignments.select(position_assignments.c.user_id == 2)
+        assert assigneduser is not None
 
-        organization, membership = create_organization('Test-Org', owner.id)
+    def test_unassign_member_to_position(self):
+        """
+        Tests that a user is unassigned from a position
+        :return:
+        """
 
-        
+    def test_delete_position(self):
+        """
+        Tests that a position is delete from a organization
+        :return:
+        """
+        pos = org_utils.get_position(1)
+        org = org_utils.get_organization(1)
+        assert pos is not None
 
+        org_utils.deletepositions(pos, org)
 
+        pos2 = org_utils.get_position(1)
+        assert pos2 is None
