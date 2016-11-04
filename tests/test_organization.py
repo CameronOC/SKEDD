@@ -243,31 +243,157 @@ class TestOrganization(TestCase):
         assert shift.start_time == start_time
         assert shift.end_time == end_time
         assert shift.description == 'desc'
-    
-    def test_create_shifts_JSON(self):
+
+    def test_create_single_shift_no_key_JSON(self):
+        """
+        Tests creating a single shift with no repitition
+        :return:
+        """
+        pos = org_utils.get_position(1)
+        shift_dict = {'position_id': pos.id,
+                'assigned_user_id': self.john.id,
+                'start_time': '2016-10-26T08:00:00',
+                'end_time': '2016-10-26T09:00:00',
+                'description': 'desc',
+                }
+
+        new_shifts = org_utils.create_shifts_JSON(shift_dict)
+        new_shifts.sort(key=lambda shift: shift.start_time) # sort list by start_time
+
+        assert new_shifts is not None
+        print len(new_shifts)
+        assert len(new_shifts) == 1
+
+        for s in new_shifts:
+            assert s.position_id == shift_dict['position_id']
+            assert s.assigned_user_id == shift_dict['assigned_user_id']
+            assert s.description == shift_dict['description']
+
+        print new_shifts[0].start_time
+        assert new_shifts[0].start_time == '2016-10-26T08:00:00'
+
+        assert new_shifts[0].end_time == '2016-10-26T09:00:00'
+
+    def test_create_single_shift_empty_key_JSON(self):
+        """
+        Tests when an empty repeating list is given to the create shift function
+        :return:
+        """
+        pos = org_utils.get_position(1)
+        shift_dict = {'position_id': pos.id,
+                'assigned_user_id': self.john.id,
+                'start_time': '2016-10-26T08:00:00',
+                'end_time': '2016-10-26T09:00:00',
+                'description': 'desc',
+                'repeating': []
+                }
+
+        new_shifts = org_utils.create_shifts_JSON(shift_dict)
+        new_shifts.sort(key=lambda shift: shift.start_time) # sort list by start_time
+
+        assert new_shifts is not None
+        print len(new_shifts)
+        assert len(new_shifts) == 1
+
+        for s in new_shifts:
+            assert s.position_id == shift_dict['position_id']
+            assert s.assigned_user_id == shift_dict['assigned_user_id']
+            assert s.description == shift_dict['description']
+
+        print new_shifts[0].start_time
+        assert new_shifts[0].start_time == '2016-10-26T08:00:00'
+
+        assert new_shifts[0].end_time == '2016-10-26T09:00:00'
+
+
+    def test_create_single_shift_null_key_JSON(self):
+        """
+        Tests when an nonetype repeating key is given to the create shift function
+        :return:
+        """
+        pos = org_utils.get_position(1)
+        shift_dict = {'position_id': pos.id,
+                'assigned_user_id': self.john.id,
+                'start_time': '2016-10-26T08:00:00',
+                'end_time': '2016-10-26T09:00:00',
+                'description': 'desc',
+                'repeating': None
+                }
+
+        new_shifts = org_utils.create_shifts_JSON(shift_dict)
+        new_shifts.sort(key=lambda shift: shift.start_time) # sort list by start_time
+
+        assert new_shifts is not None
+        print len(new_shifts)
+        assert len(new_shifts) == 1
+
+        for s in new_shifts:
+            assert s.position_id == shift_dict['position_id']
+            assert s.assigned_user_id == shift_dict['assigned_user_id']
+            assert s.description == shift_dict['description']
+
+        print new_shifts[0].start_time
+        assert new_shifts[0].start_time == '2016-10-26T08:00:00'
+
+        assert new_shifts[0].end_time == '2016-10-26T09:00:00'
+
+
+    def test_create_single_shift_not_assigned(self):
+        """
+        Tests creating a single shift with no repitition
+        :return:
+        """
+        pos = org_utils.get_position(1)
+        shift_dict = {'position_id': pos.id,
+                'assigned_user_id': None,
+                'start_time': '2016-10-26T08:00:00',
+                'end_time': '2016-10-26T09:00:00',
+                'description': 'desc',
+                }
+
+        new_shifts = org_utils.create_shifts_JSON(shift_dict)
+        new_shifts.sort(key=lambda shift: shift.start_time) # sort list by start_time
+
+        assert new_shifts is not None
+        print len(new_shifts)
+        assert len(new_shifts) == 1
+
+        for s in new_shifts:
+            assert s.position_id == shift_dict['position_id']
+            assert s.assigned_user_id == shift_dict['assigned_user_id']
+            assert s.description == shift_dict['description']
+
+        print new_shifts[0].start_time
+        assert new_shifts[0].start_time == '2016-10-26T08:00:00'
+
+        assert new_shifts[0].end_time == '2016-10-26T09:00:00'
+
+
+    def test_create_repeating_shifts_JSON(self):
         """
         Tests creating a new shift from 
         a dictionary (or JSON)
         :return:
         """
         pos = org_utils.get_position(1)
-        dict = {'position_id': pos.id, 
+        shift_dict = {'position_id': pos.id, 
                 'assigned_user_id': self.john.id,
                 'start_time': '2016-10-26T08:00:00', 
                 'end_time': '2016-10-26T09:00:00', 
                 'description': 'desc',
-                'repeating': [1]}
+                'repeating': [1, 2]}
         
-        new_shifts = org_utils.create_shifts_JSON(dict)
+        new_shifts = org_utils.create_shifts_JSON(shift_dict)
         new_shifts.sort(key=lambda shift: shift.start_time) # sort list by start_time
                 
         assert new_shifts is not None
+        print len(new_shifts)
         assert len(new_shifts) == 8     # 4 shifts per day (base day, all repeating days)
         
         for s in new_shifts:
-            assert s.position_id == dict['position_id']
-            assert s.assigned_user_id == dict['assigned_user_id']
-            assert s.description == dict['description']
+            assert s.position_id == shift_dict['position_id']
+            assert s.assigned_user_id == shift_dict['assigned_user_id']
+            assert s.description == shift_dict['description']
              
         assert new_shifts[0].start_time == '2016-10-25T08:00:00'
         assert new_shifts[1].start_time == '2016-10-26T08:00:00'
