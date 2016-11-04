@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>SKEDD</title>
+
+        <link href="http://maxcdn.bootstrapcdn.com/bootswatch/3.2.0/yeti/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-drawer/1.0.6/css/bootstrap-drawer.css">
+        <link href="{{url_for('static', filename='main.css')}}" rel="stylesheet" media="screen">
+        <link href='../../static/calendar/fullcalendar.css' rel='stylesheet' />
+        <link href="../../static/drawer/bootstrap-drawer.css" rel="stylsheet"/>
+        <style>
+
+
+            body {
+            font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+            font-size: 14px;
+            overflow-y: scroll;
+            }
+
+            #calendar {
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: white;
+            color: black;
+            padding: 20px;
+            margin-top: 10px;
+            border-radius: 10px;
+            }
+            #drawer-page {
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }
+            #screen {
+                background-color: pink;
+            }
+
+            #menu {
+                margin-top: 60px;
+            }
+            li {
+                padding: 5px;
+            }
+
+            .modal:nth-of-type(even) {
+                z-index: 1042 !important;
+            }
+            .modal-backdrop.in:nth-of-type(even) {
+                z-index: 1041 !important;
+            }
+        </style>
+
+    </head>
+
+    <body class="has-drawer">
+
+        {% include "navigation.html" %}
+
+        <div class="container">
+            <div class="ORGANIZATION_page">
+
+                <h1 class="ORGANIZATION_name">{{ organization.name }}</h1>
+                <div id="calendarDiv">
+                    <div id='calendar'></div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        {% include "drawer.html" %}
+        {% include "modals.html" %}
+
+        <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" ></script>
+        <script src='../../static/calendar/lib/moment.min.js'></script>
+        <script src='../../static/calendar/fullcalendar.min.js'></script>
+        <script src="../../static/calendar/organization-calendar.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-drawer/1.0.6/js/drawer.min.js"></script>
+        <script>
+            $('#drawerExample').drawer({ toggle: false });
+            $('#other-toggle').click(function() {
+                $('#drawerExample').drawer('toggle');
+                return false;
+            });
+        </script>
+    </body>
+</html>
