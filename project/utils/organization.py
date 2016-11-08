@@ -326,7 +326,6 @@ def get_users_for_org_JSON(org_id):
 
     return json.dumps(outer)
 
-
 #used in views.deletepositions
 def deletepositions(posid, orgid):
     pos = posid

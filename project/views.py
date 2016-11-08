@@ -14,7 +14,7 @@ from project import app, db, bcrypt
 from decorators import check_confirmed, owns_organization
 from project.email import send_email
 import utils.organization
-from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position
+from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position, get_users_for_org_JSON
 from utils.token import confirm_token, generate_invitation_token
 
 ################
@@ -104,7 +104,9 @@ def organization_calendar(key):
     :return:
     """
     org = utils.organization.get_organization(key)
-    return render_template('main/organizationc.html', organization=org)
+    usersjson = get_users_for_org_JSON(key)
+    print usersjson
+    return render_template('main/organizationc.html', organization=org, usersjson=usersjson)
 
 
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])

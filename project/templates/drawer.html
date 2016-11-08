@@ -1,12 +1,25 @@
+
+<script src="{{ url_for('static', filename='vue.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.js')}}"></script>
+
 <div id="drawerExample" class="drawer dw-xs-10 dw-sm-6 dw-md-4 fold drawer-right" aria-labelledby="drawerExample">
     <div class="drawer-controls">
         <a id="menu" data-toggle="drawer" href="#drawerExample" aria-foldedopen="false" aria-controls="drawerExample" class="btn btn-primary btn-sm">Menu</a>
     </div>
     <div class="drawer-contents">
         <div class="drawer-heading">
-            <h2 class="drawer-title">Menu</h2>
+            <h2 class="drawer-title">  {{ usersjson }} </h2>
         </div>
-        <div class="drawer-body">
+
+
+        <div class="drawer-body" id="vue-div">
+
+            {%raw%}
+                <script type=JavaScript>
+                    var myusers = { usersjson|safe };
+                </script>
+            {%endraw%}
+
             <h2>Positions</h2>
             <ul>
                 <li>Product Owner</li>
@@ -15,17 +28,18 @@
             </ul>
             <a data-toggle="modal" href="#createPositionModal" class="btn btn-primary ORGANIZATION_new-position">New Position</a>
             <h2>Members</h2>
-            <ul>
-                <li>Philip Guther</li>
-                <li>Bobby Lyons</li>
-                <li>Robert Pence</li>
-                <li>Chris Kempis</li>
-                <li>Cameron Johnson</li>
+            <ul v-for="">
+                <li></li>
             </ul>
             <a data-toggle="modal" href="#inviteMemberModal" class="btn btn-primary ORGANIZATION_invite">Invite Member</a>
         </div>
+
+
+
         <div class="drawer-footer locked text-center">
             <small>&copy; Caroline Amaba</small>
         </div>
     </div>
 </div>
+
+<script src="{{ url_for('static', filename='organization_index.js') }}"></script>
