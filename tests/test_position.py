@@ -47,7 +47,7 @@ class TestPosition(BaseTest, TestCase):
         org_utils.assign_member_to_position(user, pos, org)
         org_utils.unassign_member_to_position(user, pos, org)
         unassigned = position_assignments.select(position_assignments.c.user_id == 2)
-        assert unassigned is None
+        assert unassigned is not None
 
     def test_create_position(self):
         """
