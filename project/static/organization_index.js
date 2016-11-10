@@ -14,6 +14,11 @@ var app = function() {
         //console.log(this.email);
     };
 
+    function positionsobject(t, o){
+        this.title = t;
+        this.orgid = o;
+    }
+
     //function to add the user data to the user object
     function adduserstoarray(response) {
         console.log('addusertoarray was called');
@@ -27,17 +32,43 @@ var app = function() {
         }
     }
 
+    function addpositionstoarray(response) {
+        console.log('addpositionstoarray was called');
+        for (key in response)   {
+            t = response[key].title;
+            o = response[key].orgid;
+            APP.vue.addposition(
+                    new positionsobject(t, o)
+                );
+        }
+    }
+
     //function to add the user object to the vue array
     self.adduser = function (u) {
         console.log('adduser called ' + u);
         APP.vue.users.push(u);
     }
 
+    self.addposition = function(p){
+        console.log('addposition called' + p);
+        APP.vue.positions.push(p);
+    }
+
     //gets the users for an org
     self.get_users = function (){
         $.getJSON('/getusersinorg/' + orgid)
                 .then(function(response){
-                 adduserstoarray(response);
+                    //clear the array of users
+                    APP.vue.users = [];
+                    adduserstoarray(response);
+                });
+    };
+
+    self.get_positions = function(){
+        $.getJSON('/getpositionsinorg/' + orgid)
+                .then(function(response){
+                    APP.vue.positions = [];
+                    addpositionstoarray(response);
                 });
     };
 
@@ -53,13 +84,16 @@ var app = function() {
         },
         methods: {
             get_users: self.get_users,
-            adduser: self.adduser
+            adduser: self.adduser,
+            get_positions: self.get_positions,
+            addposition: self.addposition
         }
 
     });
 
     // i dont know how to pass this orgid on start up
     self.get_users();
+    self.get_positions();
     $("#vue-div").show();
 
     return self;

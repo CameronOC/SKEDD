@@ -9,9 +9,7 @@
             </div>
             <div class="modal-body">
                 <select class="form-control" id="createShiftPosition">
-                    <option>Product Owner</option>
-                    <option>Scrum Master</option>
-                    <option>Developer</option>
+                    <option v-for="position in positions">${position.title}</option>
                 </select> <br>
                 <select class="form-control" id="createShiftAssigned">
                     <option>Unassigned</option>>
@@ -39,9 +37,7 @@
             </div>
             <div id="editShiftBody" class="modal-body">
                 <select class="form-control" id="editShiftPosition">
-                    <option>Product Owner</option>
-                    <option>Scrum Master</option>
-                    <option>Developer</option>
+                    <option v-for="position in positions">${position.title}</option>
                 </select> <br>
                 <select class="form-control" id="editShiftAssigned">
                     <option>Unassigned</option>
