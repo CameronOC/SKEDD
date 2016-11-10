@@ -254,7 +254,7 @@ def create_shifts_JSON(dictionary):
         for day_int in dictionary['repeating']:
 
             if main_day_int == day_int:
-                week_ct = 1;
+                week_ct = 1
             else:
                 week_ct = 0
 
