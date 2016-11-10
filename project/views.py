@@ -14,7 +14,7 @@ from project import app, db, bcrypt
 from decorators import check_confirmed, owns_organization
 from project.email import send_email
 import utils.organization
-from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position
+from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position, get_users_for_org_JSON
 from utils.token import confirm_token, generate_invitation_token
 
 ################
