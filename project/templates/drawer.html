@@ -1,4 +1,3 @@
-
 <script src="{{ url_for('static', filename='vue.js') }}"></script>
 <script src="{{ url_for('static', filename='jquery.js')}}"></script>
 
@@ -8,17 +7,11 @@
     </div>
     <div class="drawer-contents">
         <div class="drawer-heading">
-            <h2 class="drawer-title">  {{ usersjson }} </h2>
+            <h2 class="drawer-title"> {{ organization.name }} </h2>
         </div>
 
 
         <div class="drawer-body" id="vue-div">
-
-            {%raw%}
-                <script type=JavaScript>
-                    var myusers = { usersjson|safe };
-                </script>
-            {%endraw%}
 
             <h2>Positions</h2>
             <ul>
@@ -28,8 +21,8 @@
             </ul>
             <a data-toggle="modal" href="#createPositionModal" class="btn btn-primary ORGANIZATION_new-position">New Position</a>
             <h2>Members</h2>
-            <ul v-for="">
-                <li></li>
+            <ul v-for="user in users">
+                <li>${user.first_name} ${user.last_name}</li>
             </ul>
             <a data-toggle="modal" href="#inviteMemberModal" class="btn btn-primary ORGANIZATION_invite">Invite Member</a>
         </div>

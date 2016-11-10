@@ -4,26 +4,40 @@ var app = function() {
 
     Vue.config.silent = false; // show all warnings
 
-    // Extends an array
-    self.extend = function(a, b) {
-        for (var i = 0; i < b.length; i++) {
-            a.push(b[i]);
-        }
+    //user object to store the data, this might not be neccassary
+    function usersobject(f, l, e) {
+        this.first_name =  f;
+        //console.log(this.first_name);
+        this.last_name = l;
+        //console.log(this.last_name);
+        this.email = e;
+        //console.log(this.email);
     };
 
-    //ignore this for now
-    var enumerate = function(v) {
-        var k=0;
-        return v.map(function(e) {e._idx = k++;});
-    };
+    //function to add the user data to the user object
+    function adduserstoarray(response) {
+        console.log('addusertoarray was called');
+        for (key in response)   {
+            f = response[key].first_name;
+            l = response[key].last_name;
+            e = response[key].email;
+            APP.vue.adduser(
+                    new usersobject(f, l, e)
+                );
+        }
+    }
+
+    //function to add the user object to the vue array
+    self.adduser = function (u) {
+        console.log('adduser called ' + u);
+        APP.vue.users.push(u);
+    }
 
     //gets the users for an org
     self.get_users = function (orgid){
         $.getJSON('/getusersinorg/' + orgid)
                 .then(function(response){
-                 self.users = response;
-                 console.log(response);
-                 console.log(self.users);
+                 adduserstoarray(response);
                 });
     };
 
@@ -37,13 +51,13 @@ var app = function() {
         },
         methods: {
             get_users: self.get_users,
+            adduser: self.adduser
         }
 
     });
 
     // i dont know how to pass this orgid on start up
-    //self.get_users(orgid);
-
+    //self.get_users();
     $("#vue-div").show();
 
     return self;
