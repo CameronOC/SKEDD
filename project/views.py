@@ -104,9 +104,7 @@ def organization_calendar(key):
     :return:
     """
     org = utils.organization.get_organization(key)
-    usersjson = get_users_for_org_JSON(key)
-    print usersjson
-    return render_template('main/organizationc.html', organization=org, usersjson=usersjson)
+    return render_template('main/organizationc.html', organization=org)
 
 
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])

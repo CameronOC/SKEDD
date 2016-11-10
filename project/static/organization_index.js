@@ -34,7 +34,7 @@ var app = function() {
     }
 
     //gets the users for an org
-    self.get_users = function (orgid){
+    self.get_users = function (){
         $.getJSON('/getusersinorg/' + orgid)
                 .then(function(response){
                  adduserstoarray(response);
@@ -47,7 +47,9 @@ var app = function() {
         delimiters: ['${', '}'],
         unsafeDelimiters: ['!{', '}'],
         data: {
-            users: []
+            users: [],
+            positions: [],
+            orgid: orgid
         },
         methods: {
             get_users: self.get_users,
@@ -57,7 +59,7 @@ var app = function() {
     });
 
     // i dont know how to pass this orgid on start up
-    //self.get_users();
+    self.get_users();
     $("#vue-div").show();
 
     return self;
