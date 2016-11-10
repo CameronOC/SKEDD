@@ -1,6 +1,3 @@
-<script src="{{ url_for('static', filename='vue.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery.js')}}"></script>
-
 <div id="drawerExample" class="drawer dw-xs-10 dw-sm-6 dw-md-4 fold drawer-right" aria-labelledby="drawerExample">
     <div class="drawer-controls">
         <a id="menu" data-toggle="drawer" href="#drawerExample" aria-foldedopen="false" aria-controls="drawerExample" class="btn btn-primary btn-sm">Menu</a>
@@ -11,7 +8,7 @@
         </div>
 
 
-        <div class="drawer-body" id="vue-div">
+        <div class="drawer-body" >
             <script type="text/javascript">
                 var orgid = {{organization.id}}
             </script>
@@ -37,5 +34,3 @@
         </div>
     </div>
 </div>
-
-<script src="{{ url_for('static', filename='organization_index.js') }}"></script>
