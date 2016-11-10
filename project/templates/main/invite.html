@@ -7,7 +7,7 @@
  <br>
   <h1 class="INVITE_title">Invite Employee</h1>
   <div class="INVITE_window-inner">
-    <form action="" method="post" name="invite">
+    <form id="inviteMemberForm" action="" method="post" name="invite">
       {{ form.csrf_token }}
       <p>
         {{ form.first_name(placeholder="first name") }}
