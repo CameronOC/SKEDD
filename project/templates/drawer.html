@@ -8,16 +8,14 @@
         </div>
 
 
-        <div class="drawer-body" id="vue-div">
+        <div class="drawer-body" >
             <script type="text/javascript">
                 var orgid = {{organization.id}}
             </script>
 
             <h2>Positions</h2>
-            <ul>
-                <li>Product Owner</li>
-                <li>Scrum Master</li>
-                <li>Developer</li>
+            <ul v-for="position in positions">
+                <li>${position.title} </li>
             </ul>
             <a data-toggle="modal" href="#createPositionModal" class="btn btn-primary">New Position</a>
             <h2>Members</h2>

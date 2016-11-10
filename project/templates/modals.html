@@ -1,22 +1,19 @@
 <div id="createShiftModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
         <div class="modal-content">
+            <script type="text/javascript">
+                var orgid = {{organization.id}}
+            </script>
             <div class="modal-header">
                 <h4 id="createShiftTitle" class="modal-title">New Shift</h4>
             </div>
-            <div id="createShiftBody" class="modal-body">
+            <div class="modal-body">
                 <select class="form-control" id="createShiftPosition">
-                    <option>Product Owner</option>
-                    <option>Scrum Master</option>
-                    <option>Developer</option>
+                    <option v-for="position in positions">${position.title}</option>
                 </select> <br>
                 <select class="form-control" id="createShiftAssigned">
-                    <option>Unassigned</option>
-                    <option>Philip Guther</option>
-                    <option>Bobby Lyons</option>
-                    <option>Robert Pence</option>
-                    <option>Chris Kempis</option>
-                    <option>Cameron Johnson</option>
+                    <option>Unassigned</option>>
+                    <option v-for="user in users">${user.first_name} ${user.last_name}</option>
                 </select> <br>
                 <textarea class="form-control" rows="5" id="createShiftDescription" placeholder="Description...">
                 </textarea> <br>
@@ -40,17 +37,11 @@
             </div>
             <div id="editShiftBody" class="modal-body">
                 <select class="form-control" id="editShiftPosition">
-                    <option>Product Owner</option>
-                    <option>Scrum Master</option>
-                    <option>Developer</option>
+                    <option v-for="position in positions">${position.title}</option>
                 </select> <br>
                 <select class="form-control" id="editShiftAssigned">
                     <option>Unassigned</option>
-                    <option>Philip Guther</option>
-                    <option>Bobby Lyons</option>
-                    <option>Robert Pence</option>
-                    <option>Chris Kempis</option>
-                    <option>Cameron Johnson</option>
+                    <option v-for="user in users">${user.first_name} ${user.last_name}</option>
                 </select> <br>
                 <textarea class="form-control" rows="5" id="editShiftDescription" placeholder="Description...">
                 </textarea> <br>

@@ -255,7 +255,6 @@ def position(key, key2):
     """
 
     :param key:
-    :param key2:
     :return:
     """
     org = utils.organization.get_organization(key)
@@ -293,6 +292,14 @@ def create_position(key):
         else:
             return redirect('/organization/' + str(org.id))
 
+@app.route('/positionsinorg/<key>')
+def getpositioninorg(key):
+    """
+
+    :param key:
+    :return:
+    """
+    return utils.organization.get_positions_for_org_JSON(key)
 
 @main_blueprint.route('/organization/<key>/member/<key2>', methods=['GET', ])
 @login_required
@@ -411,3 +418,7 @@ def deleteposition():
 @app.route('/getusersinorg/<key>')
 def getusersinorg(key):
     return utils.organization.get_users_for_org_JSON(key)
+
+@app.route('/getpositionsinorg/<key>')
+def getpositionsinorg(key):
+    return utils.organization.get_positions_for_org_JSON(key)
