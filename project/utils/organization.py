@@ -326,6 +326,23 @@ def get_users_for_org_JSON(org_id):
 
     return json.dumps(outer)
 
+def get_positions_for_org_JSON(org_id):
+    """
+    returns all positions in an organization as a JSON
+    dictionary of type str. Then converts into list of
+    dictionaries using json.loads equivalent.
+    :param id:
+    :return:
+    """
+    outer = {}
+    pos = Position.query.filter_by(organization_id=org_id).all()
+    for p in pos:
+        inner = {   'title': p.title,
+                    'organization_id': p.organization_id}
+        outer[str(p.id)] = inner
+
+    return json.dumps(outer)
+
 #used in views.deletepositions
 def deletepositions(posid, orgid):
     pos = posid
