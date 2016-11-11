@@ -1,0 +1,16 @@
+{
+  "name": "SKEDD-heroku",
+  "scripts": {
+    "postdeploy": "export APP_SETTINGS=\"project.config.DevelopmentConfig\""
+  },
+  "env": {
+  },
+  "formation": {
+  },
+  "addons": [
+
+  ],
+  "buildpacks": [
+
+  ]
+}
