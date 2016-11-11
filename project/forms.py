@@ -2,7 +2,7 @@
 
 
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, SelectField, BooleanField, HiddenField
+from wtforms import StringField, PasswordField, SelectField, BooleanField, HiddenField, SelectMultipleField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
