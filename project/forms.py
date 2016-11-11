@@ -2,7 +2,7 @@
 
 
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, SelectField, DateTimeField
+from wtforms import StringField, PasswordField, SelectField, BooleanField, HiddenField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -14,20 +14,24 @@ class CreateForm(Form):
     name = StringField('name', validators=[DataRequired(), Length(min=1, max=50)])
     
 class ShiftForm(Form):
+    position_id = ('positions', choices=[])
+    
     assigned_user_id = SelectField('users', choices=[])
+    
+    description = StringField('description', validators=[Length(min=1, max=100)])
+    
+    repeating = BooleanField('repeating', default=False)
 
-    day = SelectField('day', choices=[  ('Monday', 'Monday'), 
-                                        ('Tuesday', 'Tuesday'), 
-                                        ('Wednesday', 'Wednesday'), 
-                                        ('Thursday', 'Thursday'), 
-                                        ('Friday', 'Friday'), 
-                                        ('Saturday', 'Saturday'), 
-                                        ('Sunday', 'Sunday')])
+    repeat_list = SelectMultipleField('day', choices=[  (0, 'Monday'), 
+                                                        (1, 'Tuesday'), 
+                                                        (2, 'Wednesday'), 
+                                                        (3, 'Thursday'), 
+                                                        (4, 'Friday'), 
+                                                        (5, 'Saturday'), 
+                                                        (6, 'Sunday')])
                                         
-    start_time = DateTimeField('StartTime', format='%H:%M')
-    end_time = DateTimeField('EndTime', format='%H:%M')
-    am_or_pm = SelectField('AMorPM', choices=[('AM', 'AM'), ('PM', 'PM')])
-
+    start_time = HiddenField('StartTime')
+    end_time = HiddenField('EndTime')
 
 class InviteForm(Form):
     email = StringField(

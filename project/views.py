@@ -122,17 +122,11 @@ def create_shift(org_key, pos_key):
     """
     form = ShiftForm(request.form)
     if request.method == 'GET':
-        # fill in SelectField for choosing a user to assign a shift to (when creating the shift)
-        form.assigned_user_id.choices = utils.organization.gather_members_for_shift(org_key)
         return render_template('main/create_shift.html', form=form)
     else:
-        # repeat_list = form.repeat_list.data
-        # repeat_list = utils.organization.construct_repeat_list(form.repeat_list.data)
-        shift = utils.organization.create_shift(pos_key, form.assigned_user_id.data, form.day.data,
-                                                form.start_time.data, form.end_time.data)
-        '''shift = utils.organization.create_shifts_form(pos_key, form.assigned_user_id.data, 
-                                                            form.day.data, form.start_time.data, 
-                                                            form.end_time.data, repeat_list)'''
+        shift = utils.organization.create_shifts_form(pos_key, form.assigned_user_id.data, 
+                                                        form.start_time.data, form.end_time.data, 
+                                                        form.description.data, form.repeat_list.data)
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
@@ -151,8 +145,6 @@ def update_shift(org_key, pos_key, shift_key):
     shift = utils.organization.get_shift(shift_key)
     form = ShiftForm(obj=shift)
     if request.method == 'GET':
-        # fill in SelectField for choosing a user to assign a shift to (when creating the shift)
-        form.assigned_user_id.choices = utils.organization.gather_members_for_shift(org_key)
         if form.validate():
             # pre-populate form with current data
             form.populate_obj(shift)
