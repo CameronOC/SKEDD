@@ -73,8 +73,13 @@ var app = function() {
     };
 
     // functions for when a user is clicked from the drawer
-    self.test = function(index) {
-        alert(self.vue.users[index].email);
+    self.memberDetail = function(index) {
+        member = self.vue.users[index];
+        $('#memberDetailTitle').html(member.first_name + " " + member.last_name);
+        $('#memberDetailFirstName').html(member.first_name);
+        $('#memberDetailLastName').html(member.first_name);
+        $('#memberDetailEmail').html(member.email);
+        $('#memberDetailModal').modal('show');
     }
 
     // Complete as needed.
@@ -92,7 +97,7 @@ var app = function() {
             adduser: self.adduser,
             get_positions: self.get_positions,
             addposition: self.addposition,
-            test: self.test
+            member_detail: self.memberDetail
         }
 
     });

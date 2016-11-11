@@ -7,7 +7,6 @@ $(document).ready(function() {
     var nextId
 
     $('.modal').on('hidden.bs.modal', function(){
-        console.log('it works');
         $(this).find("input,textarea").val('').end();
     });
 

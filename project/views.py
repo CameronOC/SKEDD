@@ -155,7 +155,7 @@ def invite(key):
     return_dict = {}
 
     if form.validate_on_submit():
-        # utils.organization.invite_member(org, form.email.data, form.first_name.data, form.last_name.data)
+        utils.organization.invite_member(org, form.email.data, form.first_name.data, form.last_name.data)
         return_dict['status'] = "success"
     else:
         return_dict['status'] = "error"

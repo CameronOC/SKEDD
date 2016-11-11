@@ -20,7 +20,7 @@
             <a data-toggle="modal" href="#createPositionModal" class="btn btn-primary">New Position</a>
             <h2>Members</h2>
             <ul v-for="(user, index) in users">
-                <li class="btn btn-primary" v-on:click="test(index)">${user.first_name} ${user.last_name}</li>
+                <li class="btn btn-primary" v-on:click="member_detail(index)">${user.first_name} ${user.last_name}</li>
             </ul>
             <a data-toggle="modal" href="#inviteMemberModal" class="btn btn-primary">Invite Member</a>
         </div>
