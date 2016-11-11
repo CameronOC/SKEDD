@@ -361,7 +361,7 @@ def get_users_for_org_JSON(org_id):
             'first_name': member.member.first_name,
             'last_name': member.member.last_name,
             'email': member.member.email,
-            'id': member.member.email
+            'id': member.member.id
         })
 
     return json.dumps(members_list)
