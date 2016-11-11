@@ -126,8 +126,13 @@ def create_shift(org_key, pos_key):
         form.assigned_user_id.choices = utils.organization.gather_members_for_shift(org_key)
         return render_template('main/create_shift.html', form=form)
     else:
+        # repeat_list = form.repeat_list.data
+        # repeat_list = utils.organization.construct_repeat_list(form.repeat_list.data)
         shift = utils.organization.create_shift(pos_key, form.assigned_user_id.data, form.day.data,
                                                 form.start_time.data, form.end_time.data)
+        '''shift = utils.organization.create_shifts_form(pos_key, form.assigned_user_id.data, 
+                                                            form.day.data, form.start_time.data, 
+                                                            form.end_time.data, repeat_list)'''
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
@@ -153,8 +158,8 @@ def update_shift(org_key, pos_key, shift_key):
             form.populate_obj(shift)
         return render_template('main/update_shift.html', form=form)
     else:
-        utils.organization.update_shift(shift, pos_key, form.assigned_user_id.data, form.day.data,
-                                        form.start_time.data, form.end_time.data)
+        shift.update(pos_key, form.assigned_user_id.data, form.start_time.data, 
+                        form.end_time.data, form.description.data)
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 

@@ -35,7 +35,8 @@ class TestShifts(BaseTest, TestCase):
 
     def test_create_single_shift_no_repeating_key_JSON(self):
         """
-        Tests creating a single shift with no repitition
+        Tests creating a single shift with no repetition
+        from JSON
         :return:
         """
         pos = org_utils.get_position(1)
@@ -64,7 +65,8 @@ class TestShifts(BaseTest, TestCase):
 
     def test_create_single_shift_empty_repeating_key_JSON(self):
         """
-        Tests when an empty repeating list is given to the create shift function
+        Tests when an empty repeating list is given to the 
+        create shift JSON function
         :return:
         """
         pos = org_utils.get_position(1)
@@ -95,7 +97,8 @@ class TestShifts(BaseTest, TestCase):
 
     def test_create_single_shift_null_repeating_key_JSON(self):
         """
-        Tests when an nonetype repeating key is given to the create shift function
+        Tests when an nonetype repeating key is given to the create 
+        shift JSON function
         :return:
         """
         pos = org_utils.get_position(1)
@@ -124,9 +127,10 @@ class TestShifts(BaseTest, TestCase):
         assert new_shifts[0].end_time == '2016-10-26T09:00:00'
 
 
-    def test_create_single_shift_not_assigned(self):
+    def test_create_single_shift_not_assigned_JSON(self):
         """
-        Tests creating a single shift with no repitition
+        Tests creating a single shift with no repetition
+        from JSON with null user id 
         :return:
         """
         pos = org_utils.get_position(1)
@@ -154,10 +158,11 @@ class TestShifts(BaseTest, TestCase):
         assert new_shifts[0].end_time == '2016-10-26T09:00:00'
 
 
-    def test_create_repeating_shifts_same_day_in_repeating_JSON(self):
+    def test_create_repeating_shifts_same_day_in_repeating_list_JSON(self):
         """
         Tests creating a new shift from
-        a dictionary (or JSON)
+        a dictionary (or JSON) where the repeating
+        list contains the same day as the base day
         :return:
         """
         pos = org_utils.get_position(1)
@@ -201,7 +206,9 @@ class TestShifts(BaseTest, TestCase):
     def test_create_repeating_shifts_diff_days_in_repeating_JSON(self):
         """
         Tests creating a new shift from
-        a dictionary (or JSON)
+        a dictionary (or JSON) where the repeating
+        list contains days different from the base
+        day
         :return:
         """
         pos = org_utils.get_position(1)
@@ -277,8 +284,8 @@ class TestShifts(BaseTest, TestCase):
         end_time = '2016-10-26T10:30:00'
 
 
-        org_utils.update_shift(shift, new_pos.id, self.john.id,
-                                start_time, end_time, 'desc')
+        shift.update(   new_pos.id, self.john.id,
+                        start_time, end_time, 'desc')
 
         # re-query, compare fields
         shift = org_utils.get_shift(1)
@@ -287,11 +294,20 @@ class TestShifts(BaseTest, TestCase):
         assert shift.start_time == start_time
         assert shift.end_time == end_time
         assert shift.description == 'desc'
+        
+        # test optional args
+        shift.update(position_id=self.shift.position_id)
+        shift = org_utils.get_shift(1)
+        assert shift.position_id == self.shift.position_id
+        assert shift.assigned_user_id == self.john.id
+        assert shift.start_time == start_time
+        assert shift.end_time == end_time
+        assert shift.description == 'desc'
 
         # reset fields for future tests
-        org_utils.update_shift(shift, self.shift.position_id, self.shift.assigned_user_id,
-                                self.shift.start_time, self.shift.end_time,
-                                self.shift.description)
+        shift.update(   self.shift.position_id, self.shift.assigned_user_id,
+                        self.shift.start_time, self.shift.end_time,
+                        self.shift.description)
 
     def test_get_all_shifts_JSON(self):
         """
@@ -299,7 +315,7 @@ class TestShifts(BaseTest, TestCase):
         object
         :return:
         """
-        shifts = org_utils.get_all_shifts_JSON(org_id=1) #string
+        shifts = org_utils.get_all_shifts_for_org_JSON(org_id=1) #string
         shift_dict = json.loads(shifts) # dictionary of dictionaries
 
         assert shifts is not None
@@ -307,7 +323,36 @@ class TestShifts(BaseTest, TestCase):
         assert len(shift_dict) == 1
         for s in shift_dict:
             assert shift_dict[str(s)]['position_id'] == self.shift.position_id
+            assert shift_dict[str(s)]['assigned_user_name'] == ''
             assert shift_dict[str(s)]['assigned_user_id'] == self.shift.assigned_user_id
             assert shift_dict[str(s)]['start_time'] == self.shift.start_time
             assert shift_dict[str(s)]['end_time'] == self.shift.end_time
             assert shift_dict[str(s)]['description'] == self.shift.description
+
+        shift = org_utils.get_shift(1)
+        shift.update(assigned_user_id=self.john.id)
+        shifts = org_utils.get_all_shifts_for_org_JSON(org_id=1) #string
+        shift_dict = json.loads(shifts)
+        assert shifts is not None
+        assert shift_dict is not None
+        assert len(shift_dict) == 1
+        for s in shift_dict:
+            assert shift_dict[str(s)]['position_id'] == self.shift.position_id
+            assert shift_dict[str(s)]['assigned_user_name'] == 'John Doe'
+            assert shift_dict[str(s)]['assigned_user_id'] == self.shift.assigned_user_id
+            assert shift_dict[str(s)]['start_time'] == self.shift.start_time
+            assert shift_dict[str(s)]['end_time'] == self.shift.end_time
+            assert shift_dict[str(s)]['description'] == self.shift.description
+        
+        shift.update(assigned_user_id=None)
+        shift = org_utils.get_shift(1)
+        assert shift.assigned_user_id == None
+
+
+
+
+
+
+
+
+
