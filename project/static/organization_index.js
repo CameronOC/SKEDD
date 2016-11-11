@@ -72,6 +72,11 @@ var app = function() {
                 });
     };
 
+    // functions for when a user is clicked from the drawer
+    self.test = function(index) {
+        alert(self.vue.users[index].email);
+    }
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -86,7 +91,8 @@ var app = function() {
             get_users: self.get_users,
             adduser: self.adduser,
             get_positions: self.get_positions,
-            addposition: self.addposition
+            addposition: self.addposition,
+            test: self.test
         }
 
     });
