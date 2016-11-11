@@ -83,7 +83,7 @@ def confirm_user(user, password=None):
     if password is not None:
         user.password = bcrypt.generate_password_hash(password)
     user.confirmed = True
-    user.confirmed_on = datetime.datetime.now()
+    user.confirmed_on = datetime.now()
     db.session.commit()
 
 
