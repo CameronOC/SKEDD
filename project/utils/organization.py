@@ -354,15 +354,17 @@ def get_all_shifts_for_org_JSON(org_id):
     return json.dumps(outer)
             
 def get_users_for_org_JSON(org_id):
-    outer = {}
+    members_list = []
     members = Membership.query.filter_by(organization_id=org_id).all()
-    for m in members:
-        inner = {   'first_name': m.member.first_name,
-                    'last_name': m.member.last_name,
-                    'email': m.member.email}
-        outer[str(m.member.id)] = inner
+    for member in members:
+        members_list.append({
+            'first_name': member.member.first_name,
+            'last_name': member.member.last_name,
+            'email': member.member.email,
+            'id': member.member.email
+        })
 
-    return json.dumps(outer)
+    return json.dumps(members_list)
 
 def get_positions_for_org_JSON(org_id):
     """
