@@ -12,11 +12,8 @@ from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
 from project import app, db, bcrypt
 from decorators import check_confirmed, owns_organization
-from project.email import send_email
 import utils.organization
 from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position, get_users_for_org_JSON
-from utils.token import confirm_token, generate_invitation_token
-from flask_security import current_user
 import json
 
 ################
@@ -92,22 +89,7 @@ def organization(key):
     :return:
     """
     org = utils.organization.get_organization(key)
-    return render_template('main/organization.html', organization=org)
-
-
-@main_blueprint.route('/organizationc/<key>', methods=['GET', ])
-@login_required
-@check_confirmed
-def organization_calendar(key):
-    """
-    The home page for an organization. displays relevant positions
-    and members information.
-    :param key:
-    :return:
-    """
-    org = utils.organization.get_organization(key)
-    return render_template('main/organizationc.html', organization=org, form=InviteForm())
-
+    return render_template('main/organization.html', organization=org, form=InviteForm())
 
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
 @login_required
