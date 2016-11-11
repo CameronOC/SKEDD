@@ -4,26 +4,29 @@
     </div>
     <div class="drawer-contents">
         <div class="drawer-heading">
-            <h2 class="drawer-title">Menu</h2>
+            <h2 class="drawer-title"> {{ organization.name }} </h2>
         </div>
-        <div class="drawer-body">
+
+
+        <div class="drawer-body" >
+            <script type="text/javascript">
+                var orgid = {{organization.id}}
+            </script>
+
             <h2>Positions</h2>
-            <ul>
-                <li>Product Owner</li>
-                <li>Scrum Master</li>
-                <li>Developer</li>
+            <ul v-for="position in positions">
+                <li>${position.title} </li>
             </ul>
-            <a data-toggle="modal" href="#createPositionModal" class="btn btn-primary ORGANIZATION_new-position">New Position</a>
+            <a data-toggle="modal" href="#createPositionModal" class="btn btn-primary">New Position</a>
             <h2>Members</h2>
-            <ul>
-                <li>Philip Guther</li>
-                <li>Bobby Lyons</li>
-                <li>Robert Pence</li>
-                <li>Chris Kempis</li>
-                <li>Cameron Johnson</li>
+            <ul v-for="user in users">
+                <li>${user.first_name} ${user.last_name}</li>
             </ul>
-            <a data-toggle="modal" href="#inviteMemberModal" class="btn btn-primary ORGANIZATION_invite">Invite Member</a>
+            <a data-toggle="modal" href="#inviteMemberModal" class="btn btn-primary">Invite Member</a>
         </div>
+
+
+
         <div class="drawer-footer locked text-center">
             <small>&copy; Caroline Amaba</small>
         </div>

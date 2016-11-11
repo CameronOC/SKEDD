@@ -83,7 +83,7 @@ def confirm_user(user, password=None):
     if password is not None:
         user.password = bcrypt.generate_password_hash(password)
     user.confirmed = True
-    user.confirmed_on = datetime.datetime.now()
+    user.confirmed_on = datetime.now()
     db.session.commit()
 
 
@@ -240,11 +240,25 @@ def create_shifts_JSON(dictionary):
     main_start_time = datetime.strptime(dictionary['start_time'], '%Y-%m-%dT%H:%M:%S')
     main_end_time = datetime.strptime(dictionary['end_time'], '%Y-%m-%dT%H:%M:%S')
 
+    delta = timedelta()
+    shifts.append(create_shift_helper(
+                dictionary['position_id'],
+                dictionary['assigned_user_id'],
+                dictionary['description'],
+                main_start_time,
+                main_end_time,
+                delta))
+
     if 'repeating' in dictionary and dictionary['repeating'] is not None and len(dictionary['repeating']) > 0:
         main_day_int = main_start_time.weekday()
         for day_int in dictionary['repeating']:
-            week_ct = 3
-            while week_ct >= 0:
+
+            if main_day_int == day_int:
+                week_ct = 1
+            else:
+                week_ct = 0
+
+            while week_ct < 4:
                 day_difference = day_int - main_day_int
                 delta = timedelta(days=day_difference, weeks=week_ct)
                 shifts.append(create_shift_helper(
@@ -255,18 +269,10 @@ def create_shifts_JSON(dictionary):
                     main_end_time,
                     delta
                 ))
-                week_ct -= 1
-    else:
-        delta = timedelta()
-        shifts.append(create_shift_helper(
-                    dictionary['position_id'],
-                    dictionary['assigned_user_id'],
-                    dictionary['description'],
-                    main_start_time,
-                    main_end_time,
-                    delta
-                ))
+                week_ct += 1
+
     return shifts
+
 
 
 def create_shift_helper(position_id, assigned_user_id, description, start_time, end_time, delta):
@@ -326,6 +332,22 @@ def get_users_for_org_JSON(org_id):
 
     return json.dumps(outer)
 
+def get_positions_for_org_JSON(org_id):
+    """
+    returns all positions in an organization as a JSON
+    dictionary of type str. Then converts into list of
+    dictionaries using json.loads equivalent.
+    :param id:
+    :return:
+    """
+    outer = {}
+    pos = Position.query.filter_by(organization_id=org_id).all()
+    for p in pos:
+        inner = {   'title': p.title,
+                    'organization_id': p.organization_id}
+        outer[str(p.id)] = inner
+
+    return json.dumps(outer)
 
 #used in views.deletepositions
 def deletepositions(posid, orgid):

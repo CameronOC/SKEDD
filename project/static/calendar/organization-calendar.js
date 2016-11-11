@@ -145,17 +145,36 @@ $(document).ready(function() {
     * Code to Create new Position
     *
     */
-    var nextId = 3;
 
-    $('#newPosition').on('click', function() {
-        $('#createPositionModal').modal('show');
-    });
+    $('#inviteMemberSubmit').on('click', function() {
+        var newUser = {
+            first_name: $('#first_name').val(),
+            last_name: $('#last_name').val(),
+            email: $('#email').val()
+        };
 
-    $('#createCancel').on('click', function() {
 
-        var tempId = parseInt($('#createShiftId').text());
-        $('#calendar').fullCalendar( 'removeEvents', tempId);
-        $('#createShiftModal').modal('hide');
+
+        url = "/organization/" + orgid.toString() + "/invite"
+
+
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: $("#inviteMemberForm").serialize(), // serializes the form's elements.
+
+            success: function(data)
+            {
+
+                if(data.status == "success"){
+                    APP.adduser(newUser);
+                    $('#inviteMemberModal').modal('hide');
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+            }
+        });
     });
 
 });

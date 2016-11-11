@@ -25,6 +25,7 @@ def owns_organization(fn):
     @wraps(fn)
     def decorated_view(*args, **kwargs):
         key = kwargs['key']
+        print key
         org = Organization.query.filter_by(id=key).first()
 
         if org.owner.id != g.user.id:
