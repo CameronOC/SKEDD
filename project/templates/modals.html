@@ -77,6 +77,9 @@
     </div>
 </div>
 
+
+
+
 <div id="inviteMemberModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
         <div class="modal-content">
@@ -84,11 +87,19 @@
                 <h4 id="inviteMemberTitle" class="modal-title">Invite Member</h4>
             </div>
             <div id="inviteMemberBody" class="modal-body">
-
-                <input type="text" class="form-control" id="inviteMemberFirstName" placeholder="First Name"> <br>
-                <input type="text" class="form-control" id="inviteMemberLastName" placeholder="Last Name"> <br>
-                <input type="text" class="form-control" id="inviteMemberEmail" placeholder="email@domain.com"> <br>
-                <br>
+                <form action="" method="post" name="invite" id="inviteMemberForm">
+                  {{ form.csrf_token }}
+                  <p>
+                    {{ form.first_name(placeholder="first name", class_="form-control") }}
+                  </p>
+                  <p>
+                    {{ form.last_name(placeholder="last name", class_="form-control") }}
+                  </p>
+                  <p>
+                    <p>
+                      {{ form.email(placeholder="example@example.com", class_="form-control") }}
+                    </p>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="inviteMemberCancel" data-dismiss="modal">Cancel</button>
