@@ -53,13 +53,3 @@ class ProductionConfig(BaseConfig):
     STRIPE_PUBLISHABLE_KEY = 'bar'
 
     #DATABASE_URL = "postgres://qwewadszqdekje:7IQa5Oi2Nw6UF5VFjCYkcpReWp@ec2-54-243-203-85.compute-1.amazonaws.com:5432/dcoknfoqnds1l3"
-    #urlparse.uses_netloc.append("postgres")
-    #url = urlparse.urlparse(os.environ["DATABASE_URL"])
-
-#    conn = psycopg2.connect(
- #       database=url.path[1:],
-  #      user=url.username,
-   #     password=url.password,
-    #    host=url.hostname,
-   #     port=url.port
-    #)
