@@ -20,6 +20,10 @@ for development:
 for running tests:
 
     export APP_SETTINGS="project.config.TestingConfig"
+
+for production:
+		
+		export APP_SETTINGS="project.config.ProductionConfig"
 	
 ## For Windows
 
