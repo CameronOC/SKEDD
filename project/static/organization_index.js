@@ -5,13 +5,14 @@ var app = function() {
     Vue.config.silent = false; // show all warnings
 
     //user object to store the data, this might not be neccassary
-    function usersobject(f, l, e) {
-        this.first_name =  f;
+    function usersobject(firstName, lastName, email, id) {
+        this.first_name =  firstName;
         //console.log(this.first_name);
-        this.last_name = l;
+        this.last_name = lastName;
         //console.log(this.last_name);
-        this.email = e;
+        this.email = email;
         //console.log(this.email);
+        this.id = id;
     };
 
     function positionsobject(t, o){
@@ -22,13 +23,16 @@ var app = function() {
     //function to add the user data to the user object
     function adduserstoarray(response) {
         console.log('addusertoarray was called');
-        for (key in response)   {
-            f = response[key].first_name;
-            l = response[key].last_name;
-            e = response[key].email;
+
+        for (var i = 0; i < response.length; i++) {
+            console.log(response[i].first_name)
+            first = response[i].first_name;
+            last = response[i].last_name;
+            email = response[i].email;
+            id = response[i].id;
             APP.vue.adduser(
-                    new usersobject(f, l, e)
-                );
+                new usersobject(first, last, email, id)
+            );
         }
     }
 
@@ -72,6 +76,17 @@ var app = function() {
                 });
     };
 
+    // functions for when a user is clicked from the drawer
+    self.memberDetail = function(index) {
+        member = self.vue.users[index];
+        $('#memberDetailTitle').html(member.first_name + " " + member.last_name);
+        $('#memberDetailFirstName').html(member.first_name);
+        $('#memberDetailLastName').html(member.first_name);
+        $('#memberDetailEmail').html(member.email);
+        $('#memberDetailId').html(member.id);
+        $('#memberDetailModal').modal('show');
+    }
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -86,7 +101,8 @@ var app = function() {
             get_users: self.get_users,
             adduser: self.adduser,
             get_positions: self.get_positions,
-            addposition: self.addposition
+            addposition: self.addposition,
+            member_detail: self.memberDetail
         }
 
     });

@@ -396,7 +396,11 @@ def deleteposition():
 
 @app.route('/getusersinorg/<key>')
 def getusersinorg(key):
-    return utils.organization.get_users_for_org_JSON(key)
+    response = Response(response=utils.organization.get_users_for_org_JSON(key),
+                        status=200,
+                        mimetype="application/json")
+
+    return response
 
 @app.route('/getpositionsinorg/<key>')
 def getpositionsinorg(key):

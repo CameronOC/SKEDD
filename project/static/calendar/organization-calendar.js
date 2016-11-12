@@ -7,7 +7,6 @@ $(document).ready(function() {
     var nextId
 
     $('.modal').on('hidden.bs.modal', function(){
-        console.log('it works');
         $(this).find("input,textarea").val('').end();
     });
 
@@ -147,6 +146,9 @@ $(document).ready(function() {
     */
 
     $('#inviteMemberSubmit').on('click', function() {
+
+        $('#inviteMemberSubmit').prop('disabled', true);
+
         var newUser = {
             first_name: $('#first_name').val(),
             last_name: $('#last_name').val(),
@@ -175,6 +177,9 @@ $(document).ready(function() {
                 }
             }
         });
+
+        $('#inviteMemberSubmit').prop('disabled', false);
+
     });
 
 });
