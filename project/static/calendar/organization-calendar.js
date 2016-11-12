@@ -73,6 +73,25 @@ $(document).ready(function() {
         $('#editShiftModal').modal('hide');
     });
 
+    var getShifts = function() {
+
+        url = "/organization/" + orgid.toString() + "/shifts"
+
+
+
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "GET",
+            url: url,
+            success: function(data) {
+                return data;
+            }
+        });
+
+    }
+
     /*
     *
     * Initialize Calendar
@@ -90,24 +109,7 @@ $(document).ready(function() {
         editable: true,
         selectable: true,
         selectHelper: true,
-        events: [
-            {
-                title: 'Product Owner',
-                start: '2016-10-26T06:00:00',
-                end: '2016-10-26T14:00:00',
-                description: 'Set the Product Backlog for the application',
-                assigned: 'Chris Kempis',
-                id: 1,
-            },
-            {
-                title: 'Scrum Master',
-                start: '2016-10-26T10:00:00',
-                end: '2016-10-26T16:00:00',
-                description: 'Run Scrum Meetings, update burnup chart and Scrum Board.',
-                assigned: 'Philip Guther',
-                id: 2,
-            }
-        ],
+        events: getShifts(),
         eventRender: function(event, element) {
             element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned + "</span>");
         },
@@ -162,6 +164,9 @@ $(document).ready(function() {
 
 
         $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
             type: "POST",
             url: url,
             data: $("#inviteMemberForm").serialize(), // serializes the form's elements.

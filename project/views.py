@@ -395,6 +395,8 @@ def deleteposition():
     return render_template('main/organization.html', organization=org)
 
 @app.route('/getusersinorg/<key>')
+@login_required
+@owns_organization
 def getusersinorg(key):
     response = Response(response=utils.organization.get_users_for_org_JSON(key),
                         status=200,
@@ -403,5 +405,22 @@ def getusersinorg(key):
     return response
 
 @app.route('/getpositionsinorg/<key>')
+@login_required
+@owns_organization
 def getpositionsinorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
+
+@main_blueprint.route('/organization/<key>/shifts')
+@login_required
+@owns_organization
+def get_shifts_for_org(key):
+    """
+
+    :param key:
+    :return:
+    """
+    response = Response(response=utils.organization.get_all_shifts_for_org_JSON(key),
+                        status=200,
+                        mimetype="application/json")
+
+    return response

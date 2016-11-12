@@ -332,7 +332,7 @@ def get_all_shifts_for_org_JSON(org_id):
     :param org_id:
     :return:
     """
-    outer = {}
+    shifts_list = []
     positions = Position.query.filter_by(organization_id=org_id).all()
     for p in positions:
         shifts = Shift.query.filter_by(position_id=p.id).all()
@@ -343,15 +343,16 @@ def get_all_shifts_for_org_JSON(org_id):
             else:
                 assigned_user_name = ''
                 
-            inner = {   'position_id': s.position_id,
-                        'assigned_user_name': assigned_user_name,
-                        'assigned_user_id': s.assigned_user_id,
-                        'start_time': s.start_time,
-                        'end_time': s.end_time,
-                        'description': s.description}
-            outer[str(s.id)] = inner
+            shifts_list.append({'position_id': s.position_id,
+                                'assigned_user_name': assigned_user_name,
+                                'assigned_user_id': s.assigned_user_id,
+                                'start_time': s.start_time,
+                                'end_time': s.end_time,
+                                'description': s.description,
+                                'id': s.id
+                                })
 
-    return json.dumps(outer)
+    return json.dumps(shifts_list)
             
 def get_users_for_org_JSON(org_id):
     members_list = []
