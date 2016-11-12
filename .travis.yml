@@ -6,6 +6,7 @@ install:
 - export APP_SETTINGS="project.config.TestingConfig"
 - export APP_MAIL_USERNAME="skedd.mail@gmail.com"
 - export APP_MAIL_PASSWORD="cumulonimbus"
+- export DATABASE_URL="postgres://qwewadszqdekje:7IQa5Oi2Nw6UF5VFjCYkcpReWp@ec2-54-243-203-85.compute-1.amazonaws.com:5432/dcoknfoqnds1l3"
 script:
 - nosetests
 deploy:
