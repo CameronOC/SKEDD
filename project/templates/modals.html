@@ -142,7 +142,15 @@
                 Last Name: <span id="memberDetailLastName"></span> <br>
                 Email: <span id="memberDetailEmail"></span> <br>
                 ID: <span id="memberDetailId"></span> <br>
+
+                Positions Assigned to: <span id="memberDetailFirstName2"></span>
+                <div v-for="position in assignedpositions">
+                    <li>${position.title}</li>
+                </div>
+
             </div>
+
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="memberDetailSubmit">Submit</button>

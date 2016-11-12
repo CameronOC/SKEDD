@@ -407,6 +407,13 @@ def getusersinorg(key):
 
     return response
 
+@app.route('/getassignedpositions/<key>/<key2>')
+def getassignedpositions(key, key2):
+    response = Response(response=utils.organization.get_assigned_positions_for_user(key, key2),
+                        status=200,
+                        mimetype="application/json")
+    return response
+
 @app.route('/getpositionsinorg/<key>')
 @login_required
 @owns_organization

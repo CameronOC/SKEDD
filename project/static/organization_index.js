@@ -20,6 +20,10 @@ var app = function() {
         this.orgid = o;
     }
 
+    function assignedpositionobject(t){
+        this.title = t;
+    }
+
     //function to add the user data to the user object
     function adduserstoarray(response) {
         console.log('addusertoarray was called');
@@ -47,6 +51,18 @@ var app = function() {
         }
     }
 
+    function addassignedpositiontoarray(response){
+        console.log('addassignedpositiontoarray was called');
+        console.log(response);
+        for (var i = 0; i < response.length; i++) {
+            console.log(response[i].title)
+            title = response[i].title;
+            APP.vue.addassignedposition(
+                new assignedpositionobject(title)
+            );
+        }
+    }
+
     //function to add the user object to the vue array
     self.adduser = function (u) {
         console.log('adduser called ' + u);
@@ -56,6 +72,11 @@ var app = function() {
     self.addposition = function(p){
         console.log('addposition called' + p);
         APP.vue.positions.push(p);
+    }
+
+    self.addassignedposition = function(ap){
+        console.log('add assignedposition called' + ap);
+        APP.vue.assignedpositions.push(ap);
     }
 
     //gets the users for an org
@@ -76,14 +97,30 @@ var app = function() {
                 });
     };
 
+    self.get_assigned_positions = function(index){
+        member = self.vue.users[index];
+        console.log(member)
+        memberid = member.id;
+        console.log(memberid);
+        $.getJSON('/getassignedpositions/' + orgid + '/' + memberid)
+            .then(function(response){
+                APP.vue.assignedpositions = [];
+                addassignedpositiontoarray(response);
+            })
+    }
+
     // functions for when a user is clicked from the drawer
     self.memberDetail = function(index) {
         member = self.vue.users[index];
         $('#memberDetailTitle').html(member.first_name + " " + member.last_name);
         $('#memberDetailFirstName').html(member.first_name);
-        $('#memberDetailLastName').html(member.first_name);
+        $('#memberDetailFirstName2').html(member.first_name);
+        $('#memberDetailLastName').html(member.last_name);
         $('#memberDetailEmail').html(member.email);
         $('#memberDetailId').html(member.id);
+
+        self.get_assigned_positions(index);
+
         $('#memberDetailModal').modal('show');
     }
 
@@ -95,6 +132,7 @@ var app = function() {
         data: {
             users: [],
             positions: [],
+            assignedpositions: [],
             orgid: orgid
         },
         methods: {
@@ -102,7 +140,9 @@ var app = function() {
             adduser: self.adduser,
             get_positions: self.get_positions,
             addposition: self.addposition,
-            member_detail: self.memberDetail
+            member_detail: self.memberDetail,
+            get_assigned_positions: self.get_assigned_positions,
+            addassignedposition: self.addassignedposition
         }
 
     });

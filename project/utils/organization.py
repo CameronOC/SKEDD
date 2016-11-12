@@ -420,3 +420,19 @@ def unassign_member_to_position(userid, posid, orgid):
     #removes the user from the position
     pos.assigned_users.remove(user)
     db.session.commit()
+
+def get_assigned_positions_for_user(orgid, userid):
+    assigned_list = []
+    org = Organization.query.filter_by(id=orgid).first()
+    for pos in org.owned_positions:
+        #print str(pos) + 'position'
+        for person in pos.assigned_users:
+            #print str(person) + 'person'
+            #print 'personid: ' + str(person.id) + ' userid: ' + str(userid)
+            #print str(person.id) == str(userid)
+            if str(person.id) == str(userid):
+                assigned_list.append({ 'title': pos.title })
+
+    return json.dumps(assigned_list)
+
+
