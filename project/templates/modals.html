@@ -148,6 +148,13 @@
                     <li>${position.title}</li>
                 </div>
 
+                Assign Positions to: <span id="memberDetailFirstName3"></span>
+                <div>
+                    <select class="dropdownmenu" name='position'>
+                        <option v-for="position in positions"> ${position.title} </option>         
+                    </select>
+                </div>
+
             </div>
 
 

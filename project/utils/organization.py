@@ -434,5 +434,3 @@ def get_assigned_positions_for_user(orgid, userid):
                 assigned_list.append({ 'title': pos.title })
 
     return json.dumps(assigned_list)
-
-

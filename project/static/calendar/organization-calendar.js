@@ -172,6 +172,30 @@ $(document).ready(function() {
         });
     });
 
+    $('#AddUserToPositionSubmit').on('click', function() {
+        var newPosition = {
+            title: $('#title').val()
+        };
+
+        url = "/organization/" + orgid.toString() + "/create_position"
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: $("#AddUserToPositionForm").serialize(), // serializes the form's elements.
+
+            success: function(data)
+            {
+                if(data.status == "success"){
+                    APP.addposition(newPosition);
+                    APP.get_positions();
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+            }
+        });
+    });
+
 
     //Code to invite a member
     $('#inviteMemberSubmit').on('click', function() {

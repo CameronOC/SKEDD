@@ -115,6 +115,7 @@ var app = function() {
         $('#memberDetailTitle').html(member.first_name + " " + member.last_name);
         $('#memberDetailFirstName').html(member.first_name);
         $('#memberDetailFirstName2').html(member.first_name);
+        $('#memberDetailFirstName3').html(member.first_name);
         $('#memberDetailLastName').html(member.last_name);
         $('#memberDetailEmail').html(member.email);
         $('#memberDetailId').html(member.id);
