@@ -8,3 +8,10 @@ install:
 - export APP_MAIL_PASSWORD="cumulonimbus"
 script:
 - nosetests
+deploy:
+  provider: heroku
+  api_key:
+    secure: Pm2/50oUuqpRyb99pokvmqPJCWzV/MhJU5xJR09uEXgF6BHgr8eBkDUmAP/t1VGtr+o/EIIMQW4rIPWQIjsgIQH+Cotzy/Li66LCWURhZEFq0ApvBSFnvWZT6tfeUY9E7W3TejGY7D7heYTxcHVnivfPuwikGyDc7sjvJG31+3/w7rqiRETSd7vF90RYazx4jiencE8VEbiN73F3KAQeSKF3Hr9WBaFcx3qQ0vb5/edHgcnmYMMcgMrMTBG6Z8MsnZHdHyWnmdsaeE9oGJOkj7WdyI4MkY4NYb/OVMIOWdi8ifaV8+psOr73ji3SKymyfyLtGFZk23s7CPLvuVakDUBhTablc2YT0HV9zZkra9/GY2B/g0AyQ9RVj57uIIaFikWt0pWsV9WBiiQTe2W1LWKcsOMWitlKWVbijzRhliFdL6tAxtcYqez8Wi5WzSId8sr38VJMJv/0yE0UrdzXPUPohEkw54Nzcefs8g7IOxz5q3d7P+KVW3VIyzp41WkTPdz4MiXaY40EQBrhtGSkJyx4ZiQPgZJs47FD4Rjm1gnTi4KRy5zYdYA0NgoNAVBeemgVAKouTmJeYXINgKeE3Geak20R8qvSwTvFCYhqHuiQ7C6a3OLOSYN4npaWeoDWkku9PskqpFA5Rv5/TmmTxJc6NE1AS6ZCt2mmqukjSqs=
+  app: skedd
+  on:
+    repo: CameronOC/SKEDD
