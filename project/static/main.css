@@ -127,32 +127,44 @@ h1.POSITION_title {
   font-size: 32px;
 }
 
-div.PROFILE_window {
-	position: relative;
-	background: #333333;
-	background: linear-gradient(90deg, #262626, #404040);
-	padding: 1px 20px 20px 20px;
-	border-radius:4px;
-	box-shadow:0 4px 10px 4px rgba(0,0,0,0.19);
-	color: white;
-	max-width: 30%;
-	text-align: center;
-	margin:auto;
-}
 
-div.PROFILE_change-password {
-	margin-left: 2.5%;
+
+
+
+
+div.PROFILE_window {
+  position: relative;
+  background: #333333;
+  background: linear-gradient(90deg, #262626, #404040);
+  padding: 1px 20px 20px 20px;
+  border-radius:4px;
+  box-shadow:0 4px 10px 4px rgba(0,0,0,0.19);
+  color: white;
+  max-width: 75%;
+  text-align: center;
+  margin:auto;
 }
 
 h1.PROFILE_title{
-	font-weight:bold;
-	color: white;
-	text-shadow: 2px 2px 4px #1a1a1a;
-	font-size: 32px;
+  font-weight:bold;
+  color: white;
+  text-shadow: 2px 2px 4px #1a1a1a;
+  font-size: 32px;
 }
 
+div.PROFILE_body {
+  margin-left: 2.5%;
+  color: white;
+}
+
+div.PROFILE_change-password{
+  color: black;
+}
+
+
+
 button.PROFILE_update-button {
-  background-color: #008CBA;
+  background-color: #008CBA; 
   border-radius: 4px;
   border: none;
   color: white;
@@ -171,6 +183,11 @@ button.PROFILE_update-button:hover {
   color: white;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
+
+
+
+
+
 
 div.CREATE-POSITION_window{
 	position: relative;
