@@ -58,7 +58,7 @@
     </div>
 </div>
 
-<div id="createPositionModal" class="modal fade" data-backdrop="static" data-keyboard="false">
+<div id="CreatePositionModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -66,8 +66,12 @@
             </div>
             <div id="createPositionBody" class="modal-body">
 
-                <input type="text" class="form-control" id="createPositionName" placeholder="Name">
-                <br>
+                <form action="" method="post" name="create" id="CreatePositionForm">
+                    {{ form1.csrf_token }}
+                  <p>
+                    {{ form1.name(placeholder="Position Name", class_="form-control") }}
+                  </p>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="createPositionCancel" data-dismiss="modal">Cancel</button>
@@ -100,6 +104,23 @@
                       {{ form.email(placeholder="example@example.com", class_="form-control") }}
                     </p>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="inviteMemberCancel" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="inviteMemberSubmit">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MemberModal" class="modal fade" data-backdrop="static" data-keyboard="false">
+   <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="MemberTitle" class="modal-title">Member</h4>
+            </div>
+            <div id="inviteMemberBody" class="modal-body">
+                
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="inviteMemberCancel" data-dismiss="modal">Cancel</button>

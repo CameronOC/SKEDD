@@ -89,7 +89,7 @@ def organization(key):
     :return:
     """
     org = utils.organization.get_organization(key)
-    return render_template('main/organization.html', organization=org, form=InviteForm())
+    return render_template('main/organization.html', organization=org, form=InviteForm(), form1=PositionForm())
 
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
 @login_required
@@ -251,28 +251,31 @@ def position(key, key2):
 @check_confirmed
 @owns_organization
 def create_position(key):
-    """
 
-    :param key:
-    :return:
-    """
-    if request.method == 'GET':
-        org = Organization.query.filter_by(id=key).first()
-        return render_template('main/create_position.html', form=CreateForm())
+    #the new create_position function.
+    org = utils.organization.get_organization(key)
+    form1 = PositionForm(request.form)
+    return_dict = {}
 
+    if form1.validate_on_submit():
+        utils.organization.create_position(org, form1.name.data)
+        return_dict['status'] = "success"
     else:
-        org = Organization.query.filter_by(id=key).first()
-        form = PositionForm(request.form)
-        if form.validate_on_submit():
-            title = form.name.data
-            pos = Position(title=title, organization_id=org.id)
-            db.session.add(pos)
-            org.owned_positions.append(pos)
-            db.session.commit()
+        return_dict['status'] = "error"
+        errors_dict = {
+            'title': []
+        }
 
-            return redirect('/organization/' + str(org.id) + '/position/' + str(pos.id))
-        else:
-            return redirect('/organization/' + str(org.id))
+        for error in form.title.errors:
+            errors_dict['title'].append(error)
+
+        return_dict['errors'] = errors_dict
+
+    response = Response(response=json.dumps(return_dict),
+                    status=200,
+                    mimetype="application/json")
+
+    return response
 
 @app.route('/positionsinorg/<key>')
 def getpositioninorg(key):

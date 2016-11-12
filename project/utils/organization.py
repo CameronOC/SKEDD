@@ -108,6 +108,16 @@ def membership_from_key_token(key, token):
     membership = user.memberships.filter_by(organization_id=org.id).first()
     return membership
 
+def create_position(org, title):
+    """
+    Creates a position given a organization and a position title/name
+    :return:
+    """
+    position = Position(title=title, organization_id=org.id)
+    db.session.add(position)
+    org.owned_positions.append(position)
+    db.session.commit()
+    return position
 
 def invite_member(org, email, first_name, last_name):
     """
