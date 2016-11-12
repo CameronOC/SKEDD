@@ -113,6 +113,7 @@
     </div>
 </div>
 
+
 <div id="MemberModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
         <div class="modal-content">
@@ -125,6 +126,26 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="inviteMemberCancel" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="inviteMemberSubmit">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="memberDetailModal" class="modal fade" data-backdrop="static" data-keyboard="false">
+   <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="memberDetailTitle" class="modal-title"></h4>
+            </div>
+            <div id="memberDetailBody" class="modal-body">
+                First Name: <span id="memberDetailFirstName"></span> <br>
+                Last Name: <span id="memberDetailLastName"></span> <br>
+                Email: <span id="memberDetailEmail"></span> <br>
+                ID: <span id="memberDetailId"></span> <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="memberDetailSubmit">Submit</button>
             </div>
         </div>
     </div>

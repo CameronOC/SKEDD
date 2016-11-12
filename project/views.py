@@ -106,12 +106,11 @@ def create_shift(org_key, pos_key):
     """
     form = ShiftForm(request.form)
     if request.method == 'GET':
-        # fill in SelectField for choosing a user to assign a shift to (when creating the shift)
-        form.assigned_user_id.choices = utils.organization.gather_members_for_shift(org_key)
         return render_template('main/create_shift.html', form=form)
     else:
-        shift = utils.organization.create_shift(pos_key, form.assigned_user_id.data, form.day.data,
-                                                form.start_time.data, form.end_time.data)
+        shift = utils.organization.create_shifts_form(pos_key, form.assigned_user_id.data, 
+                                                        form.start_time.data, form.end_time.data, 
+                                                        form.description.data, form.repeat_list.data)
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
@@ -130,15 +129,13 @@ def update_shift(org_key, pos_key, shift_key):
     shift = utils.organization.get_shift(shift_key)
     form = ShiftForm(obj=shift)
     if request.method == 'GET':
-        # fill in SelectField for choosing a user to assign a shift to (when creating the shift)
-        form.assigned_user_id.choices = utils.organization.gather_members_for_shift(org_key)
         if form.validate():
             # pre-populate form with current data
             form.populate_obj(shift)
         return render_template('main/update_shift.html', form=form)
     else:
-        utils.organization.update_shift(shift, pos_key, form.assigned_user_id.data, form.day.data,
-                                        form.start_time.data, form.end_time.data)
+        shift.update(pos_key, form.assigned_user_id.data, form.start_time.data, 
+                        form.end_time.data, form.description.data)
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
@@ -401,9 +398,32 @@ def deleteposition():
     return render_template('main/organization.html', organization=org)
 
 @app.route('/getusersinorg/<key>')
+@login_required
+@owns_organization
 def getusersinorg(key):
-    return utils.organization.get_users_for_org_JSON(key)
+    response = Response(response=utils.organization.get_users_for_org_JSON(key),
+                        status=200,
+                        mimetype="application/json")
+
+    return response
 
 @app.route('/getpositionsinorg/<key>')
+@login_required
+@owns_organization
 def getpositionsinorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
+
+@main_blueprint.route('/organization/<key>/shifts')
+@login_required
+@owns_organization
+def get_shifts_for_org(key):
+    """
+
+    :param key:
+    :return:
+    """
+    response = Response(response=utils.organization.get_all_shifts_for_org_JSON(key),
+                        status=200,
+                        mimetype="application/json")
+
+    return response
