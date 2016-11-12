@@ -1,1 +1,1 @@
-web: gunicorn skedd:app
+web: gunicorn project.app:app
