@@ -336,22 +336,18 @@ def assignpos():
     return render_template('main/position.html', position=mypos, organization=org)
 
 
-@app.route('/unassign', methods=['POST'])
+@app.route('/unassign/<key1>/<key2>', methods=['POST'])
 @login_required
 @check_confirmed
-def unassign():
+def unassign(key1, key2):
     """
 
     :return:
     """
     # get the user, position, and org
-    myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
-    mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    
-    unassign_member_to_position(myuser, mypos, org)
-    # redirects to the page before
-    return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
+    response = Response(response=unassign_member_to_position(key1, key2),
+                        status=200)
+    return response
 
 
 @app.route('/unassignpos', methods=['POST'])

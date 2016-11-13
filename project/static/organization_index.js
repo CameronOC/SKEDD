@@ -23,7 +23,7 @@ var app = function() {
 
     function assignedpositionobject(t, p){
         this.title = t;
-        this.posid = p;
+        this.id = p;
     }
 
     //function to add the user data to the user object
@@ -60,8 +60,10 @@ var app = function() {
         for (var i = 0; i < response.length; i++) {
             //console.log(response[i].title)
             title = response[i].title;
+            posid = response[i].position_id;
+            userid = response[i].user_id;
             APP.vue.addassignedposition(
-                new assignedpositionobject(title)
+                new assignedpositionobject(title, posid)
             );
         }
     }
@@ -101,7 +103,7 @@ var app = function() {
     };
 
     self.get_assigned_positions = function(index){
-        member = self.vue.users[index];
+        //member = self.vue.users[index];
         //console.log(member)
         memberid = APP.vue.userid;
         //console.log(memberid);
@@ -131,6 +133,22 @@ var app = function() {
         $('#memberDetailModal').modal('show');
     }
 
+    self.unassign_position = function(index){
+
+        console.log("unassign_position called")
+
+        var uid = APP.vue.userid;
+        var posid = self.vue.assignedpositions[index].id;
+        console.log(posid);
+
+        url = "/unassign/" + uid.toString() + "/" + posid.toString()
+
+        $.post(url,
+            function () {
+                self.get_assigned_positions();
+            });
+    }
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -150,7 +168,8 @@ var app = function() {
             addposition: self.addposition,
             member_detail: self.memberDetail,
             get_assigned_positions: self.get_assigned_positions,
-            addassignedposition: self.addassignedposition
+            addassignedposition: self.addassignedposition,
+            unassign_position: self.unassign_position
         }
 
     });

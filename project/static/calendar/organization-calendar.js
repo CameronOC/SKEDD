@@ -179,8 +179,6 @@ $(document).ready(function() {
         //get the title of the position from the dropdownmenu
         var select = document.getElementById("positiondropdown");
         var positiontitle = select.options[select.selectedIndex].value;
-        
-        //get the userid
         var uid = APP.vue.userid;
         
         url = "/assign/" + uid.toString() + "/" + positiontitle.toString()
@@ -198,7 +196,6 @@ $(document).ready(function() {
         APP.get_assigned_positions();
         //$('#memberDetailModal').modal('hide');
     });
-
 
     //Code to invite a member
     $('#inviteMemberSubmit').on('click', function() {

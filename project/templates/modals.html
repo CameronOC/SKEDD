@@ -144,9 +144,15 @@
                 ID: <span id="memberDetailId"></span> <br>
 
                 Positions Assigned to: <span id="memberDetailFirstName2"></span>
-                <div v-for="position in assignedpositions">
-                    <li>${position.title}</li>
-                </div>
+
+                <form action="" method='post' id="DeleteUserFromPosition">
+                <!-- Because this button is in a v-for loop i had to write the function for unassign in organization-index.js and not organization-calendar.js.-->
+                    <div v-for="(position, index) in assignedpositions">
+                        <div id="unposition">
+                        ${position.title} <button type="button" class="btn btn-primary" v-on:click="unassign_position(index)"/> Unassign </button>
+                        </div>
+                    </div>
+                </form>
 
                 <form action="" method='post' id="AddUserToPositionForm" >
                     Assign Positions to: <span id="memberDetailFirstName3"></span>
@@ -163,8 +169,8 @@
 
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="memberDetailSubmit">Submit</button>
+                <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Back</button>
+                <!-- <button type="button" class="btn btn-primary" id="memberDetailSubmit">Submit</button> -->
             </div>
         </div>
     </div>

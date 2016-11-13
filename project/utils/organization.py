@@ -415,13 +415,13 @@ def assign_member_to_position(user, pos):
     return "success"
 
 
-def unassign_member_to_position(userid, posid, orgid):
-    user = userid
-    pos = posid
-    org = orgid
+def unassign_member_to_position(user, pos):
+    myuser = User.query.filter_by(id=user).first()
+    mypos = Position.query.filter_by(id=pos).first()
     #removes the user from the position
-    pos.assigned_users.remove(user)
+    mypos.assigned_users.remove(myuser)
     db.session.commit()
+    return "success"
 
 def get_assigned_positions_for_user(orgid, userid):
     assigned_list = []
