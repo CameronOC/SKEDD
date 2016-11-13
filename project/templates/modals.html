@@ -148,12 +148,16 @@
                     <li>${position.title}</li>
                 </div>
 
-                Assign Positions to: <span id="memberDetailFirstName3"></span>
-                <div>
-                    <select class="dropdownmenu" name='position'>
-                        <option v-for="position in positions"> ${position.title} </option>         
-                    </select>
-                </div>
+                <form action="" method='post' id="AddUserToPositionForm" >
+                    Assign Positions to: <span id="memberDetailFirstName3"></span>
+                    <div>
+                        <select class="dropdownmenu" name="position" id="positiondropdown">
+                            <option v-for="position in positions"> ${position.title} </option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="AddUserToPositionSubmit"/> Press Me </button>
+                </form>
 
             </div>
 

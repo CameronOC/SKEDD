@@ -78,7 +78,7 @@ def create():
     return render_template('main/create.html', form=CreateForm())
 
 
-@main_blueprint.route('/organization/<key>', methods=['GET', ])
+@main_blueprint.route('/organization/<key>', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 def organization(key):
@@ -301,25 +301,17 @@ def manager_members_profile(key, key2):
     return render_template('main/member.html', user=user, organization=org)
 
 
-@app.route('/assign', methods=['POST'])
+@app.route('/assign/<key1>/<key2>', methods=['POST'])
 @login_required
 @check_confirmed
-def assign():
+def assign(key1, key2):
     """
 
     :return:
     """
-    myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
-    mypos = Position.query.filter_by(title=request.form['position']).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    if myuser in mypos.assigned_users:
-        flash('This persons position is already assigned to ' + mypos.title, 'danger')
-        return render_template('main/member.html', user=myuser, organization=org)
-
-    assign_member_to_position(myuser, mypos, org)
-
-    # redirects to the page before
-    return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
+    response = Response(response=assign_member_to_position(key1, key2),
+                        status=200)
+    return response
 
 
 @app.route('/assignpos', methods=['POST'])
@@ -327,7 +319,6 @@ def assign():
 @check_confirmed
 def assignpos():
     """
-
     :return:
     """
     # get the user, position, and org

@@ -172,28 +172,31 @@ $(document).ready(function() {
         });
     });
 
+    //Code to add a member to a position
     $('#AddUserToPositionSubmit').on('click', function() {
-        var newPosition = {
-            title: $('#title').val()
-        };
+        console.log("AddUsertopositionsubmit pressed")
 
-        url = "/organization/" + orgid.toString() + "/create_position"
+        //get the title of the position from the dropdownmenu
+        var select = document.getElementById("positiondropdown");
+        var positiontitle = select.options[select.selectedIndex].value;
+        
+        //get the userid
+        var uid = APP.vue.userid;
+        
+        url = "/assign/" + uid.toString() + "/" + positiontitle.toString()
 
         $.ajax({
             type: "POST",
             url: url,
-            data: $("#AddUserToPositionForm").serialize(), // serializes the form's elements.
 
-            success: function(data)
+            success: function()
             {
-                if(data.status == "success"){
-                    APP.addposition(newPosition);
-                    APP.get_positions();
-                }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
-                }
+                console.log("success")
             }
         });
+
+        APP.get_assigned_positions();
+        //$('#memberDetailModal').modal('hide');
     });
 
 

@@ -385,14 +385,16 @@ def get_positions_for_org_JSON(org_id):
     :param id:
     :return:
     """
-    outer = {}
+    positions_list = []
     pos = Position.query.filter_by(organization_id=org_id).all()
     for p in pos:
-        inner = {   'title': p.title,
-                    'organization_id': p.organization_id}
-        outer[str(p.id)] = inner
+        positions_list.append({   
+                    'title': p.title,
+                    'organization_id': p.organization_id,
+                    'id': p.id
+        })
 
-    return json.dumps(outer)
+    return json.dumps(positions_list)
 
 #used in views.deletepositions
 def deletepositions(posid, orgid):
@@ -404,13 +406,13 @@ def deletepositions(posid, orgid):
 
 
 #used in views.assign and views.assignpos
-def assign_member_to_position(userid, posid, orgid):
-    user = userid
-    pos = posid
-    org = orgid
+def assign_member_to_position(user, pos):
     #assign the user to an org
-    pos.assigned_users.append(user)
+    myuser = User.query.filter_by(id=user).first()
+    mypos = Position.query.filter_by(title=pos).first()
+    mypos.assigned_users.append(myuser)
     db.session.commit()
+    return "success"
 
 
 def unassign_member_to_position(userid, posid, orgid):
@@ -425,12 +427,12 @@ def get_assigned_positions_for_user(orgid, userid):
     assigned_list = []
     org = Organization.query.filter_by(id=orgid).first()
     for pos in org.owned_positions:
-        #print str(pos) + 'position'
         for person in pos.assigned_users:
-            #print str(person) + 'person'
-            #print 'personid: ' + str(person.id) + ' userid: ' + str(userid)
-            #print str(person.id) == str(userid)
             if str(person.id) == str(userid):
-                assigned_list.append({ 'title': pos.title })
+                assigned_list.append({ 
+                    'title': pos.title,
+                    'position_id': pos.id,
+                    'user_id': person.id
+                 })
 
     return json.dumps(assigned_list)

@@ -15,13 +15,15 @@ var app = function() {
         this.id = id;
     };
 
-    function positionsobject(t, o){
+    function positionsobject(t, o, p){
         this.title = t;
         this.orgid = o;
+        this.id = p;
     }
 
-    function assignedpositionobject(t){
+    function assignedpositionobject(t, p){
         this.title = t;
+        this.posid = p;
     }
 
     //function to add the user data to the user object
@@ -29,7 +31,7 @@ var app = function() {
         console.log('addusertoarray was called');
 
         for (var i = 0; i < response.length; i++) {
-            console.log(response[i].first_name)
+            //console.log(response[i].first_name)
             first = response[i].first_name;
             last = response[i].last_name;
             email = response[i].email;
@@ -45,17 +47,18 @@ var app = function() {
         for (key in response)   {
             t = response[key].title;
             o = response[key].orgid;
+            p = response[key].id;
             APP.vue.addposition(
-                    new positionsobject(t, o)
+                    new positionsobject(t, o, p)
                 );
         }
     }
 
     function addassignedpositiontoarray(response){
         console.log('addassignedpositiontoarray was called');
-        console.log(response);
+        //console.log(response);
         for (var i = 0; i < response.length; i++) {
-            console.log(response[i].title)
+            //console.log(response[i].title)
             title = response[i].title;
             APP.vue.addassignedposition(
                 new assignedpositionobject(title)
@@ -65,17 +68,17 @@ var app = function() {
 
     //function to add the user object to the vue array
     self.adduser = function (u) {
-        console.log('adduser called ' + u);
+        //console.log('adduser called ' + u);
         APP.vue.users.push(u);
     }
 
     self.addposition = function(p){
-        console.log('addposition called' + p);
+        //console.log('addposition called' + p);
         APP.vue.positions.push(p);
     }
 
     self.addassignedposition = function(ap){
-        console.log('add assignedposition called' + ap);
+        //console.log('add assignedposition called' + ap);
         APP.vue.assignedpositions.push(ap);
     }
 
@@ -99,9 +102,9 @@ var app = function() {
 
     self.get_assigned_positions = function(index){
         member = self.vue.users[index];
-        console.log(member)
-        memberid = member.id;
-        console.log(memberid);
+        //console.log(member)
+        memberid = APP.vue.userid;
+        //console.log(memberid);
         $.getJSON('/getassignedpositions/' + orgid + '/' + memberid)
             .then(function(response){
                 APP.vue.assignedpositions = [];
@@ -120,6 +123,9 @@ var app = function() {
         $('#memberDetailEmail').html(member.email);
         $('#memberDetailId').html(member.id);
 
+        APP.vue.userid = member.id;
+        //console.log(member.id);
+
         self.get_assigned_positions(index);
 
         $('#memberDetailModal').modal('show');
@@ -134,7 +140,8 @@ var app = function() {
             users: [],
             positions: [],
             assignedpositions: [],
-            orgid: orgid
+            orgid: orgid,
+            userid: -1
         },
         methods: {
             get_users: self.get_users,
