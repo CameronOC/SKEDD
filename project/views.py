@@ -89,7 +89,7 @@ def organization(key):
     :return:
     """
     org = utils.organization.get_organization(key)
-    return render_template('main/organization.html', organization=org, form=InviteForm())
+    return render_template('main/organization.html', organization=org, form=InviteForm(), shift_form=ShiftForm())
 
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
 @login_required

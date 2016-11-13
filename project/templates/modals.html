@@ -8,18 +8,31 @@
                 <h4 id="createShiftTitle" class="modal-title">New Shift</h4>
             </div>
             <div class="modal-body">
-                <select class="form-control" id="createShiftPosition">
-                    <option v-for="position in positions">${position.title}</option>
-                </select> <br>
-                <select class="form-control" id="createShiftAssigned">
-                    <option>Unassigned</option>>
-                    <option v-for="user in users">${user.first_name} ${user.last_name}</option>
-                </select> <br>
-                <textarea class="form-control" rows="5" id="createShiftDescription" placeholder="Description...">
-                </textarea> <br>
-                Start: <span id="createShiftStart"></span> <br>
-                End: <span id="createShiftEnd"></span>
-                <h1 id="createShiftId"></h1>
+                <form action="" method="post" name="invite" id="createShiftForm">
+                    {{ shift_form.csrf_token }}
+                    <p>
+                        Position: {{ shift_form.position_id(class_="form-control") }}
+                    </p>
+                    <p>
+                        Assigned Member: {{ shift_form.assigned_user_id(class_="form-control") }}
+                    </p>
+                    <p>
+                        Repeating {{ shift_form.repeating(class_="") }}
+                    </p>
+                    <p>
+                        {{ shift_form.repeat_list(class_="form-control") }}
+                    </p>
+                    <p>
+                        {{ shift_form.description(class_="form-control", placeholder="description...") }}
+                    </p>
+                    <p>
+                        {{ shift_form.start_time(class_="form-control") }}
+                    </p>
+                    <p>
+                        {{ shift_form.end_time(class_="form-control") }}
+                    </p>
+                </form>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="createCancel">Cancel</button>

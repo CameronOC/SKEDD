@@ -259,7 +259,12 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
     """
     creates a month's worth of shifts
     based on data from a form
-    :param dictionary:
+    :param position_id:
+    :param assigned_user_id:
+    :param start_time:
+    :param end_time:
+    :param description:
+    :param repeat_list:
     :return:
     """
     shifts = []
