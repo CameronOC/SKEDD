@@ -46,7 +46,10 @@ class ProductionConfig(BaseConfig):
     """Production configuration."""
     SECRET_KEY = 'my_precious'
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/example'
+    #SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/example'
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
     DEBUG_TB_ENABLED = False
     STRIPE_SECRET_KEY = 'foo'
     STRIPE_PUBLISHABLE_KEY = 'bar'
+
+    #DATABASE_URL = "postgres://qwewadszqdekje:7IQa5Oi2Nw6UF5VFjCYkcpReWp@ec2-54-243-203-85.compute-1.amazonaws.com:5432/dcoknfoqnds1l3"
