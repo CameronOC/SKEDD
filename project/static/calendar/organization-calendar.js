@@ -73,6 +73,25 @@ $(document).ready(function() {
         $('#editShiftModal').modal('hide');
     });
 
+    var getShifts = function() {
+
+        url = "/organization/" + orgid.toString() + "/shifts"
+
+
+
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "GET",
+            url: url,
+            success: function(data) {
+                return data;
+            }
+        });
+
+    }
+
     /*
     *
     * Initialize Calendar
@@ -90,24 +109,7 @@ $(document).ready(function() {
         editable: true,
         selectable: true,
         selectHelper: true,
-        events: [
-            {
-                title: 'Product Owner',
-                start: '2016-10-26T06:00:00',
-                end: '2016-10-26T14:00:00',
-                description: 'Set the Product Backlog for the application',
-                assigned: 'Chris Kempis',
-                id: 1,
-            },
-            {
-                title: 'Scrum Master',
-                start: '2016-10-26T10:00:00',
-                end: '2016-10-26T16:00:00',
-                description: 'Run Scrum Meetings, update burnup chart and Scrum Board.',
-                assigned: 'Philip Guther',
-                id: 2,
-            }
-        ],
+        events: getShifts(),
         eventRender: function(event, element) {
             element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned + "</span>");
         },
@@ -144,7 +146,60 @@ $(document).ready(function() {
     * Code to Create new Position
     *
     */
+    $('#createPositionSubmit').on('click', function() {
+        var newPosition = {
+            title: $('#title').val()
+        };
 
+        url = "/organization/" + orgid.toString() + "/create_position"
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: $("#CreatePositionForm").serialize(), // serializes the form's elements.
+
+            success: function(data)
+            {
+
+                if(data.status == "success"){
+                    APP.addposition(newPosition);
+                    APP.get_positions();
+                    $('#CreatePositionModal').modal('hide');
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+            }
+        });
+    });
+
+    //Code to add a member to a position
+    $('#AddUserToPositionSubmit').on('click', function() {
+        console.log("AddUsertopositionsubmit pressed")
+
+        //get the title of the position from the dropdownmenu
+        var select = document.getElementById("positiondropdown");
+        var positiontitle = select.options[select.selectedIndex].value;
+        //var positionid = APP.vue.positions[index].id;
+        //console.log(positionid) 
+        var uid = APP.vue.userid;
+        
+        url = "/assign/" + uid.toString() + "/" + positiontitle.toString()
+
+        $.ajax({
+            type: "POST",
+            url: url,
+
+            success: function()
+            {
+                console.log("success")
+            }
+        });
+
+        APP.get_assigned_positions();
+        //$('#memberDetailModal').modal('hide');
+    });
+
+    //Code to invite a member
     $('#inviteMemberSubmit').on('click', function() {
 
         $('#inviteMemberSubmit').prop('disabled', true);
@@ -162,6 +217,9 @@ $(document).ready(function() {
 
 
         $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
             type: "POST",
             url: url,
             data: $("#inviteMemberForm").serialize(), // serializes the form's elements.
