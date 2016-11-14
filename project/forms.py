@@ -14,15 +14,15 @@ class CreateForm(Form):
     name = StringField('name', validators=[DataRequired(), Length(min=1, max=50)])
     
 class ShiftForm(Form):
-    position_id = SelectField('positions', choices=[])
+    shift_position_id = SelectField('positions', choices=[])
     
-    assigned_user_id = SelectField('users', choices=[])
+    shift_assigned_user_id = SelectField('users', choices=[])
     
-    description = StringField('description', validators=[Length(min=1, max=100)])
+    shift_description = StringField('description', validators=[Length(min=1, max=100)])
     
-    repeating = BooleanField('repeating', default=False)
+    shift_repeating = BooleanField('repeating', default=False)
 
-    repeat_list = SelectMultipleField('day', choices=[  (0, 'Monday'), 
+    shift_repeat_list = SelectMultipleField('day', choices=[  (0, 'Monday'),
                                                         (1, 'Tuesday'), 
                                                         (2, 'Wednesday'), 
                                                         (3, 'Thursday'), 
@@ -30,8 +30,9 @@ class ShiftForm(Form):
                                                         (5, 'Saturday'), 
                                                         (6, 'Sunday')])
                                         
-    start_time = HiddenField('StartTime')
-    end_time = HiddenField('EndTime')
+    shift_start_time = HiddenField('StartTime')
+    shift_end_time = HiddenField('EndTime')
+    shift_id = HiddenField('ShiftId')
 
 class InviteForm(Form):
     email = StringField(

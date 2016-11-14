@@ -19,15 +19,15 @@ $(document).ready(function() {
 
     $('#createSubmit').on('click', function() {
 
-        var tempId = parseInt($('#createShiftId').text());
+        var tempId = parseInt($('#shift_id').val());
 
         var eventlist = $("#calendar").fullCalendar('clientEvents', tempId);
 
         evento = eventlist[0];
 
-        evento.title = $('#createShiftPosition').val();
-        evento.description = $('#createShiftDescription').val();
-        evento.assigned = $('#createShiftAssigned').val();
+        evento.title = $('#shift_position_id').val();
+        evento.description = $('#shift_description').val();
+        evento.assigned = $('#shift_assigned_user_id').val();
 
         $('#calendar').fullCalendar('updateEvent', evento);
         $('#createShiftModal').modal('hide');
@@ -35,8 +35,7 @@ $(document).ready(function() {
     });
 
     $('#createCancel').on('click', function() {
-
-        var tempId = parseInt($('#createShiftId').text());
+        var tempId = parseInt($('#shift_id').val());
         $('#calendar').fullCalendar( 'removeEvents', tempId);
         $('#createShiftModal').modal('hide');
     });
@@ -63,7 +62,7 @@ $(document).ready(function() {
 
         $('#calendar').fullCalendar('updateEvent', evento);
         $('#editShiftModal').modal('hide');
-        nextId = nextId + 1;7
+        nextId = nextId + 1;
     });
 
     $('#editDelete').on('click', function() {
@@ -132,9 +131,9 @@ $(document).ready(function() {
                 id: nextId,
             };
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
-            $('#createShiftStart').html(start.toString());
-            $('#createShiftEnd').html(end.toString());
-            $('#createShiftId').html(nextId.toString());
+            $('#shift_start_time').val(start.toString());
+            $('#shift_end_time').val(end.toString());
+            $('#shift_id').val(nextId.toString());
             $('#createShiftModal').modal('show');
 
         }
