@@ -154,8 +154,8 @@ def update_shift(org_key, pos_key, shift_key):
             form.populate_obj(shift)
         return render_template('main/update_shift.html', form=form)
     else:
-        shift.update(pos_key, form.assigned_user_id.data, form.start_time.data, 
-                        form.end_time.data, form.description.data)
+        shift.update(pos_key, form.shift_assigned_user_id.data, form.shift_start_time.data,
+                        form.shift_end_time.data, form.shift_description.data)
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
@@ -283,7 +283,7 @@ def create_position(key):
             'title': []
         }
 
-        for error in form.title.errors:
+        for error in form1.name.errors:
             errors_dict['title'].append(error)
 
         return_dict['errors'] = errors_dict
@@ -350,7 +350,7 @@ def assignpos():
         flash('This persons position is already assigned to ' + mypos.title, 'danger')
         return render_template('main/position.html', position=mypos, organization=org)
 
-    assign_member_to_position(myuser, mypos, org)
+    assign_member_to_position(myuser, mypos)
     
     # redirects to the page before
     return render_template('main/position.html', position=mypos, organization=org)
@@ -383,7 +383,7 @@ def unassignpos():
     mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
     org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
 
-    unassign_member_to_position(myuser, mypos, org)
+    unassign_member_to_position(myuser, mypos)
     
     # redirects to the page before
     return render_template('main/position.html', position=mypos, organization=org)
