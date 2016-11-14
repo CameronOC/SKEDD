@@ -11,7 +11,11 @@
                 <form action="" method="post" name="invite" id="createShiftForm">
                     {{ shift_form.csrf_token }}
                     <p>
-                        Position: {{ shift_form.shift_position_id(class_="form-control") }}
+                        Position:
+                        <select class="form-control" v-for="position in positions" name="shift_position_id" id="shift_position_id">
+                            <option value="">Unassigned</option>
+                            <option value="${position.id}">${position.title}</option>
+                        </select> <br>
                     </p>
                     <p>
                         Assigned Member: {{ shift_form.shift_assigned_user_id(class_="form-control") }}
