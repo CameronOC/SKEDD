@@ -78,7 +78,7 @@ def create():
     return render_template('main/create.html', form=CreateForm())
 
 
-@main_blueprint.route('/organization/<key>', methods=['GET', ])
+@main_blueprint.route('/organization/<key>', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 def organization(key):
@@ -89,7 +89,27 @@ def organization(key):
     :return:
     """
     org = utils.organization.get_organization(key)
-    return render_template('main/organization.html', organization=org, form=InviteForm(), shift_form=ShiftForm())
+    return render_template('main/organization.html',
+                           organization=org,
+                           form=InviteForm(),
+                           form1=PositionForm(),
+                           shift_form=ShiftForm())
+
+
+@main_blueprint.route('/organization/<key>/shifts')
+@login_required
+@owns_organization
+def get_shifts_for_org(key):
+    """
+    Gets all shifts for an organization
+    :param key:
+    :return:
+    """
+    response = Response(response=utils.organization.get_all_shifts_for_org_JSON(key),
+                        status=200,
+                        mimetype="application/json")
+
+    return response
 
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
 @login_required
@@ -108,9 +128,9 @@ def create_shift(org_key, pos_key):
     if request.method == 'GET':
         return render_template('main/create_shift.html', form=form)
     else:
-        shift = utils.organization.create_shifts_form(pos_key, form.assigned_user_id.data, 
-                                                        form.start_time.data, form.end_time.data, 
-                                                        form.description.data, form.repeat_list.data)
+        shift = utils.organization.create_shifts_form(pos_key, form.shift_assigned_user_id.data,
+                                                        form.shift_start_time.data, form.shift_end_time.data,
+                                                        form.shift_description.data, form.shift_repeat_list.data)
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
@@ -248,28 +268,31 @@ def position(key, key2):
 @check_confirmed
 @owns_organization
 def create_position(key):
-    """
 
-    :param key:
-    :return:
-    """
-    if request.method == 'GET':
-        org = Organization.query.filter_by(id=key).first()
-        return render_template('main/create_position.html', form=CreateForm())
+    #the new create_position function.
+    org = utils.organization.get_organization(key)
+    form1 = PositionForm(request.form)
+    return_dict = {}
 
+    if form1.validate_on_submit():
+        utils.organization.create_position(org, form1.name.data)
+        return_dict['status'] = "success"
     else:
-        org = Organization.query.filter_by(id=key).first()
-        form = PositionForm(request.form)
-        if form.validate_on_submit():
-            title = form.name.data
-            pos = Position(title=title, organization_id=org.id)
-            db.session.add(pos)
-            org.owned_positions.append(pos)
-            db.session.commit()
+        return_dict['status'] = "error"
+        errors_dict = {
+            'title': []
+        }
 
-            return redirect('/organization/' + str(org.id) + '/position/' + str(pos.id))
-        else:
-            return redirect('/organization/' + str(org.id))
+        for error in form.title.errors:
+            errors_dict['title'].append(error)
+
+        return_dict['errors'] = errors_dict
+
+    response = Response(response=json.dumps(return_dict),
+                    status=200,
+                    mimetype="application/json")
+
+    return response
 
 @app.route('/positionsinorg/<key>')
 def getpositioninorg(key):
@@ -298,25 +321,17 @@ def manager_members_profile(key, key2):
     return render_template('main/member.html', user=user, organization=org)
 
 
-@app.route('/assign', methods=['POST'])
+@app.route('/assign/<key1>/<key2>', methods=['POST'])
 @login_required
 @check_confirmed
-def assign():
+def assign(key1, key2):
     """
 
     :return:
     """
-    myuser = User.query.filter_by(id=request.form["assignuserid"]).first_or_404()
-    mypos = Position.query.filter_by(title=request.form['position']).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    if myuser in mypos.assigned_users:
-        flash('This persons position is already assigned to ' + mypos.title, 'danger')
-        return render_template('main/member.html', user=myuser, organization=org)
-
-    assign_member_to_position(myuser, mypos, org)
-
-    # redirects to the page before
-    return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
+    response = Response(response=assign_member_to_position(key1, key2),
+                        status=200)
+    return response
 
 
 @app.route('/assignpos', methods=['POST'])
@@ -324,7 +339,6 @@ def assign():
 @check_confirmed
 def assignpos():
     """
-
     :return:
     """
     # get the user, position, and org
@@ -342,22 +356,18 @@ def assignpos():
     return render_template('main/position.html', position=mypos, organization=org)
 
 
-@app.route('/unassign', methods=['POST'])
+@app.route('/unassign/<key1>/<key2>', methods=['POST'])
 @login_required
 @check_confirmed
-def unassign():
+def unassign(key1, key2):
     """
 
     :return:
     """
     # get the user, position, and org
-    myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
-    mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    
-    unassign_member_to_position(myuser, mypos, org)
-    # redirects to the page before
-    return redirect(url_for('main.manager_members_profile', key=org.id, key2=myuser.id))
+    response = Response(response=unassign_member_to_position(key1, key2),
+                        status=200)
+    return response
 
 
 @app.route('/unassignpos', methods=['POST'])
@@ -404,23 +414,15 @@ def getusersinorg(key):
 
     return response
 
+@app.route('/getassignedpositions/<key>/<key2>')
+def getassignedpositions(key, key2):
+    response = Response(response=utils.organization.get_assigned_positions_for_user(key, key2),
+                        status=200,
+                        mimetype="application/json")
+    return response
+
 @app.route('/getpositionsinorg/<key>')
 @login_required
 @owns_organization
 def getpositionsinorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
-
-@main_blueprint.route('/organization/<key>/shifts')
-@login_required
-@owns_organization
-def get_shifts_for_org(key):
-    """
-
-    :param key:
-    :return:
-    """
-    response = Response(response=utils.organization.get_all_shifts_for_org_JSON(key),
-                        status=200,
-                        mimetype="application/json")
-
-    return response

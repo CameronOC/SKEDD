@@ -145,7 +145,60 @@ $(document).ready(function() {
     * Code to Create new Position
     *
     */
+    $('#createPositionSubmit').on('click', function() {
+        var newPosition = {
+            title: $('#title').val()
+        };
 
+        url = "/organization/" + orgid.toString() + "/create_position"
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: $("#CreatePositionForm").serialize(), // serializes the form's elements.
+
+            success: function(data)
+            {
+
+                if(data.status == "success"){
+                    APP.addposition(newPosition);
+                    APP.get_positions();
+                    $('#CreatePositionModal').modal('hide');
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+            }
+        });
+    });
+
+    //Code to add a member to a position
+    $('#AddUserToPositionSubmit').on('click', function() {
+        console.log("AddUsertopositionsubmit pressed")
+
+        //get the title of the position from the dropdownmenu
+        var select = document.getElementById("positiondropdown");
+        var positiontitle = select.options[select.selectedIndex].value;
+        //var positionid = APP.vue.positions[index].id;
+        //console.log(positionid) 
+        var uid = APP.vue.userid;
+        
+        url = "/assign/" + uid.toString() + "/" + positiontitle.toString()
+
+        $.ajax({
+            type: "POST",
+            url: url,
+
+            success: function()
+            {
+                console.log("success")
+            }
+        });
+
+        APP.get_assigned_positions();
+        //$('#memberDetailModal').modal('hide');
+    });
+
+    //Code to invite a member
     $('#inviteMemberSubmit').on('click', function() {
 
         $('#inviteMemberSubmit').prop('disabled', true);
