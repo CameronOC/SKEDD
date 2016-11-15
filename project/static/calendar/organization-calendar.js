@@ -4,7 +4,6 @@ $(document).ready(function() {
     * Code that applies to both modals
     *
     */
-    var nextId
 
     $('.modal').on('hidden.bs.modal', function(){
         $(this).find("input,textarea").val('').end();
@@ -15,16 +14,39 @@ $(document).ready(function() {
 
     /*
     *
-    * Code to Create new Events
+    * Code to Create new Shifts
     *
     */
-    var nextId = 3;
 
     $('#createSubmit').on('click', function() {
+        $('#createSubmit').prop('disabled', true);
 
-        var tempId = parseInt($('#shift_id').val());
+        url = url = "/organization/" + orgid.toString() + "/shift/create";
 
-        var eventlist = $("#calendar").fullCalendar('clientEvents', tempId);
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "POST",
+            url: url,
+            data: $("#createShiftForm").serialize(), // serializes the form's elements.
+
+            success: function(data)
+            {
+
+                if(data.status == "success"){
+
+                    console.log(JSON.stringify(data));
+
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+            }
+        });
+
+
+
+        var eventlist = $("#calendar").fullCalendar('clientEvents', 0);
 
         evento = eventlist[0];
 
@@ -34,7 +56,6 @@ $(document).ready(function() {
 
         $('#calendar').fullCalendar('updateEvent', evento);
         $('#createShiftModal').modal('hide');
-        nextId = nextId + 1;
     });
 
     $('#createCancel').on('click', function() {
@@ -44,6 +65,18 @@ $(document).ready(function() {
         $('#createShiftModal').modal('hide');
     });
 
+
+    $('#shift_repeating').change(function() {
+        $('#shift_repeat_list').toggle();
+    });
+
+    /*
+    *
+    * This function makes an ajax call to the server to get the members for a position
+    * whenever a position is selected in the create shift modal
+    * these members are then used as options to the assigned member select field
+    *
+    */
     $('#shift_position_id').change(function() {
         $('#createSubmit').prop('disabled', false);
 
@@ -103,7 +136,6 @@ $(document).ready(function() {
 
         $('#calendar').fullCalendar('updateEvent', evento);
         $('#editShiftModal').modal('hide');
-        nextId = nextId + 1;
     });
 
     $('#editDelete').on('click', function() {
@@ -169,12 +201,12 @@ $(document).ready(function() {
             var newEvent = {
                 start: start,
                 end: end,
-                id: nextId,
+                id: 0,
             };
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
             $('#shift_start_time').val(start.toString());
             $('#shift_end_time').val(end.toString());
-            $('#shift_id').val(nextId.toString());
+            $('#shift_id').val('0');
             $('#createSubmit').prop('disabled', true);
             $('#createShiftModal').modal('show');
 
