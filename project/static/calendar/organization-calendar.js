@@ -42,21 +42,21 @@ $(document).ready(function() {
 
                     for (var i = 0; i < data.shifts.length; i++) {
                         var newEvent = {
-                            start: data.shift[i].start,
-                            end: data.shift[i].end,
-                            id: data.shift[i].id,
-                            title: data.shift[i].position_title,
-                            position_id: data.shift[i].position_id,
-                            description: data.shift[i].description,
-                            assigned_member: data.shift[i].assigned_member,
-                            assigned_member_id: data.shift[i].assigned_member_id,
+                            start: data.shifts[i].start,
+                            end: data.shifts[i].end,
+                            id: data.shifts[i].id,
+                            title: data.shifts[i].position_title,
+                            position_id: data.shifts[i].position_id,
+                            description: data.shifts[i].description,
+                            assigned_member: data.shifts[i].assigned_member,
+                            assigned_member_id: data.shifts[i].assigned_member_id,
                         };
 
-                        $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
+                        //$('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
 
                     }
 
-
+                    $('#calendar').fullCalendar( 'refetchEvents' )
 
 
                 }else if(data.status == "error"){
