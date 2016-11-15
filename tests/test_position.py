@@ -67,22 +67,22 @@ class TestPosition(BaseTest, TestCase):
         :return:
         """
         positions = org_utils.get_positions_for_org_JSON(org_id=1) #string
-        position_dict = json.loads(positions) # dictionary of dictionaries
+        positions_list = json.loads(positions) # dictionary of dictionaries
 
         assert positions is not None
-        assert position_dict is not None
-        assert len(position_dict) == 1
-        for p in position_dict:
-            assert position_dict[str(p)]['title'] == self.position.title
-            assert position_dict[str(p)]['organization_id'] == self.position.organization_id
+        assert positions_list is not None
+        assert len(positions_list) == 1
+        for p in positions_list:
+            assert p['title'] == self.position.title
+            assert p['organization_id'] == self.position.organization_id
 
     def test_get_users_for_position(self):
         """
         Tests getting all the users for a specific position
         :return:
         """
-        org_utils.assign_member_to_position(self.john.id, self.position.title)
-        org_utils.assign_member_to_position(self.owner.id, self.position.title)
+        org_utils.assign_member_to_position(self.john.id, self.position.id)
+        org_utils.assign_member_to_position(self.owner.id, self.position.id)
 
         response = json.loads(org_utils.get_members_for_position(self.position.id))
         assert response is not None

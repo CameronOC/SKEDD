@@ -323,10 +323,11 @@ class TestShifts(BaseTest, TestCase):
         assert len(shift_list) == 1
         for s in shift_list:
             assert s['position_id'] == self.shift.position_id
-            assert s['assigned_user_name'] == ''
-            assert s['assigned_user_id'] == self.shift.assigned_user_id
-            assert s['start_time'] == self.shift.start_time
-            assert s['end_time'] == self.shift.end_time
+            assert s['title'] == self.shift.Position.title
+            assert s['assigned_member'] == ''
+            assert s['assigned_member_id'] == self.shift.assigned_user_id
+            assert s['start'] == self.shift.start_time
+            assert s['end'] == self.shift.end_time
             assert s['description'] == self.shift.description
             assert s['id'] == self.shift.id
 
@@ -339,10 +340,10 @@ class TestShifts(BaseTest, TestCase):
         assert len(shift_list) == 1
         for s in shift_list:
             assert s['position_id'] == self.shift.position_id
-            assert s['assigned_user_name'] == 'John Doe'
-            assert s['assigned_user_id'] == self.shift.assigned_user_id
-            assert s['start_time'] == self.shift.start_time
-            assert s['end_time'] == self.shift.end_time
+            assert s['assigned_member'] == 'John Doe'
+            assert s['assigned_member_id'] == self.shift.assigned_user_id
+            assert s['start'] == self.shift.start_time
+            assert s['end'] == self.shift.end_time
             assert s['description'] == self.shift.description
             assert s['id'] == self.shift.id
         
