@@ -12,9 +12,10 @@
                     {{ shift_form.csrf_token }}
                     <p>
                         Position:
-                        <select class="form-control" v-for="position in positions" name="shift_position_id" id="shift_position_id">
-                            <option value="">Unassigned</option>
-                            <option value="${position.id}">${position.title}</option>
+                        <select class="form-control" name="shift_position_id" id="shift_position_id">
+                            <option selected disabled value="">Choose a Position...</option>
+                            <option v-for="position in positions" v-bind:value="position.id">${position.title}</option>
+
                         </select> <br>
                     </p>
                     <p>
@@ -100,9 +101,6 @@
         </div>
     </div>
 </div>
-
-
-
 
 <div id="inviteMemberModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">

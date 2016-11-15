@@ -87,3 +87,25 @@ class TestPosition(BaseTest, TestCase):
         for p in position_dict:
             assert position_dict[str(p)]['title'] == self.position.title
             assert position_dict[str(p)]['organization_id'] == self.position.organization_id
+
+    def test_get_users_for_position(self):
+        """
+        Tests getting all the users for a specific position
+        :return:
+        """
+        org_utils.assign_member_to_position(self.john.id, self.position.title)
+        org_utils.assign_member_to_position(self.owner.id, self.position.title)
+
+        members = json.loads(org_utils.get_members_for_position(self.position.id))
+        print members
+        assert len(members) == 2
+        member_one = members[0]
+        member_two = members[1]
+
+        assert member_one['first_name'] == 'John'
+        assert member_one['last_name'] == 'Doe'
+        assert member_one['id'] == 2
+
+        assert member_two['first_name'] == 'Organization'
+        assert member_two['last_name'] == 'Owner'
+        assert member_two['id'] == 1

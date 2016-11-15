@@ -303,6 +303,20 @@ def getpositioninorg(key):
     """
     return utils.organization.get_positions_for_org_JSON(key)
 
+
+@app.route('/organization/<key>/position/<key2>/users')
+def get_position_members(key, key2):
+    """
+    Returms a json list of all users for a position
+    :param key:
+    :param key2:
+    :return:
+    """
+    response = Response(response=utils.organization.get_members_for_position(key2),
+                        status=200)
+    return response
+
+
 @main_blueprint.route('/organization/<key>/member/<key2>', methods=['GET', ])
 @login_required
 @check_confirmed

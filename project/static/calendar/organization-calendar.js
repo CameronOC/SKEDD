@@ -40,7 +40,9 @@ $(document).ready(function() {
         $('#createShiftModal').modal('hide');
     });
 
-
+    $('#shift_position_id').change(function() {
+        alert($(this).val());
+    });
 
     /*
     *
@@ -209,11 +211,7 @@ $(document).ready(function() {
             email: $('#email').val()
         };
 
-
-
         url = "/organization/" + orgid.toString() + "/invite"
-
-
 
         $.ajax({
             headers: {
@@ -238,5 +236,7 @@ $(document).ready(function() {
         $('#inviteMemberSubmit').prop('disabled', false);
 
     });
+
+
 
 });

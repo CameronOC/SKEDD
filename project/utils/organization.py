@@ -382,6 +382,33 @@ def get_users_for_org_JSON(org_id):
 
     return json.dumps(members_list)
 
+def get_members_for_position(position_id):
+    """
+    returns a JSON list of users that are assigned to a position
+    :param position_id:
+    :return:
+    """
+    members_list = []
+
+    members_list.append({
+        'first_name':'',
+        'last_name': '',
+        'id': 0
+    })
+
+    position = Position.query.get(position_id)
+    members = position.assigned_users
+
+    for member in members:
+        members_list.append({
+            'first_name': member.first_name,
+            'last_name': member.last_name,
+            'id': member.id
+        })
+
+
+    return json.dumps(members_list)
+
 def get_positions_for_org_JSON(org_id):
     """
     returns all positions in an organization as a JSON
