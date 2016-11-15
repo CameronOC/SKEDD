@@ -262,9 +262,10 @@ def create_shifts_JSON(dictionary):
                 week_ct += 1
 
     return shifts
-    
-    
-def create_shifts_form( position_id, assigned_user_id, start_time, 
+
+
+# noinspection PyTypeChecker
+def create_shifts_form( position_id, assigned_user_id, start_time,
                         end_time, description, repeat_list=None):
     """
     creates a month's worth of shifts
@@ -282,20 +283,23 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
     main_end_time = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
 
     delta = timedelta()
-    shifts.append(create_shift_helper(
+
+    new_shift = create_shift_helper(
                 position_id,
                 assigned_user_id,
                 description,
                 main_start_time,
                 main_end_time,
-                delta))
+                delta)
+
+    shifts.append(shift_to_dict(new_shift))
 
     if repeat_list is not None and len(repeat_list) > 0:
         main_day_int = main_start_time.weekday()
         for day_int in repeat_list:
 
             if main_day_int == day_int:
-                week_ct = 1;
+                week_ct = 1
             else:
                 week_ct = 0
 
@@ -337,6 +341,40 @@ def create_shift_helper(position_id, assigned_user_id, description, start_time, 
     # db.session.add(new_shift)
     # db.session.commit()
     return new_shift
+
+
+def shift_to_dict(shift):
+    """
+    Takes a shift object and returns a dictionary representation
+    :param shift:
+    :return:
+    """
+
+    if shift is None or not isinstance(shift, Shift):
+        return None
+
+    shift_dict = {
+        'id': shift.id,
+        'position_id': shift.position_id,
+        'position_title': shift.Position.title,
+        'start': shift.start_time,
+        'end': shift.end_time,
+    }
+
+    if shift.description is None:
+        shift_dict['description'] = ''
+    else:
+        shift_dict['description'] = shift.description
+
+    if shift.user is not None:
+        shift_dict['assigned_member_id'] = shift.assigned_user_id
+        shift_dict['assigned_member'] = shift.user.first_name + ' ' + shift.user.last_name
+
+    else:
+        shift_dict['assigned_member_id'] = 0
+        shift_dict['assigned_member'] = ''
+
+    return shift_dict
 
 def get_all_shifts_for_org_JSON(org_id):
     """

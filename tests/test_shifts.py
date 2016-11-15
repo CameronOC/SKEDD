@@ -350,7 +350,41 @@ class TestShifts(BaseTest, TestCase):
         shift = org_utils.get_shift(1)
         assert shift.assigned_user_id == None
 
+    def test_shift_to_dict(self):
+        """
+        tests converting a shift to a dictionary
+        :return:
+        """
 
+        shift_dict = org_utils.shift_to_dict(self.shift)
+
+        print shift_dict
+
+        assert shift_dict is not None
+
+        assert 'id' in shift_dict
+        assert shift_dict['id'] == 1
+
+        assert 'assigned_member_id' in shift_dict
+        assert shift_dict['assigned_member_id'] == 0
+
+        assert 'assigned_member' in shift_dict
+        assert shift_dict['assigned_member'] == ''
+
+        assert 'position_id' in shift_dict
+        assert shift_dict['position_id'] == self.position.id
+
+        assert 'position_title' in shift_dict
+        assert shift_dict['position_title'] == self.position.title
+
+        assert 'start' in shift_dict
+        assert shift_dict['start'] == self.shift.start_time
+
+        assert 'end' in shift_dict
+        assert shift_dict['end'] == self.shift.end_time
+
+        assert 'description' in shift_dict
+        assert shift_dict['description'] == ''
 
 
 
