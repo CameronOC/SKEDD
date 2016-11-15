@@ -298,22 +298,24 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
         main_day_int = main_start_time.weekday()
         for day_int in repeat_list:
 
-            if main_day_int == day_int:
+            if main_day_int == int(day_int):
                 week_ct = 1
             else:
                 week_ct = 0
 
             while week_ct < 4:
-                day_difference = day_int - main_day_int
+                day_difference = int(day_int) - main_day_int
                 delta = timedelta(days=day_difference, weeks=week_ct)
-                shifts.append(create_shift_helper(
-                    position_id,
-                    assigned_user_id,
-                    description,
-                    main_start_time,
-                    main_end_time,
-                    delta
-                ))
+                new_shift = create_shift_helper(
+                            position_id,
+                            assigned_user_id,
+                            description,
+                            main_start_time,
+                            main_end_time,
+                            delta)
+
+                shifts.append(shift_to_dict(new_shift))
+
                 week_ct += 1
 
     return shifts
