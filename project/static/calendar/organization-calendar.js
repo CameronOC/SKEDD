@@ -258,12 +258,12 @@ $(document).ready(function() {
 
         //get the title of the position from the dropdownmenu
         var select = document.getElementById("positiondropdown");
-        var positiontitle = select.options[select.selectedIndex].value;
+        var positionid = select.options[select.selectedIndex].value;
         //var positionid = APP.vue.positions[index].id;
         //console.log(positionid) 
         var uid = APP.vue.userid;
         
-        url = "/assign/" + uid.toString() + "/" + positiontitle.toString()
+        url = "/assign/" + uid.toString() + "/" + positionid.toString()
 
         $.ajax({
             type: "POST",

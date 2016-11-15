@@ -17,17 +17,11 @@ class TestPosition(BaseTest, TestCase):
         Tests that a user is assigned to a position
         :return:
         """
-        pos = org_utils.get_position(1)
-        org = org_utils.get_organization(1)
-        user = User(
-            email='member2@organization.com',
-            first_name='Will',
-            last_name='Smith',
-            password='password',
-            confirmed=True
-        )
-        org_utils.assign_member_to_position(user, pos, org)
-        assigneduser = position_assignments.select(position_assignments.c.user_id == 2)
+        pos = org_utils.get_position(1).id
+        user = org_utils.get_user(1).id
+        
+        org_utils.assign_member_to_position(user, pos)
+        assigneduser = position_assignments.select(position_assignments.c.user_id == 1)
         assert assigneduser is not None
 
     def test_unassign_member_to_position(self):
@@ -35,18 +29,12 @@ class TestPosition(BaseTest, TestCase):
         Tests that a user is unassigned from a position
         :return:
         """
-        pos = org_utils.get_position(1)
-        org = org_utils.get_organization(1)
-        user = User(
-            email='member2@organization.com',
-            first_name='Will',
-            last_name='Smith',
-            password='password',
-            confirmed=True
-        )
-        org_utils.assign_member_to_position(user, pos, org)
-        org_utils.unassign_member_to_position(user, pos, org)
-        unassigned = position_assignments.select(position_assignments.c.user_id == 2)
+        pos = org_utils.get_position(1).id
+        user = org_utils.get_user(1).id
+
+        org_utils.assign_member_to_position(user, pos)
+        org_utils.unassign_member_to_position(user, pos)
+        unassigned = position_assignments.select(position_assignments.c.user_id == 1)
         assert unassigned is not None
 
     def test_create_position(self):

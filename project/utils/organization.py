@@ -478,7 +478,7 @@ def deletepositions(posid, orgid):
 def assign_member_to_position(user, pos):
     #assign the user to an org
     myuser = User.query.filter_by(id=user).first()
-    mypos = Position.query.filter_by(title=pos).first()
+    mypos = Position.query.filter_by(id=pos).first()
     mypos.assigned_users.append(myuser)
     db.session.commit()
     return "success"
