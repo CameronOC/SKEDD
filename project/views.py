@@ -111,11 +111,12 @@ def get_shifts_for_org(key):
 
     return response
 
-@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
+
+@main_blueprint.route('/organization/<key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 #@owns_organization
-def create_shift(org_key, pos_key):
+def create_shift(key):
     """
     Creates a new shift.  Shifts can be assigned to a user or left empty at
     initialization, but are always related to a position, which is in turn
@@ -124,14 +125,57 @@ def create_shift(org_key, pos_key):
     :param pos_key:
     :return:
     """
+
+    org = utils.organization.get_organization(key)
     form = ShiftForm(request.form)
-    if request.method == 'GET':
-        return render_template('main/create_shift.html', form=form)
+    return_dict = {}
+
+    if form.validate_on_submit():
+
+        return_dict['data'] = form.shift_repeat_list.data
+        return_dict['status'] = "success"
     else:
-        shift = utils.organization.create_shifts_form(pos_key, form.shift_assigned_user_id.data,
-                                                        form.shift_start_time.data, form.shift_end_time.data,
-                                                        form.shift_description.data, form.shift_repeat_list.data)
-    return redirect(url_for('main.position', key=org_key, key2=pos_key))
+        return_dict['status'] = "error"
+        errors_dict = {
+            'shift_assigned_member_id': [],
+            'shift_description': [],
+            'shift_repeating': [],
+            'shift_repeat_list': [],
+            'shift_start_time': [],
+            'shift_end_time': [],
+            'shift_id': []
+        }
+
+        for error in form.shift_description.errors:
+            errors_dict['shift_description'].append(error)
+
+        for error in form.shift_repeating.errors:
+            errors_dict['shift_repeating'].append(error)
+
+        for error in form.shift_repeat_list.errors:
+            errors_dict['shift_repeat_list'].append(error)
+
+        for error in form.shift_start_time.errors:
+            errors_dict['shift_start_time'].append(error)
+
+        for error in form.shift_end_time.errors:
+            errors_dict['shift_end_time'].append(error)
+
+        for error in form.shift_id.errors:
+            errors_dict['shift_id'].append(error)
+
+        return_dict['errors'] = errors_dict
+    response = Response(response=json.dumps(return_dict),
+                    status=200,
+                    mimetype="application/json")
+
+    """
+
+    shift = utils.organization.create_shifts_form(pos_key, form.shift_assigned_member_id.data,
+                                                    form.shift_start_time.data, form.shift_end_time.data,
+                                                    form.shift_description.data, form.shift_repeat_list.data)
+    """
+    return response
 
 
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/<shift_key>/edit', methods=['GET', 'POST'])
@@ -154,7 +198,7 @@ def update_shift(org_key, pos_key, shift_key):
             form.populate_obj(shift)
         return render_template('main/update_shift.html', form=form)
     else:
-        shift.update(pos_key, form.shift_assigned_user_id.data, form.shift_start_time.data,
+        shift.update(pos_key, form.shift_assigned_member_id.data, form.shift_start_time.data,
                         form.shift_end_time.data, form.shift_description.data)
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
