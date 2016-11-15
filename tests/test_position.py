@@ -96,7 +96,14 @@ class TestPosition(BaseTest, TestCase):
         org_utils.assign_member_to_position(self.john.id, self.position.title)
         org_utils.assign_member_to_position(self.owner.id, self.position.title)
 
-        members = json.loads(org_utils.get_members_for_position(self.position.id))
+        response = json.loads(org_utils.get_members_for_position(self.position.id))
+        assert response is not None
+        assert 'status' in response
+        assert response['status'] == 'success'
+
+        assert 'members' in response
+        members = response['members']
+
         print members
         assert len(members) == 2
         member_one = members[0]
