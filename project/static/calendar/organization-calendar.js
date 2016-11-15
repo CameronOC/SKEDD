@@ -162,6 +162,10 @@ $(document).ready(function() {
     * Initialize Calendar
     *
     */
+    var time = moment.duration('04:00:00');
+    var firstHour = (moment(new Date()).local());
+    firstHour.subtract(time);
+    firstHour = firstHour.format("HH:00:00")
 
     $('#calendar').fullCalendar({
         header: {
@@ -169,7 +173,9 @@ $(document).ready(function() {
             center: 'title',
             right: 'month,agendaWeek,agendaDay'
         },
+        height: $(window).height()*0.67,
         defaultView: 'agendaWeek',
+        scrollTime: firstHour,
         allDaySlot: false,
         editable: true,
         selectable: true,
@@ -205,6 +211,14 @@ $(document).ready(function() {
 
         }
     });
+
+
+    if(calendar) {
+      $(window).resize(function() {
+        var calHeight = $(window).height()*0.67;
+        $('#calendar').fullCalendar('option', 'height', calHeight);
+      });
+    };
 
 
     /*
