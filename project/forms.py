@@ -16,7 +16,7 @@ class CreateForm(Form):
 class ShiftForm(Form):
     # shift_position_id = SelectField('positions', choices=[])
     
-    shift_assigned_user_id = SelectField('users', choices=[])
+    shift_assigned_member_id = SelectField('users', choices=[])
     
     shift_description = StringField('description', validators=[Length(min=1, max=100)])
     
