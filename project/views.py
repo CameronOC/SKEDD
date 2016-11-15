@@ -11,7 +11,7 @@ from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
 from project import app, db, bcrypt
-from decorators import check_confirmed, owns_organization
+from decorators import check_confirmed, owns_organization, organization_member
 import utils.organization
 from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position, get_users_for_org_JSON
 import json
@@ -81,6 +81,7 @@ def create():
 @main_blueprint.route('/organization/<key>', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
+@organization_member
 def organization(key):
     """
     The home page for an organization. displays relevant positions
