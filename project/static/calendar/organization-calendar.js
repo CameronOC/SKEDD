@@ -240,4 +240,25 @@ $(document).ready(function() {
 
     });
 
+    $('#DeleteUserFromOrg').on('click', function() {
+        console.log("DeleteUserFromOrg pressed")
+
+        var uid = APP.vue.userid;
+        
+        url = "/deleteuserfromorg/" + uid.toString() + "/" + orgid.toString()
+
+        $.ajax({
+            type: "POST",
+            url: url,
+
+            success: function()
+            {
+                console.log("success")
+            }
+        });
+
+        APP.get_users();
+        //$('#memberDetailModal').modal('hide');
+    });
+
 });

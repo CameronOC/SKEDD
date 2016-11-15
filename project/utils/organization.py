@@ -436,3 +436,18 @@ def get_assigned_positions_for_user(orgid, userid):
                  })
 
     return json.dumps(assigned_list)
+
+#For some reason this sets the org_id to null instead of just removing the row...
+#I'll fix it later if I need to.
+def delete_user_from_org(userid, orgid):
+    user = User.query.filter_by(id=userid).first()
+    org = Organization.query.filter_by(id=orgid).first()
+    membership = get_membership(org, user)
+    #Membership.query.filter_by(member_id=userid, organization_id=orgid).delete()
+    org.memberships.remove(membership)
+    user.memberships.remove(membership)
+    #membership.organization_members.remove(membership)
+    #membership.delete()
+    db.session.commit()
+    return "success"
+

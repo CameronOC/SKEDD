@@ -421,3 +421,8 @@ def get_shifts_for_org(key):
                         mimetype="application/json")
 
     return response
+
+@app.route('/deleteuserfromorg/<key1>/<key2>',  methods=['POST'])
+@login_required
+def deleteuserfromorg(key1, key2):
+    return utils.organization.delete_user_from_org(key1, key2)
