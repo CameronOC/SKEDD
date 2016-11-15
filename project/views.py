@@ -292,22 +292,6 @@ def setup_account(key, token):
         return render_template('main/setup.html', form=form, organization=membership.organization)
 
 
-@main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', 'POST'})
-@login_required
-@check_confirmed
-def position(key, key2):
-    """
-
-    :param key:
-    :return:
-    """
-    org = utils.organization.get_organization(key)
-
-    pos = Position.query.filter_by(id=key2).first()
-    shifts = pos.assigned_shifts.all()
-    return render_template('main/position.html', position=pos, organization=org, shifts=shifts)
-
-
 @main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
@@ -362,24 +346,6 @@ def get_position_members(key, key2):
     return response
 
 
-@main_blueprint.route('/organization/<key>/member/<key2>', methods=['GET', ])
-@login_required
-@check_confirmed
-@owns_organization
-def manager_members_profile(key, key2):
-    """
-
-    :param key:
-    :param key2:
-    :return:
-    """
-    org = utils.organization.get_organization(key)
-
-    user = User.query.filter_by(id=key2).first()
-
-    return render_template('main/member.html', user=user, organization=org)
-
-
 @app.route('/assign/<key1>/<key2>', methods=['POST'])
 @login_required
 @check_confirmed
@@ -391,28 +357,6 @@ def assign(key1, key2):
     response = Response(response=assign_member_to_position(key1, key2),
                         status=200)
     return response
-
-
-@app.route('/assignpos', methods=['POST'])
-@login_required
-@check_confirmed
-def assignpos():
-    """
-    :return:
-    """
-    # get the user, position, and org
-    myuser = User.query.filter_by(id=request.form["userid"]).first_or_404()
-    mypos = Position.query.filter_by(id=request.form['positionid']).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    # if this user already exists return flash
-    if myuser in mypos.assigned_users:
-        flash('This persons position is already assigned to ' + mypos.title, 'danger')
-        return render_template('main/position.html', position=mypos, organization=org)
-
-    assign_member_to_position(myuser, mypos)
-    
-    # redirects to the page before
-    return render_template('main/position.html', position=mypos, organization=org)
 
 
 @app.route('/unassign/<key1>/<key2>', methods=['POST'])
@@ -428,40 +372,6 @@ def unassign(key1, key2):
                         status=200)
     return response
 
-
-@app.route('/unassignpos', methods=['POST'])
-@login_required
-@check_confirmed
-def unassignpos():
-    """
-
-    :return:
-    """
-    # get the user, position, and org
-    myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
-    mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-
-    unassign_member_to_position(myuser, mypos)
-    
-    # redirects to the page before
-    return render_template('main/position.html', position=mypos, organization=org)
-
-
-@app.route('/deleteposition', methods=['POST'])
-@login_required
-@check_confirmed
-def deleteposition():
-    """
-
-    :return:
-    """
-    pos = Position.query.filter_by(id=request.form["deleteposid"]).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-
-    deletepositions(pos, org)
-
-    return render_template('main/organization.html', organization=org)
 
 @app.route('/getusersinorg/<key>')
 @login_required
