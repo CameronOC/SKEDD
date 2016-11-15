@@ -38,6 +38,27 @@ $(document).ready(function() {
 
                     console.log(JSON.stringify(data));
 
+                    $('#calendar').fullCalendar( 'removeEvents', 0);
+
+                    for (var i = 0; i < data.shifts.length; i++) {
+                        var newEvent = {
+                            start: data.shift[i].start,
+                            end: data.shift[i].end,
+                            id: data.shift[i].id,
+                            title: data.shift[i].position_title,
+                            position_id: data.shift[i].position_id,
+                            description: data.shift[i].description,
+                            assigned_member: data.shift[i].assigned_member,
+                            assigned_member_id: data.shift[i].assigned_member_id,
+                        };
+
+                        $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
+
+                    }
+
+
+
+
                 }else if(data.status == "error"){
                     alert(JSON.stringify(data));
                 }
@@ -45,16 +66,6 @@ $(document).ready(function() {
         });
 
 
-
-        var eventlist = $("#calendar").fullCalendar('clientEvents', 0);
-
-        evento = eventlist[0];
-
-        evento.title = $('#shift_position_id option:selected').text();
-        evento.description = $('#shift_description').val();
-        evento.assigned = $('#shift_assigned_user_id').val();
-
-        $('#calendar').fullCalendar('updateEvent', evento);
         $('#createShiftModal').modal('hide');
     });
 
@@ -68,6 +79,7 @@ $(document).ready(function() {
 
     $('#shift_repeating').change(function() {
         $('#shift_repeat_list').toggle();
+        $("#shift_repeat_list option:selected").prop("selected", false);
     });
 
     /*
@@ -145,25 +157,6 @@ $(document).ready(function() {
         $('#editShiftModal').modal('hide');
     });
 
-    var getShifts = function() {
-
-        url = "/organization/" + orgid.toString() + "/shifts"
-
-
-
-        $.ajax({
-            headers: {
-                'Accept': "application/json; charset=utf-8",
-            },
-            type: "GET",
-            url: url,
-            success: function(data) {
-                return data;
-            }
-        });
-
-    }
-
     /*
     *
     * Initialize Calendar
@@ -181,9 +174,9 @@ $(document).ready(function() {
         editable: true,
         selectable: true,
         selectHelper: true,
-        events: getShifts(),
+        events: "/organization/" + orgid.toString() + "/shifts",
         eventRender: function(event, element) {
-            element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned + "</span>");
+            element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned_member + "</span>");
         },
         eventClick:  function(event, jsEvent, view) {
             $('#editShiftTitle').html(event.title);
@@ -204,8 +197,8 @@ $(document).ready(function() {
                 id: 0,
             };
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
-            $('#shift_start_time').val(start.toString());
-            $('#shift_end_time').val(end.toString());
+            $('#shift_start_time').val(start.toISOString());
+            $('#shift_end_time').val(end.toISOString());
             $('#shift_id').val('0');
             $('#createSubmit').prop('disabled', true);
             $('#createShiftModal').modal('show');

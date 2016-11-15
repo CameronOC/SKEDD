@@ -338,8 +338,8 @@ def create_shift_helper(position_id, assigned_user_id, description, start_time, 
                              new_end_time,
                              description
                              )
-    # db.session.add(new_shift)
-    # db.session.commit()
+    db.session.add(new_shift)
+    db.session.commit()
     return new_shift
 
 
@@ -397,10 +397,11 @@ def get_all_shifts_for_org_JSON(org_id):
                 assigned_user_name = ''
                 
             shifts_list.append({'position_id': s.position_id,
-                                'assigned_user_name': assigned_user_name,
-                                'assigned_user_id': s.assigned_user_id,
-                                'start_time': s.start_time,
-                                'end_time': s.end_time,
+                                'title': s.Position.title,
+                                'assigned_member': assigned_user_name,
+                                'assigned_member_id': s.assigned_user_id,
+                                'start': s.start_time,
+                                'end': s.end_time,
                                 'description': s.description,
                                 'id': s.id
                                 })

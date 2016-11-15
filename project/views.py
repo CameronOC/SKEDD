@@ -132,12 +132,18 @@ def create_shift(key):
 
     if form.validate_on_submit():
 
-        return_dict['data'] = form.shift_repeat_list.data
+        shifts = utils.organization.create_shifts_form(request.form['shift_position_id'],
+                                                       request.form['shift_assigned_member_id'],
+                                                       form.shift_start_time.data,
+                                                       form.shift_end_time.data,
+                                                       form.shift_description.data,
+                                                       form.shift_repeat_list.data)
+
+        return_dict['shifts'] = shifts
         return_dict['status'] = "success"
     else:
         return_dict['status'] = "error"
         errors_dict = {
-            'shift_assigned_member_id': [],
             'shift_description': [],
             'shift_repeating': [],
             'shift_repeat_list': [],
@@ -169,12 +175,6 @@ def create_shift(key):
                     status=200,
                     mimetype="application/json")
 
-    """
-
-    shift = utils.organization.create_shifts_form(pos_key, form.shift_assigned_member_id.data,
-                                                    form.shift_start_time.data, form.shift_end_time.data,
-                                                    form.shift_description.data, form.shift_repeat_list.data)
-    """
     return response
 
 
