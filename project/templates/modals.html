@@ -19,16 +19,18 @@
                         </select> <br>
                     </p>
                     <p>
-                        Assigned Member: {{ shift_form.shift_assigned_member_id(class_="form-control") }}
+                        Assigned Member:
+                        <select class="form-control" name="shift_assigned_member_id" id="shift_assigned_member_id">
+                        </select> <br>
                     </p>
                     <p>
-                        Repeating {{ shift_form.shift_repeating(class_="") }}
+                        Create Multiple {{ shift_form.shift_repeating(class_="") }}
                     </p>
                     <p>
-                        {{ shift_form.shift_repeat_list(class_="form-control") }}
+                        {{ shift_form.shift_repeat_list(class_="form-control", size=7) }}
                     </p>
                     <p>
-                        {{ shift_form.shift_description(class_="form-control", placeholder="description...") }}
+                        {{ shift_form.shift_description(class_="form-control", rows=7, placeholder="description...") }}
                     </p>
                     <p>
                         {{ shift_form.shift_start_time(class_="form-control") }}
