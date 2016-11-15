@@ -9,7 +9,9 @@ $(document).ready(function() {
         $(this).find("input,textarea").val('').end();
         $('#shift_assigned_member_id').empty();
         $('#shift_position_id').val('0');
-
+        $("#shift_repeat_list option:selected").prop("selected", false);
+        $('#shift_repeating').prop('checked', false);
+        $('#shift_repeat_list').hide();
     });
 
     /*
@@ -40,24 +42,8 @@ $(document).ready(function() {
 
                     $('#calendar').fullCalendar( 'removeEvents', 0);
 
-                    for (var i = 0; i < data.shifts.length; i++) {
-                        var newEvent = {
-                            start: data.shifts[i].start,
-                            end: data.shifts[i].end,
-                            id: data.shifts[i].id,
-                            title: data.shifts[i].position_title,
-                            position_id: data.shifts[i].position_id,
-                            description: data.shifts[i].description,
-                            assigned_member: data.shifts[i].assigned_member,
-                            assigned_member_id: data.shifts[i].assigned_member_id,
-                        };
-
-                        //$('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
-
-                    }
-
                     $('#calendar').fullCalendar( 'refetchEvents' )
-
+                    $('#createShiftModal').modal('hide');
 
                 }else if(data.status == "error"){
                     alert(JSON.stringify(data));
@@ -66,7 +52,7 @@ $(document).ready(function() {
         });
 
 
-        $('#createShiftModal').modal('hide');
+
     });
 
     $('#createCancel').on('click', function() {
