@@ -158,7 +158,7 @@
                     Assign Positions to: <span id="memberDetailFirstName3"></span>
                     <div>
                         <select class="dropdownmenu" name="position" id="positiondropdown">
-                            <option v-for="(position, index) in positions"> ${position.title} </option>
+                            <option v-for="(position, index) in positions" v-bind:value="position.id"> ${position.title} </option>
                         </select>
                     </div>
 
