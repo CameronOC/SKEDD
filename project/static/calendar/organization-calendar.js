@@ -8,8 +8,8 @@ $(document).ready(function() {
 
     $('.modal').on('hidden.bs.modal', function(){
         $(this).find("input,textarea").val('').end();
-
-
+        $('#shift_assigned_member_id').empty();
+        $('#shift_position_id').val('0');
 
     });
 
