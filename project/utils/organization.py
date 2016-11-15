@@ -390,12 +390,6 @@ def get_members_for_position(position_id):
     """
     members_list = []
 
-    members_list.append({
-        'first_name':'',
-        'last_name': '',
-        'id': 0
-    })
-
     position = Position.query.get(position_id)
     members = position.assigned_users
 
@@ -406,8 +400,10 @@ def get_members_for_position(position_id):
             'id': member.id
         })
 
-
-    return json.dumps(members_list)
+    return json.dumps({
+        'status': 'success',
+        'members': members_list
+    })
 
 def get_positions_for_org_JSON(org_id):
     """

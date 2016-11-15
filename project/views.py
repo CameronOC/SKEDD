@@ -313,7 +313,7 @@ def get_position_members(key, key2):
     :return:
     """
     response = Response(response=utils.organization.get_members_for_position(key2),
-                        status=200)
+                        status=200,  mimetype="application/json")
     return response
 
 

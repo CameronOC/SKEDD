@@ -8,6 +8,9 @@ $(document).ready(function() {
 
     $('.modal').on('hidden.bs.modal', function(){
         $(this).find("input,textarea").val('').end();
+
+
+
     });
 
     /*
@@ -25,7 +28,7 @@ $(document).ready(function() {
 
         evento = eventlist[0];
 
-        evento.title = $('#shift_position_id').val();
+        evento.title = $('#shift_position_id option:selected').text();
         evento.description = $('#shift_description').val();
         evento.assigned = $('#shift_assigned_user_id').val();
 
@@ -37,11 +40,47 @@ $(document).ready(function() {
     $('#createCancel').on('click', function() {
         var tempId = parseInt($('#shift_id').val());
         $('#calendar').fullCalendar( 'removeEvents', tempId);
+        $('#createSubmit').prop('disabled', true);
         $('#createShiftModal').modal('hide');
     });
 
     $('#shift_position_id').change(function() {
-        alert($(this).val());
+        $('#createSubmit').prop('disabled', false);
+
+        url = "/organization/" + orgid.toString() + "/position/" + ($(this).val()).toString() + "/users";
+
+        // alert(url);
+
+
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "GET",
+            url: url,
+
+            success: function(data)
+            {
+                if(data.status == "success"){
+                    $('#shift_assigned_member_id').empty()
+
+                    var html = '<option class="generated" value="0"></option>';
+                    $('#shift_assigned_member_id').append(html);
+
+                    for (var i = 0; i < data.members.length; i++) {
+                        var current = data.members[i];
+                        var html = '<option class="generated" value="' + (current.id).toString() + '">' +
+                                    current.first_name + ' ' + current.last_name + '</option>'
+                        $('#shift_assigned_member_id').append(html);
+                    }
+
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+            }
+        });
+
+
     });
 
     /*
@@ -136,6 +175,7 @@ $(document).ready(function() {
             $('#shift_start_time').val(start.toString());
             $('#shift_end_time').val(end.toString());
             $('#shift_id').val(nextId.toString());
+            $('#createSubmit').prop('disabled', true);
             $('#createShiftModal').modal('show');
 
         }
