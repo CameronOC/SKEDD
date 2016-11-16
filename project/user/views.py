@@ -86,6 +86,8 @@ def logout():
 @login_required
 @check_confirmed
 def profile():
+
+    
     form = ChangePasswordForm(request.form)
     if form.validate_on_submit():
         user = User.query.filter_by(email=current_user.email).first()

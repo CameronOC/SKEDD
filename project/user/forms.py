@@ -56,3 +56,4 @@ class ChangePasswordForm(Form):
             EqualTo('password', message='Passwords must match.')
         ]
     )
+

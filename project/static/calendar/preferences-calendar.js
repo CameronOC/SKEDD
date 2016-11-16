@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var nextId = 0;
+    var timeId = 0;
 
     $('#calendar').fullCalendar({
         header: {
@@ -12,17 +12,38 @@ $(document).ready(function() {
         editable: true,
         selectable: true,
         selectHelper: true,
+
         select: function(start, end, allDay) {
-            var s = start.format('dddd, hh:mm a');
-            var e = end.format('dddd, hh:mm a');
+            var newEventData = {from: start.format('dddd, hh:mm a'), to: end.format('dddd, hh:mm a'), id: timeId};
             var newEvent = {
                 start: start,
                 end: end,
-                id: nextId,
+                id: timeId,
             };
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
-            nextId = nextId + 1;
-            alert('EVENT ID:  '+newEvent.id+' || '+'START:  '+s+' || '+'END:  '+e);
+            timeId = timeId + 1;
+            alert('EVENT ID:  '+newEventData.id+' || '+'START:  '+newEventData.from+' || '+'END:  '+newEventData.to);
+            
+            var newEventDataString = JSON.stringify(newEventData);
+
+            alert(newEventDataString);
+
+
+            $.ajax({
+                url: "/profile",
+                type: "POST",
+                data: {
+                newEventDataString
+                },
+                dataType: "json",
+                success: function(data) {
+                    alert("Data: " + newEventDataString);
+                },
+                error: function(data){
+                    alert("Shit Failed:  " + newEventDataString);
+                }
+            });
+
         },
 
         eventClick: function (calEvent, jsEvent, view) {           
@@ -37,6 +58,7 @@ $(document).ready(function() {
     *
     */
 
+    /*
     $('#inviteMemberSubmit').on('click', function() {
         var newUser = {
             first_name: $('#first_name').val(),
@@ -46,9 +68,7 @@ $(document).ready(function() {
 
 
 
-        url = "/organization/" + orgid.toString() + "/invite"
-
-
+        url = "/profile"
 
         $.ajax({
             type: "POST",
@@ -66,6 +86,6 @@ $(document).ready(function() {
                 }
             }
         });
-    });
+    }); */
 
 });

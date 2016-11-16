@@ -150,6 +150,22 @@ class Position(db.Model):
     def __repr__(self):
         return '<title: {}>'.format(self.title)
 
+
+class Preference(db.Model):
+    __tablename__ = "preferences"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    preferences = db.Column(db.String, nullable=False)
+
+    def __init__(self, user_id, preferences):
+        self.user_id = user_id
+        self.preferences = preferences
+
+    def __repr__(self):
+        return '<preferences: {}>'.format(self.preferences) 
+
+"""
 class Preference(db.Model):
     __tablename__ = "preferences"
 
@@ -167,3 +183,4 @@ class Preference(db.Model):
 
     def __repr__(self):
         return '<title: {}>'.format(self.title)
+"""
