@@ -133,6 +133,20 @@ var app = function() {
         $('#memberDetailModal').modal('show');
     }
 
+    self.positionDetail = function(index) {
+        position = self.vue.positions[index];
+        $('#positionDetailTitle').html(position.title);
+        $('#positionDetailTitle2').html(position.title);
+        $('#positionDetailDescription').html(position.desciption);
+        $('#positionDetailId').html(position.id);
+
+        //APP.vue.posid = position.id;
+        //console.log(member.id);
+        //self.get_assigned_positions(index);
+
+        $('#positionDetailModal').modal('show');
+    }
+
     self.unassign_position = function(index){
 
         console.log("unassign_position called")
@@ -167,6 +181,7 @@ var app = function() {
             get_positions: self.get_positions,
             addposition: self.addposition,
             member_detail: self.memberDetail,
+            position_detail: self.positionDetail,
             get_assigned_positions: self.get_assigned_positions,
             addassignedposition: self.addassignedposition,
             unassign_position: self.unassign_position
