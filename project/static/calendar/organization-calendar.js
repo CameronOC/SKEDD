@@ -237,9 +237,9 @@ $(document).ready(function() {
 
                 }else if(data.status == "error"){
                     alert(JSON.stringify(data));
+                    revertFunc();
                 }
 
-                $('#calendar').fullCalendar( 'refetchEvents' )
             }
         });
 
