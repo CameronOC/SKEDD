@@ -57,7 +57,7 @@ $(document).ready(function() {
 
     $('#createCancel').on('click', function() {
         var tempId = parseInt($('#shift_id').val());
-        $('#calendar').fullCalendar( 'removeEvents', tempId);
+        $('#calendar').fullCalendar( 'removeEvents', 0);
         $('#createSubmit').prop('disabled', true);
         $('#createShiftModal').modal('hide');
     });
@@ -194,6 +194,37 @@ $(document).ready(function() {
             $('#shift_id').val('0');
             $('#createSubmit').prop('disabled', true);
             $('#createShiftModal').modal('show');
+
+        },
+        eventResize: function(event, delta, revertFunc) {
+
+            url = "/organization/" + orgid.toString() + "/shift/" + (event.id).toString() + "/time";
+
+
+            var times = {start: event.start.toISOString(), end: event.end.toISOString()};
+
+            $.ajax({
+                headers: {
+                    'Accept': "application/json; charset=utf-8",
+                },
+                type: "POST",
+                dataType: 'json',
+                data: times,
+                url: url,
+
+                success: function(data)
+                {
+                    console.log(JSON.stringify(data));
+
+                    if(data.status == "success"){
+
+                        $('#calendar').fullCalendar( 'refetchEvents' )
+
+                    }else if(data.status == "error"){
+                        alert(JSON.stringify(data));
+                    }
+                }
+            });
 
         }
     });

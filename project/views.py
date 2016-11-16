@@ -179,6 +179,28 @@ def create_shift(key):
     return response
 
 
+@main_blueprint.route('/organization/<key>/shift/<key1>/time', methods=['POST',])
+@login_required
+@check_confirmed
+@owns_organization
+def update_shift_time(key, key1):
+    """
+    updates the shift start and end time
+    :param key:
+    :param key1:
+    :return:
+    """
+    shift = Shift.query.get(key1)
+    shift.update_time(request.form['start'], request.form['end'])
+    response_dict =  json.dumps({'status': 'success', 'shift': utils.organization.shift_to_dict(shift)})
+
+    response = Response(response=json.dumps(response_dict),
+                    status=200,
+                    mimetype="application/json")
+
+    return response
+
+
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/<shift_key>/edit', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
