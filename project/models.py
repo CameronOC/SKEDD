@@ -131,6 +131,7 @@ class Membership(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     joined = db.Column(db.Boolean, default=False, nullable=False)
     is_owner = db.Column(db.Boolean, default=False, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
@@ -138,15 +139,20 @@ class Membership(db.Model):
     # makes it so that a user can't be a member of an organization multiple times
     UniqueConstraint('member_id', 'organization_id')
 
-    def __init__(self, member_id, organization_id, is_owner=False, joined=False):
+    def __init__(self, member_id, organization_id, is_owner=False, joined=False, is_admin=False):
         self.member_id = member_id
         self.organization_id = organization_id
         self.is_owner = is_owner
         self.joined = joined
+        self.is_admin = is_admin
 
     def __repr__(self):
         return '<Organization: {}, Member: {}, joined: {}>'.format(self.organization_id, self.member_id, self.joined)
-
+        
+    def change_admin(self):
+        self.is_admin = not self.is_admin
+        db.session.commit()
+        
 
 class Organization(db.Model):
     __tablename__ = "organizations"
