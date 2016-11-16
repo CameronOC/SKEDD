@@ -114,11 +114,11 @@ def create_shift(org_key, pos_key):
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
-@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/<shift_key>/edit', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<key>/position/<key1>/shift/<key2>/edit', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 #@owns_organization
-def update_shift(org_key, pos_key, shift_key):
+def update_shift(key, key1, key2):
     """
     Updates an existing shift.
     :param org_key:
@@ -126,7 +126,7 @@ def update_shift(org_key, pos_key, shift_key):
     :param shift_key:
     :return:
     """
-    shift = utils.organization.get_shift(shift_key)
+    shift = utils.organization.get_shift(key2)
     form = ShiftForm(obj=shift)
     if request.method == 'GET':
         if form.validate():
@@ -136,7 +136,7 @@ def update_shift(org_key, pos_key, shift_key):
     else:
         shift.update(pos_key, form.assigned_user_id.data, form.start_time.data, 
                         form.end_time.data, form.description.data)
-    return redirect(url_for('main.position', key=org_key, key2=pos_key))
+    return redirect(url_for('main.position', key=key, key1=key1))
 
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
@@ -227,10 +227,10 @@ def setup_account(key, token):
         return render_template('main/setup.html', form=form, organization=membership.organization)
 
 
-@main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', 'POST'})
+@main_blueprint.route('/organization/<key>/position/<key1>', methods={'GET', 'POST'})
 @login_required
 @check_confirmed
-def position(key, key2):
+def position(key, key1):
     """
 
     :param key:
@@ -238,7 +238,7 @@ def position(key, key2):
     """
     org = utils.organization.get_organization(key)
 
-    pos = Position.query.filter_by(id=key2).first()
+    pos = Position.query.filter_by(id=key1).first()
     shifts = pos.assigned_shifts.all()
     return render_template('main/position.html', position=pos, organization=org, shifts=shifts)
 
@@ -396,7 +396,7 @@ def getusersinorg(key):
 
 @app.route('/getassignedpositions/<key>/<key1>')
 def getassignedpositions(key, key1):
-    response = Response(response=utils.organization.get_assigned_positions_for_user(key, key2),
+    response = Response(response=utils.organization.get_assigned_positions_for_user(key, key1),
                         status=200,
                         mimetype="application/json")
     return response
