@@ -4,44 +4,115 @@ $(document).ready(function() {
     * Code that applies to both modals
     *
     */
-    var nextId
 
     $('.modal').on('hidden.bs.modal', function(){
         $(this).find("input,textarea").val('').end();
+        $('#shift_assigned_member_id').empty();
+        $('#shift_position_id').val('0');
+        $("#shift_repeat_list option:selected").prop("selected", false);
+        $('#shift_repeating').prop('checked', false);
+        $('#shift_repeat_list').hide();
     });
 
     /*
     *
-    * Code to Create new Events
+    * Code to Create new Shifts
     *
     */
-    var nextId = 3;
 
     $('#createSubmit').on('click', function() {
+        $('#createSubmit').prop('disabled', true);
 
-        var tempId = parseInt($('#createShiftId').text());
+        url = url = "/organization/" + orgid.toString() + "/shift/create";
 
-        var eventlist = $("#calendar").fullCalendar('clientEvents', tempId);
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "POST",
+            url: url,
+            data: $("#createShiftForm").serialize(), // serializes the form's elements.
 
-        evento = eventlist[0];
+            success: function(data)
+            {
 
-        evento.title = $('#createShiftPosition').val();
-        evento.description = $('#createShiftDescription').val();
-        evento.assigned = $('#createShiftAssigned').val();
+                if(data.status == "success"){
 
-        $('#calendar').fullCalendar('updateEvent', evento);
-        $('#createShiftModal').modal('hide');
-        nextId = nextId + 1;
+                    console.log(JSON.stringify(data));
+
+                    $('#calendar').fullCalendar( 'removeEvents', 0);
+
+                    $('#calendar').fullCalendar( 'refetchEvents' )
+                    $('#createShiftModal').modal('hide');
+
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+            }
+        });
+
+
+
     });
 
     $('#createCancel').on('click', function() {
-
-        var tempId = parseInt($('#createShiftId').text());
-        $('#calendar').fullCalendar( 'removeEvents', tempId);
+        var tempId = parseInt($('#shift_id').val());
+        $('#calendar').fullCalendar( 'removeEvents', 0);
+        $('#createSubmit').prop('disabled', true);
         $('#createShiftModal').modal('hide');
     });
 
 
+    $('#shift_repeating').change(function() {
+        $('#shift_repeat_list').toggle();
+        $("#shift_repeat_list option:selected").prop("selected", false);
+    });
+
+    /*
+    *
+    * This function makes an ajax call to the server to get the members for a position
+    * whenever a position is selected in the create shift modal
+    * these members are then used as options to the assigned member select field
+    *
+    */
+    $('#shift_position_id').change(function() {
+        $('#createSubmit').prop('disabled', false);
+
+        url = "/organization/" + orgid.toString() + "/position/" + ($(this).val()).toString() + "/users";
+
+        // alert(url);
+
+
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "GET",
+            url: url,
+
+            success: function(data)
+            {
+                if(data.status == "success"){
+                    $('#shift_assigned_member_id').empty()
+
+                    var html = '<option class="generated" value="0"></option>';
+                    $('#shift_assigned_member_id').append(html);
+
+                    for (var i = 0; i < data.members.length; i++) {
+                        var current = data.members[i];
+                        var html = '<option class="generated" value="' + (current.id).toString() + '">' +
+                                    current.first_name + ' ' + current.last_name + '</option>'
+                        $('#shift_assigned_member_id').append(html);
+                    }
+
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+            }
+        });
+
+
+    });
 
     /*
     *
@@ -63,7 +134,6 @@ $(document).ready(function() {
 
         $('#calendar').fullCalendar('updateEvent', evento);
         $('#editShiftModal').modal('hide');
-        nextId = nextId + 1;7
     });
 
     $('#editDelete').on('click', function() {
@@ -73,30 +143,15 @@ $(document).ready(function() {
         $('#editShiftModal').modal('hide');
     });
 
-    var getShifts = function() {
-
-        url = "/organization/" + orgid.toString() + "/shifts"
-
-
-
-        $.ajax({
-            headers: {
-                'Accept': "application/json; charset=utf-8",
-            },
-            type: "GET",
-            url: url,
-            success: function(data) {
-                return data;
-            }
-        });
-
-    }
-
     /*
     *
     * Initialize Calendar
     *
     */
+    var time = moment.duration('04:00:00');
+    var firstHour = (moment(new Date()).local());
+    firstHour.subtract(time);
+    firstHour = firstHour.format("HH:00:00")
 
     $('#calendar').fullCalendar({
         header: {
@@ -104,14 +159,16 @@ $(document).ready(function() {
             center: 'title',
             right: 'month,agendaWeek,agendaDay'
         },
+        height: $(window).height()*0.67,
         defaultView: 'agendaWeek',
+        scrollTime: firstHour,
         allDaySlot: false,
         editable: true,
         selectable: true,
         selectHelper: true,
-        events: getShifts(),
+        events: "/organization/" + orgid.toString() + "/shifts",
         eventRender: function(event, element) {
-            element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned + "</span>");
+            element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned_member + "</span>");
         },
         eventClick:  function(event, jsEvent, view) {
             $('#editShiftTitle').html(event.title);
@@ -129,16 +186,64 @@ $(document).ready(function() {
             var newEvent = {
                 start: start,
                 end: end,
-                id: nextId,
+                id: 0,
             };
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
-            $('#createShiftStart').html(start.toString());
-            $('#createShiftEnd').html(end.toString());
-            $('#createShiftId').html(nextId.toString());
+            $('#shift_start_time').val(start.toISOString());
+            $('#shift_end_time').val(end.toISOString());
+            $('#shift_id').val('0');
+            $('#createSubmit').prop('disabled', true);
             $('#createShiftModal').modal('show');
 
-        }
+        },
+        eventResize: function(event, delta, revertFunc) {
+            updateTime(event, delta, revertFunc);
+        },
+        eventDrop: function(event, delta, revertFunc) {
+            updateTime(event, delta, revertFunc);
+        },
     });
+
+
+    if(calendar) {
+      $(window).resize(function() {
+        var calHeight = $(window).height()*0.67;
+        $('#calendar').fullCalendar('option', 'height', calHeight);
+      });
+    };
+
+    function updateTime(event, delta, revertFunc) {
+
+        url = "/organization/" + orgid.toString() + "/shift/" + (event.id).toString() + "/time";
+
+
+        var times = {start: event.start.toISOString(), end: event.end.toISOString()};
+
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "POST",
+            dataType: 'json',
+            data: times,
+            url: url,
+
+            success: function(data)
+            {
+                console.log(JSON.stringify(data));
+
+                if(data.status == "success"){
+
+
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                    revertFunc();
+                }
+
+            }
+        });
+
+    }
 
 
     /*
@@ -178,12 +283,12 @@ $(document).ready(function() {
 
         //get the title of the position from the dropdownmenu
         var select = document.getElementById("positiondropdown");
-        var positiontitle = select.options[select.selectedIndex].value;
+        var positionid = select.options[select.selectedIndex].value;
         //var positionid = APP.vue.positions[index].id;
         //console.log(positionid) 
         var uid = APP.vue.userid;
         
-        url = "/assign/" + uid.toString() + "/" + positiontitle.toString()
+        url = "/assign/" + uid.toString() + "/" + positionid.toString()
 
         $.ajax({
             type: "POST",
@@ -210,11 +315,7 @@ $(document).ready(function() {
             email: $('#email').val()
         };
 
-
-
         url = "/organization/" + orgid.toString() + "/invite"
-
-
 
         $.ajax({
             headers: {
@@ -239,5 +340,7 @@ $(document).ready(function() {
         $('#inviteMemberSubmit').prop('disabled', false);
 
     });
+
+
 
 });

@@ -11,7 +11,7 @@ from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
 from project import app, db, bcrypt
-from decorators import check_confirmed, owns_organization, admin_of_org
+from decorators import check_confirmed, owns_organization, organization_member, admin_of_org
 import utils.organization
 from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position, get_users_for_org_JSON
 import json
@@ -81,6 +81,7 @@ def create():
 @main_blueprint.route('/organization/<key>', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
+@organization_member
 def organization(key):
     """
     The home page for an organization. displays relevant positions
@@ -89,13 +90,34 @@ def organization(key):
     :return:
     """
     org = utils.organization.get_organization(key)
-    return render_template('main/organization.html', organization=org, form=InviteForm(), form1=PositionForm())
+    return render_template('main/organization.html',
+                           organization=org,
+                           form=InviteForm(),
+                           form1=PositionForm(),
+                           shift_form=ShiftForm())
 
-@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/create', methods=['GET', 'POST'])
+
+@main_blueprint.route('/organization/<key>/shifts')
+@login_required
+@owns_organization
+def get_shifts_for_org(key):
+    """
+    Gets all shifts for an organization
+    :param key:
+    :return:
+    """
+    response = Response(response=utils.organization.get_all_shifts_for_org_JSON(key),
+                        status=200,
+                        mimetype="application/json")
+
+    return response
+
+
+@main_blueprint.route('/organization/<key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 #@owns_organization
-def create_shift(org_key, pos_key):
+def create_shift(key):
     """
     Creates a new shift.  Shifts can be assigned to a user or left empty at
     initialization, but are always related to a position, which is in turn
@@ -104,14 +126,79 @@ def create_shift(org_key, pos_key):
     :param pos_key:
     :return:
     """
+
+    org = utils.organization.get_organization(key)
     form = ShiftForm(request.form)
-    if request.method == 'GET':
-        return render_template('main/create_shift.html', form=form)
+    return_dict = {}
+
+    if form.validate_on_submit():
+
+        shifts = utils.organization.create_shifts_form(request.form['shift_position_id'],
+                                                       request.form['shift_assigned_member_id'],
+                                                       form.shift_start_time.data,
+                                                       form.shift_end_time.data,
+                                                       form.shift_description.data,
+                                                       form.shift_repeat_list.data)
+
+        return_dict['shifts'] = shifts
+        return_dict['status'] = "success"
     else:
-        shift = utils.organization.create_shifts_form(pos_key, form.assigned_user_id.data, 
-                                                        form.start_time.data, form.end_time.data, 
-                                                        form.description.data, form.repeat_list.data)
-    return redirect(url_for('main.position', key=org_key, key2=pos_key))
+        return_dict['status'] = "error"
+        errors_dict = {
+            'shift_description': [],
+            'shift_repeating': [],
+            'shift_repeat_list': [],
+            'shift_start_time': [],
+            'shift_end_time': [],
+            'shift_id': []
+        }
+
+        for error in form.shift_description.errors:
+            errors_dict['shift_description'].append(error)
+
+        for error in form.shift_repeating.errors:
+            errors_dict['shift_repeating'].append(error)
+
+        for error in form.shift_repeat_list.errors:
+            errors_dict['shift_repeat_list'].append(error)
+
+        for error in form.shift_start_time.errors:
+            errors_dict['shift_start_time'].append(error)
+
+        for error in form.shift_end_time.errors:
+            errors_dict['shift_end_time'].append(error)
+
+        for error in form.shift_id.errors:
+            errors_dict['shift_id'].append(error)
+
+        return_dict['errors'] = errors_dict
+    response = Response(response=json.dumps(return_dict),
+                    status=200,
+                    mimetype="application/json")
+
+    return response
+
+
+@main_blueprint.route('/organization/<key>/shift/<key1>/time', methods=['POST',])
+@login_required
+@check_confirmed
+@owns_organization
+def update_shift_time(key, key1):
+    """
+    updates the shift start and end time
+    :param key:
+    :param key1:
+    :return:
+    """
+    shift = Shift.query.get(key1)
+    shift.update_time(request.form['start'], request.form['end'])
+    response_dict =  json.dumps({'status': 'success', 'shift': utils.organization.shift_to_dict(shift)})
+
+    response = Response(response=json.dumps(response_dict),
+                    status=200,
+                    mimetype="application/json")
+
+    return response
 
 
 @main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/<shift_key>/edit', methods=['GET', 'POST'])
@@ -134,8 +221,8 @@ def update_shift(org_key, pos_key, shift_key):
             form.populate_obj(shift)
         return render_template('main/update_shift.html', form=form)
     else:
-        shift.update(pos_key, form.assigned_user_id.data, form.start_time.data, 
-                        form.end_time.data, form.description.data)
+        shift.update(pos_key, form.shift_assigned_member_id.data, form.shift_start_time.data,
+                        form.shift_end_time.data, form.shift_description.data)
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
 
 
@@ -227,22 +314,6 @@ def setup_account(key, token):
         return render_template('main/setup.html', form=form, organization=membership.organization)
 
 
-@main_blueprint.route('/organization/<key>/position/<key2>', methods={'GET', 'POST'})
-@login_required
-@check_confirmed
-def position(key, key2):
-    """
-
-    :param key:
-    :return:
-    """
-    org = utils.organization.get_organization(key)
-
-    pos = Position.query.filter_by(id=key2).first()
-    shifts = pos.assigned_shifts.all()
-    return render_template('main/position.html', position=pos, organization=org, shifts=shifts)
-
-
 @main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
@@ -263,7 +334,7 @@ def create_position(key):
             'title': []
         }
 
-        for error in form.title.errors:
+        for error in form1.name.errors:
             errors_dict['title'].append(error)
 
         return_dict['errors'] = errors_dict
@@ -283,22 +354,18 @@ def getpositioninorg(key):
     """
     return utils.organization.get_positions_for_org_JSON(key)
 
-@main_blueprint.route('/organization/<key>/member/<key2>', methods=['GET', ])
-@login_required
-@check_confirmed
-@owns_organization
-def manager_members_profile(key, key2):
-    """
 
+@app.route('/organization/<key>/position/<key2>/users')
+def get_position_members(key, key2):
+    """
+    Returms a json list of all users for a position
     :param key:
     :param key2:
     :return:
     """
-    org = utils.organization.get_organization(key)
-
-    user = User.query.filter_by(id=key2).first()
-
-    return render_template('main/member.html', user=user, organization=org)
+    response = Response(response=utils.organization.get_members_for_position(key2),
+                        status=200,  mimetype="application/json")
+    return response
 
 
 @app.route('/assign/<key1>/<key2>', methods=['POST'])
@@ -314,28 +381,6 @@ def assign(key1, key2):
     return response
 
 
-@app.route('/assignpos', methods=['POST'])
-@login_required
-@check_confirmed
-def assignpos():
-    """
-    :return:
-    """
-    # get the user, position, and org
-    myuser = User.query.filter_by(id=request.form["userid"]).first_or_404()
-    mypos = Position.query.filter_by(id=request.form['positionid']).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-    # if this user already exists return flash
-    if myuser in mypos.assigned_users:
-        flash('This persons position is already assigned to ' + mypos.title, 'danger')
-        return render_template('main/position.html', position=mypos, organization=org)
-
-    assign_member_to_position(myuser, mypos, org)
-    
-    # redirects to the page before
-    return render_template('main/position.html', position=mypos, organization=org)
-
-
 @app.route('/unassign/<key1>/<key2>', methods=['POST'])
 @login_required
 @check_confirmed
@@ -349,40 +394,6 @@ def unassign(key1, key2):
                         status=200)
     return response
 
-
-@app.route('/unassignpos', methods=['POST'])
-@login_required
-@check_confirmed
-def unassignpos():
-    """
-
-    :return:
-    """
-    # get the user, position, and org
-    myuser = User.query.filter_by(id=request.form["unassignuserid"]).first_or_404()
-    mypos = Position.query.filter_by(id=request.form["unassignposid"]).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-
-    unassign_member_to_position(myuser, mypos, org)
-    
-    # redirects to the page before
-    return render_template('main/position.html', position=mypos, organization=org)
-
-
-@app.route('/deleteposition', methods=['POST'])
-@login_required
-@check_confirmed
-def deleteposition():
-    """
-
-    :return:
-    """
-    pos = Position.query.filter_by(id=request.form["deleteposid"]).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-
-    deletepositions(pos, org)
-
-    return render_template('main/organization.html', organization=org)
 
 @app.route('/getusersinorg/<key>')
 @login_required

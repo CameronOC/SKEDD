@@ -110,6 +110,20 @@ class Shift(db.Model):
     
         db.session.commit()
 
+    def update_time(self, start_time=None, end_time=None):
+        """
+        Updates a shifts start and end times, if they are given.
+        :param start_time:
+        :param end_time:
+        :return:
+        """
+        if start_time is not None:
+            self.start_time = start_time
+        if end_time is not None:
+            self.end_time = end_time
+
+        db.session.commit()
+
 
 class Membership(db.Model):
     __tablename__ = 'organization_members'

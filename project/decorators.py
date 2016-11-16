@@ -6,8 +6,8 @@ from functools import wraps
 from flask import flash, redirect, url_for, abort, render_template, g
 from flask_login import current_user
 
-from models import Organization
-
+from models import Organization, Membership
+from exceptions import NotOwner, NotMember
 
 
 def check_confirmed(func):
@@ -29,7 +29,7 @@ def owns_organization(fn):
         org = Organization.query.filter_by(id=key).first()
 
         if org.owner.id != g.user.id:
-            abort(render_template('errors/403_organization_owner.html'), 403)
+            raise NotOwner('403 Access Denied. You must own this organization.', status_code=403)
         return fn(*args, **kwargs)
     return decorated_view
     
@@ -44,3 +44,16 @@ def admin_of_org(f):
             abort(render_template('errors/403_organization_admin.html'), 403)
         return f(*args, **kwargs)
     return decorated_func
+
+
+def organization_member(fn):
+    @wraps(fn)
+    def decorated_view(*args, **kwargs):
+        key = kwargs['key']
+        print key
+        membership = Membership.query.filter_by(member_id=g.user.id, organization_id=key).first()
+
+        if membership is None:
+            raise NotMember('403 Access Denied. You must be a member of this organization.', status_code=403)
+        return fn(*args, **kwargs)
+    return decorated_view
