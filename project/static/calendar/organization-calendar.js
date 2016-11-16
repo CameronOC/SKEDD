@@ -197,36 +197,11 @@ $(document).ready(function() {
 
         },
         eventResize: function(event, delta, revertFunc) {
-
-            url = "/organization/" + orgid.toString() + "/shift/" + (event.id).toString() + "/time";
-
-
-            var times = {start: event.start.toISOString(), end: event.end.toISOString()};
-
-            $.ajax({
-                headers: {
-                    'Accept': "application/json; charset=utf-8",
-                },
-                type: "POST",
-                dataType: 'json',
-                data: times,
-                url: url,
-
-                success: function(data)
-                {
-                    console.log(JSON.stringify(data));
-
-                    if(data.status == "success"){
-
-                        $('#calendar').fullCalendar( 'refetchEvents' )
-
-                    }else if(data.status == "error"){
-                        alert(JSON.stringify(data));
-                    }
-                }
-            });
-
-        }
+            updateTime(event, delta, revertFunc);
+        },
+        eventDrop: function(event, delta, revertFunc) {
+            updateTime(event, delta, revertFunc);
+        },
     });
 
 
@@ -236,6 +211,39 @@ $(document).ready(function() {
         $('#calendar').fullCalendar('option', 'height', calHeight);
       });
     };
+
+    function updateTime(event, delta, revertFunc) {
+
+        url = "/organization/" + orgid.toString() + "/shift/" + (event.id).toString() + "/time";
+
+
+        var times = {start: event.start.toISOString(), end: event.end.toISOString()};
+
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "POST",
+            dataType: 'json',
+            data: times,
+            url: url,
+
+            success: function(data)
+            {
+                console.log(JSON.stringify(data));
+
+                if(data.status == "success"){
+
+
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+
+                $('#calendar').fullCalendar( 'refetchEvents' )
+            }
+        });
+
+    }
 
 
     /*
