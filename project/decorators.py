@@ -33,7 +33,7 @@ def owns_organization(fn):
         return fn(*args, **kwargs)
     return decorated_view
     
-    
+# this needs to be fixed/changed
 def admin_of_org(f):
     @wraps(f)
     def decorated_func(*args, **kwargs):
