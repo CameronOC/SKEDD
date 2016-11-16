@@ -127,7 +127,7 @@ def create_shift(key):
     :return:
     """
 
-    org = utils.organization.get_organization(key)
+
     form = ShiftForm(request.form)
     return_dict = {}
 
@@ -192,7 +192,31 @@ def update_shift_time(key, key1):
     """
     shift = Shift.query.get(key1)
     shift.update_time(request.form['start'], request.form['end'])
-    response_dict =  json.dumps({'status': 'success', 'shift': utils.organization.shift_to_dict(shift)})
+    response_dict = json.dumps({'status': 'success', 'shift': utils.organization.shift_to_dict(shift)})
+
+    response = Response(response=json.dumps(response_dict),
+                    status=200,
+                    mimetype="application/json")
+
+    return response
+
+@main_blueprint.route('/organization/<key>/shift/<key1>/delete', methods=['DELETE',])
+@login_required
+@check_confirmed
+@owns_organization
+def delete_shift(key, key1):
+    """
+    Deletes a shift
+    :param key:
+    :param key1:
+    :return:
+    """
+    utils.organization.delete_shift(key1)
+
+    response_dict = {
+        'status': 'success',
+        'message': 'Shift with id ' + key1 + ' successfully deleted',
+    }
 
     response = Response(response=json.dumps(response_dict),
                     status=200,

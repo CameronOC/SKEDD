@@ -1,4 +1,7 @@
 $(document).ready(function() {
+
+    var create = true;
+
     /*
     *
     * Code that applies to both modals
@@ -23,7 +26,13 @@ $(document).ready(function() {
     $('#createSubmit').on('click', function() {
         $('#createSubmit').prop('disabled', true);
 
-        url = url = "/organization/" + orgid.toString() + "/shift/create";
+
+        if (create == true) {
+            url = "/organization/" + orgid.toString() + "/shift/create";
+
+        } else {
+            url = '';
+        }
 
         $.ajax({
             headers: {
@@ -77,11 +86,17 @@ $(document).ready(function() {
     */
     $('#shift_position_id').change(function() {
         $('#createSubmit').prop('disabled', false);
+        updateUsersForPosition($(this).val(), null);
+    });
 
-        url = "/organization/" + orgid.toString() + "/position/" + ($(this).val()).toString() + "/users";
+    /*
+    *
+    * Makes an ajax call to get users for a position
+    *
+    */
+    function updateUsersForPosition(position, member_id) {
 
-        // alert(url);
-
+        url = "/organization/" + orgid.toString() + "/position/" + position.toString() + "/users";
 
         $.ajax({
             headers: {
@@ -105,14 +120,19 @@ $(document).ready(function() {
                         $('#shift_assigned_member_id').append(html);
                     }
 
+                    if (member_id != null) {
+                        console.log('member id not none: ' + member_id)
+                        $('#shift_assigned_member_id').val(member_id.toString());
+                    }
+
                 }else if(data.status == "error"){
                     alert(JSON.stringify(data));
                 }
             }
         });
 
+    }
 
-    });
 
     /*
     *
@@ -171,15 +191,20 @@ $(document).ready(function() {
             element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned_member + "</span>");
         },
         eventClick:  function(event, jsEvent, view) {
-            $('#editShiftTitle').html(event.title);
-            $('#editShiftPosition').val(event.title);
-            $('#editShiftDescription').val(event.description);
-            $('#editShiftAssigned').val(event.assigned);
-            $('#editShiftStart').html(event.start.toString());
-            $('#editShiftEnd').html(event.end.toString());
-            $('#editShiftId').html(event.id);
+            create = false;
+            $('#shift_start_time').val(event.start.toISOString());
+            $('#shift_end_time').val(event.end.toISOString());
+            $('#shift_id').val(event.id);
+            $('#createSubmit').prop('disabled', true);
+            $('#delete').show();
 
-            $('#editShiftModal').modal('show');
+            $('#shift_position_id').val(event.position_id)
+            updateUsersForPosition(event.position_id, event.assigned_member_id);
+
+            $('#shift_repeating').hide();
+            $('#shift_repeat_list').hide();
+
+            $('#createShiftModal').modal('show');
         },
         select: function(start, end, allDay) {
 
@@ -188,11 +213,16 @@ $(document).ready(function() {
                 end: end,
                 id: 0,
             };
+            create = true;
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
             $('#shift_start_time').val(start.toISOString());
             $('#shift_end_time').val(end.toISOString());
             $('#shift_id').val('0');
             $('#createSubmit').prop('disabled', true);
+            $('#delete').hide();
+
+            $('#shift_repeating').show();
+
             $('#createShiftModal').modal('show');
 
         },
