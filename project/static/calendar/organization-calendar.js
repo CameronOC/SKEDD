@@ -306,6 +306,7 @@ $(document).ready(function() {
         console.log("DeleteUserFromOrg pressed")
 
         var uid = APP.vue.userid;
+        console.log(uid);
         
         url = "/deleteuserfromorg/" + uid.toString() + "/" + orgid.toString()
 
