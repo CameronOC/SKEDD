@@ -398,4 +398,11 @@ class TestShifts(BaseTest, TestCase):
         assert self.shift.end_time == "2016-11-15T09:30:00"
 
 
-
+    def test_delete_shift(self):
+        """
+        Tests deleting a shift
+        :return:
+        """
+        id = self.shift.id
+        org_utils.delete_shift(id)
+        assert Shift.query.get(id) is None

@@ -345,6 +345,16 @@ def create_shift_helper(position_id, assigned_user_id, description, start_time, 
     return new_shift
 
 
+def delete_shift(shift_id):
+    """
+    deletes a shift
+    :param shift_id:
+    :return:
+    """
+    shift = Shift.query.get(shift_id)
+    db.session.delete(shift)
+    db.session.commit()
+
 def shift_to_dict(shift):
     """
     Takes a shift object and returns a dictionary representation
