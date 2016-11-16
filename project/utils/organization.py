@@ -262,14 +262,20 @@ def create_shifts_JSON(dictionary):
                 week_ct += 1
 
     return shifts
-    
-    
-def create_shifts_form( position_id, assigned_user_id, start_time, 
+
+
+# noinspection PyTypeChecker
+def create_shifts_form( position_id, assigned_user_id, start_time,
                         end_time, description, repeat_list=None):
     """
     creates a month's worth of shifts
     based on data from a form
-    :param dictionary:
+    :param position_id:
+    :param assigned_user_id:
+    :param start_time:
+    :param end_time:
+    :param description:
+    :param repeat_list:
     :return:
     """
     shifts = []
@@ -277,34 +283,39 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
     main_end_time = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
 
     delta = timedelta()
-    shifts.append(create_shift_helper(
+
+    new_shift = create_shift_helper(
                 position_id,
                 assigned_user_id,
                 description,
                 main_start_time,
                 main_end_time,
-                delta))
+                delta)
+
+    shifts.append(shift_to_dict(new_shift))
 
     if repeat_list is not None and len(repeat_list) > 0:
         main_day_int = main_start_time.weekday()
         for day_int in repeat_list:
 
-            if main_day_int == day_int:
-                week_ct = 1;
+            if main_day_int == int(day_int):
+                week_ct = 1
             else:
                 week_ct = 0
 
             while week_ct < 4:
-                day_difference = day_int - main_day_int
+                day_difference = int(day_int) - main_day_int
                 delta = timedelta(days=day_difference, weeks=week_ct)
-                shifts.append(create_shift_helper(
-                    position_id,
-                    assigned_user_id,
-                    description,
-                    main_start_time,
-                    main_end_time,
-                    delta
-                ))
+                new_shift = create_shift_helper(
+                            position_id,
+                            assigned_user_id,
+                            description,
+                            main_start_time,
+                            main_end_time,
+                            delta)
+
+                shifts.append(shift_to_dict(new_shift))
+
                 week_ct += 1
 
     return shifts
@@ -329,9 +340,43 @@ def create_shift_helper(position_id, assigned_user_id, description, start_time, 
                              new_end_time,
                              description
                              )
-    # db.session.add(new_shift)
-    # db.session.commit()
+    db.session.add(new_shift)
+    db.session.commit()
     return new_shift
+
+
+def shift_to_dict(shift):
+    """
+    Takes a shift object and returns a dictionary representation
+    :param shift:
+    :return:
+    """
+
+    if shift is None or not isinstance(shift, Shift):
+        return None
+
+    shift_dict = {
+        'id': shift.id,
+        'position_id': shift.position_id,
+        'position_title': shift.Position.title,
+        'start': shift.start_time,
+        'end': shift.end_time,
+    }
+
+    if shift.description is None:
+        shift_dict['description'] = ''
+    else:
+        shift_dict['description'] = shift.description
+
+    if shift.user is not None:
+        shift_dict['assigned_member_id'] = shift.assigned_user_id
+        shift_dict['assigned_member'] = shift.user.first_name + ' ' + shift.user.last_name
+
+    else:
+        shift_dict['assigned_member_id'] = 0
+        shift_dict['assigned_member'] = ''
+
+    return shift_dict
 
 def get_all_shifts_for_org_JSON(org_id):
     """
@@ -354,10 +399,11 @@ def get_all_shifts_for_org_JSON(org_id):
                 assigned_user_name = ''
                 
             shifts_list.append({'position_id': s.position_id,
-                                'assigned_user_name': assigned_user_name,
-                                'assigned_user_id': s.assigned_user_id,
-                                'start_time': s.start_time,
-                                'end_time': s.end_time,
+                                'title': s.Position.title,
+                                'assigned_member': assigned_user_name,
+                                'assigned_member_id': s.assigned_user_id,
+                                'start': s.start_time,
+                                'end': s.end_time,
                                 'description': s.description,
                                 'id': s.id
                                 })
@@ -376,6 +422,29 @@ def get_users_for_org_JSON(org_id):
         })
 
     return json.dumps(members_list)
+
+def get_members_for_position(position_id):
+    """
+    returns a JSON list of users that are assigned to a position
+    :param position_id:
+    :return:
+    """
+    members_list = []
+
+    position = Position.query.get(position_id)
+    members = position.assigned_users
+
+    for member in members:
+        members_list.append({
+            'first_name': member.first_name,
+            'last_name': member.last_name,
+            'id': member.id
+        })
+
+    return json.dumps({
+        'status': 'success',
+        'members': members_list
+    })
 
 def get_positions_for_org_JSON(org_id):
     """
