@@ -283,11 +283,11 @@ def getpositioninorg(key):
     """
     return utils.organization.get_positions_for_org_JSON(key)
 
-@main_blueprint.route('/organization/<key>/member/<key2>', methods=['GET', ])
+@main_blueprint.route('/organization/<key>/member/<key1>', methods=['GET', ])
 @login_required
 @check_confirmed
 @owns_organization
-def manager_members_profile(key, key2):
+def manager_members_profile(key, key1):
     """
 
     :param key:
@@ -296,20 +296,20 @@ def manager_members_profile(key, key2):
     """
     org = utils.organization.get_organization(key)
 
-    user = User.query.filter_by(id=key2).first()
+    user = User.query.filter_by(id=key1).first()
 
     return render_template('main/member.html', user=user, organization=org)
 
 
-@app.route('/assign/<key1>/<key2>', methods=['POST'])
+@app.route('/assign/<key>/<key1>', methods=['POST'])
 @login_required
 @check_confirmed
-def assign(key1, key2):
+def assign(key, key1):
     """
 
     :return:
     """
-    response = Response(response=assign_member_to_position(key1, key2),
+    response = Response(response=assign_member_to_position(key, key1),
                         status=200)
     return response
 
@@ -336,16 +336,16 @@ def assignpos():
     return render_template('main/position.html', position=mypos, organization=org)
 
 
-@app.route('/unassign/<key1>/<key2>', methods=['POST'])
+@app.route('/unassign/<key>/<key1>', methods=['POST'])
 @login_required
 @check_confirmed
-def unassign(key1, key2):
+def unassign(key, key1):
     """
 
     :return:
     """
     # get the user, position, and org
-    response = Response(response=unassign_member_to_position(key1, key2),
+    response = Response(response=unassign_member_to_position(key, key1),
                         status=200)
     return response
 
@@ -394,8 +394,8 @@ def getusersinorg(key):
 
     return response
 
-@app.route('/getassignedpositions/<key>/<key2>')
-def getassignedpositions(key, key2):
+@app.route('/getassignedpositions/<key>/<key1>')
+def getassignedpositions(key, key1):
     response = Response(response=utils.organization.get_assigned_positions_for_user(key, key2),
                         status=200,
                         mimetype="application/json")
@@ -422,7 +422,7 @@ def get_shifts_for_org(key):
 
     return response
 
-@app.route('/deleteuserfromorg/<key1>/<key2>',  methods=['POST'])
+@app.route('/deleteuserfromorg/<key>/<key1>',  methods=['POST'])
 @login_required
-def deleteuserfromorg(key1, key2):
-    return utils.organization.delete_user_from_org(key1, key2)
+def deleteuserfromorg(key, key1):
+    return utils.organization.delete_user_from_org(key, key1)
