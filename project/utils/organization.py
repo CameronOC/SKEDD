@@ -434,7 +434,7 @@ def get_all_shifts_for_org_JSON(org_id):
             if s.user is not None:
                 assigned_user_name = s.user.first_name + ' ' + s.user.last_name
             else:
-                assigned_user_name = ''
+                assigned_user_name = 'Unassigned'
                 
             shifts_list.append({'position_id': s.position_id,
                                 'title': s.Position.title,

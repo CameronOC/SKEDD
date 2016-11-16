@@ -4,167 +4,6 @@ $(document).ready(function() {
 
     /*
     *
-    * Code that applies to both modals
-    *
-    */
-
-    $('.modal').on('hidden.bs.modal', function(){
-        $(this).find("input,textarea").val('').end();
-        $('#shift_assigned_member_id').empty();
-        $('#shift_position_id').val('0');
-        $("#shift_repeat_list option:selected").prop("selected", false);
-        $('#shift_repeating').prop('checked', false);
-        $('#shift_repeat_list').hide();
-    });
-
-    /*
-    *
-    * Code to Create new Shifts
-    *
-    */
-
-    $('#createSubmit').on('click', function() {
-        $('#createSubmit').prop('disabled', true);
-
-
-        if (create == true) {
-            url = "/organization/" + orgid.toString() + "/shift/create";
-
-        } else {
-            url = '';
-        }
-
-        $.ajax({
-            headers: {
-                'Accept': "application/json; charset=utf-8",
-            },
-            type: "POST",
-            url: url,
-            data: $("#createShiftForm").serialize(), // serializes the form's elements.
-
-            success: function(data)
-            {
-
-                if(data.status == "success"){
-
-                    console.log(JSON.stringify(data));
-
-                    $('#calendar').fullCalendar( 'removeEvents', 0);
-
-                    $('#calendar').fullCalendar( 'refetchEvents' )
-                    $('#createShiftModal').modal('hide');
-
-                }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
-                }
-            }
-        });
-
-
-
-    });
-
-    $('#createCancel').on('click', function() {
-        var tempId = parseInt($('#shift_id').val());
-        $('#calendar').fullCalendar( 'removeEvents', 0);
-        $('#createSubmit').prop('disabled', true);
-        $('#createShiftModal').modal('hide');
-    });
-
-
-    $('#shift_repeating').change(function() {
-        $('#shift_repeat_list').toggle();
-        $("#shift_repeat_list option:selected").prop("selected", false);
-    });
-
-    /*
-    *
-    * This function makes an ajax call to the server to get the members for a position
-    * whenever a position is selected in the create shift modal
-    * these members are then used as options to the assigned member select field
-    *
-    */
-    $('#shift_position_id').change(function() {
-        $('#createSubmit').prop('disabled', false);
-        updateUsersForPosition($(this).val(), null);
-    });
-
-    /*
-    *
-    * Makes an ajax call to get users for a position
-    *
-    */
-    function updateUsersForPosition(position, member_id) {
-
-        url = "/organization/" + orgid.toString() + "/position/" + position.toString() + "/users";
-
-        $.ajax({
-            headers: {
-                'Accept': "application/json; charset=utf-8",
-            },
-            type: "GET",
-            url: url,
-
-            success: function(data)
-            {
-                if(data.status == "success"){
-                    $('#shift_assigned_member_id').empty()
-
-                    var html = '<option class="generated" value="0"></option>';
-                    $('#shift_assigned_member_id').append(html);
-
-                    for (var i = 0; i < data.members.length; i++) {
-                        var current = data.members[i];
-                        var html = '<option class="generated" value="' + (current.id).toString() + '">' +
-                                    current.first_name + ' ' + current.last_name + '</option>'
-                        $('#shift_assigned_member_id').append(html);
-                    }
-
-                    if (member_id != null) {
-                        console.log('member id not none: ' + member_id)
-                        $('#shift_assigned_member_id').val(member_id.toString());
-                    }
-
-                }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
-                }
-            }
-        });
-
-    }
-
-
-    /*
-    *
-    * Code to Edit Events
-    *
-    */
-
-     $('#editSubmit').on('click', function() {
-
-        var tempId = parseInt($('#editShiftId').text());
-
-        var eventlist = $("#calendar").fullCalendar('clientEvents', tempId);
-
-        evento = eventlist[0];
-
-        evento.title = $('#editShiftPosition').val();
-        evento.description = $('#editShiftDescription').val();
-        evento.assigned = $('#editShiftAssigned').val();
-
-        $('#calendar').fullCalendar('updateEvent', evento);
-        $('#editShiftModal').modal('hide');
-    });
-
-    $('#editDelete').on('click', function() {
-
-        var tempId = parseInt($('#editShiftId').text());
-        $('#calendar').fullCalendar( 'removeEvents', tempId);
-        $('#editShiftModal').modal('hide');
-    });
-
-    /*
-    *
     * Initialize Calendar
     *
     */
@@ -195,16 +34,18 @@ $(document).ready(function() {
             $('#shift_start_time').val(event.start.toISOString());
             $('#shift_end_time').val(event.end.toISOString());
             $('#shift_id').val(event.id);
-            $('#createSubmit').prop('disabled', true);
-            $('#delete').show();
+            $('#shiftSubmit').prop('disabled', true);
+            $('#shiftDelete').show();
 
             $('#shift_position_id').val(event.position_id)
             updateUsersForPosition(event.position_id, event.assigned_member_id);
 
-            $('#shift_repeating').hide();
-            $('#shift_repeat_list').hide();
+            console.log(event.description);
+            $('#shift_description').val(event.description);
 
-            $('#createShiftModal').modal('show');
+            $('#createMultipleShifts').hide();
+
+            $('#shiftModal').modal('show');
         },
         select: function(start, end, allDay) {
 
@@ -218,12 +59,12 @@ $(document).ready(function() {
             $('#shift_start_time').val(start.toISOString());
             $('#shift_end_time').val(end.toISOString());
             $('#shift_id').val('0');
-            $('#createSubmit').prop('disabled', true);
-            $('#delete').hide();
+            $('#shiftSubmit').prop('disabled', true);
+            $('#shiftDelete').hide();
 
-            $('#shift_repeating').show();
+            $('#createMultipleShifts').show();
 
-            $('#createShiftModal').modal('show');
+            $('#shiftModal').modal('show');
 
         },
         eventResize: function(event, delta, revertFunc) {
@@ -241,6 +82,191 @@ $(document).ready(function() {
         $('#calendar').fullCalendar('option', 'height', calHeight);
       });
     };
+
+    $('#shiftModal').on('hidden.bs.modal', function(){
+        $(this).find("input,textarea").val('').end();
+        $('#shift_assigned_member_id').empty();
+        $('#shift_position_id').val('0');
+        $("#shift_repeat_list option:selected").prop("selected", false);
+        $('#shift_repeating').prop('checked', false);
+        $('#shift_repeat_list').hide();
+    });
+
+    /*
+    *
+    * Shifts Code
+    *
+    */
+
+    function createSuccess() {
+        $('#calendar').fullCalendar( 'removeEvents', 0);
+        $('#calendar').fullCalendar( 'refetchEvents' );
+        $('#shiftModal').modal('hide');
+    }
+
+    /*
+    function updateSuccess() {
+        var tempId = parseInt($('#shift_id').val());
+
+        var eventlist = $("#calendar").fullCalendar('clientEvents', tempId);
+
+        evento = eventlist[0];
+
+        evento.title = $('#editShiftPosition').val();
+        evento.description = $('#editShiftDescription').val();
+        evento.assigned = $('#editShiftAssigned').val();
+
+        $('#calendar').fullCalendar('updateEvent', evento);
+        $('#shiftModal').modal('hide');
+    }
+    */
+
+    $('#shiftSubmit').on('click', function() {
+        $('#shiftSubmit').prop('disabled', true);
+
+
+        if (create == true) {
+            url = "/organization/" + orgid.toString() + "/shift/create";
+        } else {
+            url = '/organization/' + orgid.toString() + '/shift/' + ($('#shift_id').val()).toString() + '/update';
+        }
+
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "POST",
+            url: url,
+            data: $("#shiftForm").serialize(), // serializes the form's elements.
+
+            success: function(data)
+            {
+
+                if(data.status == "success"){
+
+                    if (create) {
+                        createSuccess();
+                    } else {
+                        updateSuccess();
+                    }
+
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                    $('#shiftSubmit').prop('disabled', false);
+                }
+            }
+        });
+
+
+
+    });
+
+    $('#shiftCancel').on('click', function() {
+        if (create) {
+            $('#calendar').fullCalendar( 'removeEvents', 0);
+        }
+        $('#shiftSubmit').prop('disabled', true);
+        $('#shiftModal').modal('hide');
+    });
+
+    $('#shiftDelete').on('click', function() {
+
+        var tempId = $('#shift_id').val();
+
+        $('#shiftSubmit').prop('disabled', true);
+        $('#shiftDelete').prop('disabled', true);
+        url = '/organization/' + orgid.toString() + '/shift/' + (tempId).toString() + '/delete';
+
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "DELETE",
+            url: url,
+
+            success: function(data)
+            {
+
+                if(data.status == "success"){
+
+                    $('#calendar').fullCalendar( 'removeEvents', tempId);
+                    $('#shiftModal').modal('hide');
+
+                }else if(data.status == "error"){
+                    alert('Unable to Delete Shift: ' + JSON.stringify(data));
+                    $('#shiftSubmit').prop('disabled', false);
+
+                }
+
+                $('#shiftDelete').prop('disabled', false);
+            }
+        });
+
+
+    });
+
+
+    $('#shift_repeating').change(function() {
+        $('#shift_repeat_list').toggle();
+        $("#shift_repeat_list option:selected").prop("selected", false);
+    });
+
+    /*
+    *
+    * This function makes an ajax call to the server to get the members for a position
+    * whenever a position is selected in the create shift modal
+    * these members are then used as options to the assigned member select field
+    *
+    */
+    $('#shift_position_id').change(function() {
+        updateUsersForPosition($(this).val(), null);
+    });
+
+    /*
+    *
+    * Makes an ajax call to get users for a position
+    *
+    */
+    function updateUsersForPosition(position, member_id) {
+
+        url = "/organization/" + orgid.toString() + "/position/" + position.toString() + "/users";
+
+        $.ajax({
+            headers: {
+                'Accept': "application/json; charset=utf-8",
+            },
+            type: "GET",
+            url: url,
+
+            success: function(data)
+            {
+                if(data.status == "success"){
+                    $('#shift_assigned_member_id').empty()
+
+                    var html = '<option class="generated" value="0">Unassigned</option>';
+                    $('#shift_assigned_member_id').append(html);
+
+                    for (var i = 0; i < data.members.length; i++) {
+                        var current = data.members[i];
+                        var html = '<option class="generated" value="' + (current.id).toString() + '">' +
+                                    current.first_name + ' ' + current.last_name + '</option>'
+                        $('#shift_assigned_member_id').append(html);
+                    }
+
+                    if (member_id != null) {
+                        console.log('member id not none: ' + member_id)
+                        $('#shift_assigned_member_id').val(member_id.toString());
+                    }
+
+                    $('#shiftSubmit').prop('disabled', false);
+
+                }else if(data.status == "error"){
+                    alert(JSON.stringify(data));
+                }
+            }
+        });
+
+    }
 
     function updateTime(event, delta, revertFunc) {
 

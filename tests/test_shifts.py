@@ -324,7 +324,7 @@ class TestShifts(BaseTest, TestCase):
         for s in shift_list:
             assert s['position_id'] == self.shift.position_id
             assert s['title'] == self.shift.Position.title
-            assert s['assigned_member'] == ''
+            assert s['assigned_member'] == 'Unassigned'
             assert s['assigned_member_id'] == self.shift.assigned_user_id
             assert s['start'] == self.shift.start_time
             assert s['end'] == self.shift.end_time
