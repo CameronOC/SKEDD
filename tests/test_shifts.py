@@ -387,9 +387,22 @@ class TestShifts(BaseTest, TestCase):
         assert 'description' in shift_dict
         assert shift_dict['description'] == ''
 
+    def test_update_shift_time(self):
+        """
+        Tests updating the start and end times of a shift
+        :return:
+        """
+        self.shift.update_time("2016-11-15T09:30:00", "2016-11-15T09:30:00")
+
+        assert self.shift.start_time == "2016-11-15T09:30:00"
+        assert self.shift.end_time == "2016-11-15T09:30:00"
 
 
-
-
-
-
+    def test_delete_shift(self):
+        """
+        Tests deleting a shift
+        :return:
+        """
+        id = self.shift.id
+        org_utils.delete_shift(id)
+        assert Shift.query.get(id) is None
