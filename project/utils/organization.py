@@ -330,7 +330,7 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
                             main_end_time,
                             delta)
 
-                		shifts.append(shift_to_dict(new_shift))
+                        shifts.append(shift_to_dict(new_shift))
 
                 else:
                     delta = timedelta(days=day_difference, weeks=week_ct)
@@ -342,7 +342,7 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
                             main_end_time,
                             delta)
 
-                	shifts.append(shift_to_dict(new_shift))
+                    shifts.append(shift_to_dict(new_shift))
                 	
                 week_ct += 1
 

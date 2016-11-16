@@ -417,21 +417,6 @@ def getassignedpositions(key, key2):
 @owns_organization
 def getpositionsinorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
-
-@main_blueprint.route('/organization/<key>/shifts')
-@login_required
-@owns_organization
-def get_shifts_for_org(key):
-    """
-
-    :param key:
-    :return:
-    """
-    response = Response(response=utils.organization.get_all_shifts_for_org_JSON(key),
-                        status=200,
-                        mimetype="application/json")
-
-    return response
     
 @app.route('/getmembership/<key>/<key2>')
 def get_membership(key, key2):
