@@ -77,6 +77,20 @@ def get_membership(org, user):
     :return:
     """
     return Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
+    
+def get_membership_JSON(org, user):
+    """
+    Checks if a user is in an organization
+    :param organization_id:
+    :param user_id:
+    :return:
+    """
+    membership = Membership.query.filter_by(member_id=user, organization_id=org).first()
+    membership_dict = {'id': membership.id, 'joined': membership.joined, 'is_owner': membership.is_owner,
+                        'is_admin': membership.is_admin, 'member_id': membership.member_id, 
+                        'organization_id': membership.organization_id}
+                            
+    return json.dumps(membership_dict)
 
 
 def confirm_user(user, password=None):
@@ -436,3 +450,8 @@ def get_assigned_positions_for_user(orgid, userid):
                  })
 
     return json.dumps(assigned_list)
+    
+def set_membership_admin(mem_id):
+    membership = Membership.query.filter_by(id=mem_id).first()
+    membership.change_admin()
+    return "success"

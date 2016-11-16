@@ -11,7 +11,7 @@ from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
 from project import app, db, bcrypt
-from decorators import check_confirmed, owns_organization
+from decorators import check_confirmed, owns_organization, admin_of_org
 import utils.organization
 from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position, get_users_for_org_JSON
 import json
@@ -420,4 +420,18 @@ def get_shifts_for_org(key):
                         status=200,
                         mimetype="application/json")
 
+    return response
+    
+@app.route('/getmembership/<key>/<key2>')
+def get_membership(key, key2):
+    response = Response(response=utils.organization.get_membership_JSON(key, key2),
+                        status=200,
+                        mimetype="application/json")
+    return response
+    
+@app.route('/setadmin/<key>', methods=['POST'])
+@owns_organization
+def set_admin_privileges(key):
+    response = Response(response=utils.organization.set_membership_admin(key),
+                        status=200)
     return response

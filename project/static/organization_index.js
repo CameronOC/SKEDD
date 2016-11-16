@@ -124,7 +124,16 @@ var app = function() {
         $('#memberDetailLastName').html(member.last_name);
         $('#memberDetailEmail').html(member.email);
         $('#memberDetailId').html(member.id);
-
+        
+        $.getJSON('/getmembership/' + orgid + '/' + member.id)
+            .then(function(response){
+                APP.vue.curr_membership_id = response.id;
+                APP.vue.curr_membership_admin = response.is_admin;
+                console.log(APP.vue.curr_membership_id.toString());
+                console.log(APP.vue.curr_membership_admin.toString());
+                $('#memberDetailAdmin').html(response.is_admin);
+            });
+            
         APP.vue.userid = member.id;
         //console.log(member.id);
 
@@ -149,6 +158,18 @@ var app = function() {
             });
     }
 
+    self.set_admin = function(){
+
+        console.log("set_admin called")
+
+        var mid = APP.vue.curr_membership_id;
+
+        url = '/setadmin/' + mid.toString()
+
+        $.post(url);
+    }
+
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -159,17 +180,20 @@ var app = function() {
             positions: [],
             assignedpositions: [],
             orgid: orgid,
-            userid: -1
+            userid: -1,
+            curr_membership_id: 0,
+            curr_membership_admin: false
         },
         methods: {
             get_users: self.get_users,
             adduser: self.adduser,
             get_positions: self.get_positions,
             addposition: self.addposition,
-            member_detail: self.memberDetail,
+            member_detail: self.memberDetail, // why do these have different names (member_detail, memberDetail)
             get_assigned_positions: self.get_assigned_positions,
             addassignedposition: self.addassignedposition,
-            unassign_position: self.unassign_position
+            unassign_position: self.unassign_position,
+            set_admin: self.set_admin
         }
 
     });
