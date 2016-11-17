@@ -324,4 +324,26 @@ $(document).ready(function() {
         //$('#memberDetailModal').modal('hide');
     });
 
+    $('#DeletePositionFromOrg').on('click', function() {
+        console.log("DeletePositionFromOrg pressed")
+
+        var posid = APP.vue.posid;
+        console.log(posid);
+        
+        url = "/deleteposition/" + posid.toString()
+
+        $.ajax({
+            type: "POST",
+            url: url,
+
+            success: function()
+            {
+                console.log("success")
+            }
+        });
+
+        APP.get_positions();
+        //$('#memberDetailModal').modal('hide');
+    });
+
 });

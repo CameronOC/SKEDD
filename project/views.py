@@ -448,20 +448,16 @@ def unassignpos():
     return render_template('main/position.html', position=mypos, organization=org)
 
 
-@app.route('/deleteposition', methods=['POST'])
+@app.route('/deleteposition/<key>', methods=['POST'])
 @login_required
 @check_confirmed
-def deleteposition():
+def deleteposition(key):
     """
 
     :return:
     """
-    pos = Position.query.filter_by(id=request.form["deleteposid"]).first_or_404()
-    org = Organization.query.filter_by(id=request.form["org"]).first_or_404()
-
-    deletepositions(pos, org)
-
-    return render_template('main/organization.html', organization=org)
+    deletepositions(key)
+    return "success"
 
 @app.route('/getusersinorg/<key>')
 @login_required

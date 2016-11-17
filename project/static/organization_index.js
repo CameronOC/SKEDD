@@ -140,6 +140,8 @@ var app = function() {
         $('#positionDetailDescription').html(position.desciption);
         $('#positionDetailId').html(position.id);
 
+        APP.vue.posid = position.id;
+
         //APP.vue.posid = position.id;
         //console.log(member.id);
         //self.get_assigned_positions(index);
@@ -173,7 +175,8 @@ var app = function() {
             positions: [],
             assignedpositions: [],
             orgid: orgid,
-            userid: -1
+            userid: -1,
+            posid: -1
         },
         methods: {
             get_users: self.get_users,

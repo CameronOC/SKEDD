@@ -466,11 +466,10 @@ def get_positions_for_org_JSON(org_id):
     return json.dumps(positions_list)
 
 #used in views.deletepositions
-def deletepositions(posid, orgid):
-    pos = posid
-    org = orgid
+def deletepositions(posid):
+    position = Position.query.filter_by(id=posid).first()
     #remove the position from the org
-    db.session.delete(pos)
+    db.session.delete(position)
     db.session.commit()
 
 
