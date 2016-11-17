@@ -39,10 +39,10 @@ $(document).ready(function() {
                 $('#shiftSubmit').prop('disabled', true);
                 $('#shiftDelete').show();
                 $('#createMultipleShifts').hide();
-                showAdminShiftsModal(event);
+                showAdminShiftModal(event);
 
             } else {
-                $('#shiftMemberModal').modal('show');
+                showMemberShiftModal(event);
             }
 
 
@@ -91,12 +91,16 @@ $(document).ready(function() {
         $('#errorBody').html('');
     });
 
+    $('#shiftMemberModal').on('hidden.bs.modal', function(){
+        $('#shiftMemberModal span').html('');
+    });
+
     $('#shiftModal, #CreatePositionModal, #inviteMemberModal').on('hidden.bs.modal', function(){
         $(this).find("input,textarea").val('').end();
     });
 
 
-    function showAdminShiftsModal(shift) {
+    function showAdminShiftModal(shift) {
         $('#shift_start_time').val(shift.start.toISOString());
         $('#shift_end_time').val(shift.end.toISOString());
         $('#shift_id').val(shift.id);
@@ -104,6 +108,17 @@ $(document).ready(function() {
         updateUsersForPosition(shift.position_id, shift.assigned_member_id);
         $('#shift_description').val(shift.description);
         $('#shiftModal').modal('show');
+    }
+
+    function showMemberShiftModal(shift) {
+        console.log(shift.title);
+        $('#shiftMemberTitle').html(shift.title);
+        $('#assignedTo').html(shift.assigned_member);
+        $('#description').html(shift.description);
+        $('#startTime').html(shift.start.format('hh:mm a'));
+        $('#endTime').html(shift.end.format('hh:mm a'));
+        $('#shiftMemberModal').modal('show');
+
     }
 
 
