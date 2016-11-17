@@ -91,16 +91,18 @@ def organization(key):
     :return:
     """
     org = utils.organization.get_organization(key)
+    membership = utils.organization.get_membership(org, g.user)
     return render_template('main/organization.html',
                            organization=org,
                            form=InviteForm(),
                            form1=PositionForm(),
-                           shift_form=ShiftForm())
+                           shift_form=ShiftForm(),
+                           membership=membership)
 
 
 @main_blueprint.route('/organization/<int:key>/shifts')
 @login_required
-@owns_organization
+@organization_member
 def get_shifts_for_org(key):
     """
     Gets all shifts for an organization
@@ -126,8 +128,6 @@ def create_shift(key):
     :param key:
     :return:
     """
-
-
     form = ShiftForm(request.form)
     return_dict = {}
     shift_assigned_member_id = None
@@ -135,7 +135,7 @@ def create_shift(key):
     if form.validate_on_submit():
 
         return_dict = utils.utils.validate_member_position_id(request.form,
-                                                                     pos_required=True)
+                                                              pos_required=True)
         if 'status' in return_dict:
             return Response(response=json.dumps(return_dict),
                             status=200,
@@ -170,7 +170,7 @@ def create_shift(key):
     return response
 
 
-@main_blueprint.route('/organization/<int:key>/shift/<int:key1>/time', methods=['POST',])
+@main_blueprint.route('/organization/<int:key>/shift/<int:key1>/time', methods=['POST', ])
 @login_required
 @check_confirmed
 @owns_organization
@@ -188,7 +188,7 @@ def update_shift_time(key, key1):
 
     shift = Shift.query.get(key1)
     shift.update(start_time=start_time, end_time=end_time)
-    response_dict = json.dumps({'status': 'success', 'shift': utils.organization.shift_to_dict(shift)})
+    response_dict = json.dumps({'status': 'success', 'shift': utils.utils.shift_to_dict(shift)})
 
     response = Response(response=json.dumps(response_dict),
                         status=200,
@@ -197,7 +197,7 @@ def update_shift_time(key, key1):
     return response
 
 
-@main_blueprint.route('/organization/<int:key>/shift/<int:key1>/delete', methods=['DELETE',])
+@main_blueprint.route('/organization/<int:key>/shift/<int:key1>/delete', methods=['DELETE', ])
 @login_required
 @check_confirmed
 @owns_organization
@@ -261,7 +261,7 @@ def update_shift(key, key1):
                              description=form.shift_description.data)
         response_dict['status'] = 'success'
         response_dict['message'] = 'Shift succesfully updated'
-        response_dict['shift'] = utils.organization.shift_to_dict(shift)
+        response_dict['shift'] = utils.utils.shift_to_dict(shift)
     else:
         response_dict['status'] = "error"
         errors_dict = utils.utils.shift_form_errors_to_dict(request.form)
@@ -452,7 +452,7 @@ def unassign(key1, key2):
 
 @app.route('/getusersinorg/<key>')
 @login_required
-@owns_organization
+@organization_member
 def getusersinorg(key):
     response = Response(response=utils.organization.get_users_for_org_JSON(key),
                         status=200,
@@ -469,7 +469,7 @@ def getassignedpositions(key, key2):
 
 @app.route('/getpositionsinorg/<key>')
 @login_required
-@owns_organization
+@organization_member
 def getpositionsinorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
     

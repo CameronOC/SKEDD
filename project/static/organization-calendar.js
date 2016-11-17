@@ -12,6 +12,10 @@ $(document).ready(function() {
     firstHour.subtract(time);
     firstHour = firstHour.format("HH:00:00")
 
+    if (isAdmin == false) {
+        $('#shiftModal .modal-footer').html('<button type="button" class="btn btn-default" id="errorBack" data-dismiss="modal">Back</button>')
+    }
+
     $('#calendar').fullCalendar({
         header: {
             left: 'prev,next today',
@@ -22,8 +26,8 @@ $(document).ready(function() {
         defaultView: 'agendaWeek',
         scrollTime: firstHour,
         allDaySlot: false,
-        editable: true,
-        selectable: true,
+        editable: isAdmin,
+        selectable: isAdmin,
         selectHelper: true,
         events: "/organization/" + orgid.toString() + "/shifts",
         eventRender: function(event, element) {
@@ -101,13 +105,19 @@ $(document).ready(function() {
     *
     */
 
+
     function createSuccess() {
         $('#calendar').fullCalendar( 'removeEvents', 0);
         $('#calendar').fullCalendar( 'refetchEvents' );
         $('#shiftModal').modal('hide');
     }
 
-
+    /*
+    *
+    * Code to update the rendered shift representation if an
+    * update shift ajax call is succesfully made
+    *
+    */
     function updateSuccess(shift) {
         var tempId = parseInt($('#shift_id').val());
 
@@ -128,7 +138,13 @@ $(document).ready(function() {
         $('#shiftModal').modal('hide');
     }
 
-
+    /*
+    *
+    * Creates or Updates a shift with an ajax call
+    * depending on whether the shift had just been created
+    * or was being edited
+    *
+    */
     $('#shiftSubmit').on('click', function() {
         $('#shiftSubmit').prop('disabled', true);
 
@@ -169,6 +185,12 @@ $(document).ready(function() {
 
     });
 
+    /*
+    *
+    * If shift creation is cancelled, the temporary shift that is created
+    * by dragging on the calender needs to be deleted
+    *
+    */
     $('#shiftCancel').on('click', function() {
         if (create) {
             $('#calendar').fullCalendar( 'removeEvents', 0);
@@ -177,6 +199,11 @@ $(document).ready(function() {
         $('#shiftModal').modal('hide');
     });
 
+    /*
+    *
+    * Makes an ajax call to delete a shift
+    *
+    */
     $('#shiftDelete').on('click', function() {
 
         var tempId = $('#shift_id').val();
@@ -213,7 +240,12 @@ $(document).ready(function() {
 
     });
 
-
+    /*
+    *
+    * Whenever the create multiple toggle is changed, the week selector
+    * toggles and the is cleared
+    *
+    */
     $('#shift_repeating').change(function() {
         $('#shift_repeat_list').toggle();
         $("#shift_repeat_list option:selected").prop("selected", false);
@@ -276,6 +308,11 @@ $(document).ready(function() {
 
     }
 
+    /*
+    *
+    * Makes an ajax call to update the start and end times of a shift
+    *
+    */
     function updateTime(event, delta, revertFunc) {
 
         url = "/organization/" + orgid.toString() + "/shift/" + (event.id).toString() + "/time";

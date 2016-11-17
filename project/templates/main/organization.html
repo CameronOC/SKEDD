@@ -56,6 +56,12 @@
             }
 
         </style>
+        {% if membership.is_owner %}
+            <script>var isAdmin = true;</script>
+        {% else %}
+            <script>var isAdmin = false;</script>
+        {% endif %}
+
 
     </head>
 
@@ -76,8 +82,10 @@
         </div>
 
         <div id="vue-div">
+            {% if membership.is_owner %}
+                {% include "drawer.html" %}
+            {% endif %}
             {% include "modals.html" %}
-            {% include "drawer.html" %}
         </div>
 
         <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
