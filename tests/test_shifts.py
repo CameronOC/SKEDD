@@ -318,6 +318,8 @@ class TestShifts(BaseTest, TestCase):
         shifts = org_utils.get_all_shifts_for_org_JSON(org_id=1) #string
         shift_list = json.loads(shifts) # dictionary of dictionaries
 
+        print shift_list
+
         assert shifts is not None
         assert shift_list is not None
         assert len(shift_list) == 1
@@ -347,7 +349,7 @@ class TestShifts(BaseTest, TestCase):
             assert s['description'] == self.shift.description
             assert s['id'] == self.shift.id
         
-        shift.update(assigned_user_id=None)
+        shift.update(assigned_user_id=0)
         shift = org_utils.get_shift(1)
         assert shift.assigned_user_id == None
 
@@ -370,7 +372,7 @@ class TestShifts(BaseTest, TestCase):
         assert shift_dict['assigned_member_id'] == 0
 
         assert 'assigned_member' in shift_dict
-        assert shift_dict['assigned_member'] == ''
+        assert shift_dict['assigned_member'] == 'Unassigned'
 
         assert 'position_id' in shift_dict
         assert shift_dict['position_id'] == self.position.id
