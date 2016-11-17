@@ -14,7 +14,9 @@ $(document).ready(function() {
         selectHelper: true,
 
         select: function(start, end, allDay) {
-            var newEventData = {from: start.format('dddd, hh:mm a'), to: end.format('dddd, hh:mm a'), id: timeId};
+            var newEventData = {from_day: start.format('dddd'), from_time: start.format('HH:mm'), 
+                                to_day: end.format('dddd'), to_time: end.format('HH:mm'), 
+                                id: timeId};
             var newEvent = {
                 start: start,
                 end: end,
@@ -26,21 +28,16 @@ $(document).ready(function() {
             
             var newEventDataString = JSON.stringify(newEventData);
 
-            alert(newEventDataString);
-
-
+            console.log(newEventDataString);
+            console.log(newEvent);
+ 
             $.ajax({
-                url: "/profile",
+                url: "/updatepreferences",
                 type: "POST",
-                data: {
-                newEventDataString
-                },
-                dataType: "json",
+                data: newEventDataString,
+                dataType: 'json',
                 success: function(data) {
-                    alert("Data: " + newEventDataString);
-                },
-                error: function(data){
-                    alert("Shit Failed:  " + newEventDataString);
+                    alert("Totes worked: " + newEventDataString);
                 }
             });
 

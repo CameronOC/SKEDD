@@ -86,8 +86,6 @@ def logout():
 @login_required
 @check_confirmed
 def profile():
-
-    
     form = ChangePasswordForm(request.form)
     if form.validate_on_submit():
         user = User.query.filter_by(email=current_user.email).first()
@@ -100,6 +98,13 @@ def profile():
             flash('Password change was unsuccessful.', 'danger')
             return redirect(url_for('user.profile'))
     return render_template('user/profile.html', form=form)
+
+@user_blueprint.route('/updatepreferences', methods=['GET', 'POST'])
+@login_required
+def updatepreferences():
+    pref_form = request.form
+    print(request.form)
+    return 'success'
 
 @user_blueprint.route('/confirm/<token>')
 def confirm_email(token):
