@@ -12,9 +12,6 @@ $(document).ready(function() {
     firstHour.subtract(time);
     firstHour = firstHour.format("HH:00:00")
 
-    if (isAdmin == false) {
-        $('#shiftModal .modal-footer').html('<button type="button" class="btn btn-default" id="errorBack" data-dismiss="modal">Back</button>')
-    }
 
     $('#calendar').fullCalendar({
         header: {
@@ -35,21 +32,20 @@ $(document).ready(function() {
         },
         eventClick:  function(event, jsEvent, view) {
             create = false;
-            $('#shift_start_time').val(event.start.toISOString());
-            $('#shift_end_time').val(event.end.toISOString());
-            $('#shift_id').val(event.id);
-            $('#shiftSubmit').prop('disabled', true);
-            $('#shiftDelete').show();
 
-            $('#shift_position_id').val(event.position_id)
-            updateUsersForPosition(event.position_id, event.assigned_member_id);
 
-            console.log(event.description);
-            $('#shift_description').val(event.description);
 
-            $('#createMultipleShifts').hide();
+            if (isAdmin) {
+                $('#shiftSubmit').prop('disabled', true);
+                $('#shiftDelete').show();
+                $('#createMultipleShifts').hide();
+                showAdminShiftsModal(event);
 
-            $('#shiftModal').modal('show');
+            } else {
+                $('#shiftMemberModal').modal('show');
+            }
+
+
         },
         select: function(start, end, allDay) {
 
@@ -57,18 +53,16 @@ $(document).ready(function() {
                 start: start,
                 end: end,
                 id: 0,
+                position_id: 0,
+                description: '',
             };
             create = true;
+
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
-            $('#shift_start_time').val(start.toISOString());
-            $('#shift_end_time').val(end.toISOString());
-            $('#shift_id').val('0');
             $('#shiftSubmit').prop('disabled', true);
             $('#shiftDelete').hide();
-
             $('#createMultipleShifts').show();
-
-            $('#shiftModal').modal('show');
+            showAdminShiftsModal(newEvent);
 
         },
         eventResize: function(event, delta, revertFunc) {
@@ -88,22 +82,29 @@ $(document).ready(function() {
     };
 
 
-
-
-    $('.modal').on('hidden.bs.modal', function(){
-        $(this).find("input,textarea").val('').end();
+    $('#shiftModal').on('hidden.bs.modal', function(){
         $('#shift_assigned_member_id').empty();
         $('#shift_position_id').val('0');
         $("#shift_repeat_list option:selected").prop("selected", false);
         $('#shift_repeating').prop('checked', false);
         $('#shift_repeat_list').hide();
+        $('#errorBody').html('');
     });
 
-    /*
-    *
-    * Shifts Code
-    *
-    */
+    $('#shiftModal, #CreatePositionModal, #inviteMemberModal').on('hidden.bs.modal', function(){
+        $(this).find("input,textarea").val('').end();
+    });
+
+
+    function showAdminShiftsModal(shift) {
+        $('#shift_start_time').val(shift.start.toISOString());
+        $('#shift_end_time').val(shift.end.toISOString());
+        $('#shift_id').val(shift.id);
+        $('#shift_position_id').val(shift.position_id)
+        updateUsersForPosition(shift.position_id, shift.assigned_member_id);
+        $('#shift_description').val(shift.description);
+        $('#shiftModal').modal('show');
+    }
 
 
     function createSuccess() {
@@ -157,7 +158,7 @@ $(document).ready(function() {
 
         $.ajax({
             headers: {
-                'Accept': "application/json; charset=utf-8",
+                'Accept': "application/json",
             },
             type: "POST",
             url: url,
@@ -165,7 +166,7 @@ $(document).ready(function() {
 
             success: function(data)
             {
-
+                console.log(JSON.stringify(data));
                 if(data.status == "success"){
 
                     if (create) {
@@ -214,7 +215,7 @@ $(document).ready(function() {
 
         $.ajax({
             headers: {
-                'Accept': "application/json; charset=utf-8",
+                'Accept': "application/json",
             },
             type: "DELETE",
             url: url,
@@ -273,7 +274,7 @@ $(document).ready(function() {
 
         $.ajax({
             headers: {
-                'Accept': "application/json; charset=utf-8",
+                'Accept': "application/json",
             },
             type: "GET",
             url: url,
@@ -322,7 +323,7 @@ $(document).ready(function() {
 
         $.ajax({
             headers: {
-                'Accept': "application/json; charset=utf-8",
+                'Accept': "application/json",
             },
             type: "POST",
             dataType: 'json',
@@ -420,7 +421,7 @@ $(document).ready(function() {
 
         $.ajax({
             headers: {
-                'Accept': "application/json; charset=utf-8",
+                'Accept': "application/json",
             },
             type: "POST",
             url: url,
@@ -444,7 +445,7 @@ $(document).ready(function() {
 
     function showErrorModal(message, errors) {
         if (message != null) {
-            var html = '<p>' + data.message.toString() + '<p>';
+            var html = '<p>' + message.toString() + '<p>';
             $('#errorBody').append(html);
         }
         if (errors != null) {
