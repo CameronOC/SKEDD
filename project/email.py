@@ -11,7 +11,8 @@ from project import app, mail
 def send_email(to, subject, template):
     sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
     from_email = Email("skedd.mail@gmail.com")
-    mail = Mail(from_email, subject, to, template)
+    to_email = Email("cjplanes@gmail.com")
+    mail = Mail(from_email, subject, to_email, template)
     response = sg.client.mail.send.post(request_body=mail.get())
     print(response.status_code)
     #msg = Message(
