@@ -1,4 +1,5 @@
 from project.models import Membership, Shift
+from random import randint
 
 def merge_dicts(*dict_args):
     """
@@ -136,3 +137,36 @@ def shift_to_dict(shift):
         shift_dict['assigned_member'] = 'Unassigned'
 
     return shift_dict
+
+
+def rgb_to_hex(red, green, blue):
+    """Return color as #rrggbb for the given color values."""
+    return '#%02x%02x%02x' % (red, green, blue)
+
+
+def random_color():
+    """
+    Generates a random, but aesthetically pleasing color
+    :return:
+    """
+    red_mix = 255
+    green_mix = 255
+    blue_mix = 255
+
+    red = (randint(0,255) + red_mix) / 2
+    green = (randint(0,255) + green_mix) / 2
+    blue = (randint(0,255) + blue_mix) / 2
+
+    return rgb_to_hex(red, green, blue)
+
+
+
+
+
+
+
+
+
+
+
+
