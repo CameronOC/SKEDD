@@ -11,9 +11,10 @@ from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
 from project import app, db, bcrypt
-from decorators import check_confirmed, owns_organization, organization_member, admin_of_org
+from decorators import check_confirmed, owns_organization, organization_member, admin_of_org, shift_belongs_to_org
 import utils.organization
-from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position, get_users_for_org_JSON
+import utils.utils
+from utils.organization import assign_member_to_position, unassign_member_to_position
 import json
 
 ################
@@ -97,7 +98,7 @@ def organization(key):
                            shift_form=ShiftForm())
 
 
-@main_blueprint.route('/organization/<key>/shifts')
+@main_blueprint.route('/organization/<int:key>/shifts')
 @login_required
 @owns_organization
 def get_shifts_for_org(key):
@@ -113,7 +114,7 @@ def get_shifts_for_org(key):
     return response
 
 
-@main_blueprint.route('/organization/<key>/shift/create', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<int:key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 #@owns_organization
@@ -130,11 +131,23 @@ def create_shift(key):
 
     form = ShiftForm(request.form)
     return_dict = {}
+    shift_assigned_member_id = None
 
     if form.validate_on_submit():
 
-        shifts = utils.organization.create_shifts_form(int(request.form['shift_position_id']),
-                                                       int(request.form['shift_assigned_member_id']),
+        return_dict = utils.organization.validate_member_position_id(request.form,
+                                                                     pos_required=True)
+        if 'status' in return_dict:
+            return Response(response=json.dumps(return_dict),
+                            status=200,
+                            mimetype="application/json")
+
+        shift_position_id = int(request.form['shift_position_id'])
+        if 'shift_assigned_member_id' in request.form:
+            shift_assigned_member_id = request.form['shift_assigned_member_id']
+
+        shifts = utils.organization.create_shifts_form(shift_position_id,
+                                                       shift_assigned_member_id,
                                                        form.shift_start_time.data,
                                                        form.shift_end_time.data,
                                                        form.shift_description.data,
@@ -144,34 +157,13 @@ def create_shift(key):
         return_dict['status'] = "success"
     else:
         return_dict['status'] = "error"
-        errors_dict = {
-            'shift_description': [],
-            'shift_repeating': [],
-            'shift_repeat_list': [],
-            'shift_start_time': [],
-            'shift_end_time': [],
-            'shift_id': []
-        }
+        errors_dict = utils.organization.shift_form_errors_to_dict(request.form)
 
-        for error in form.shift_description.errors:
-            errors_dict['shift_description'].append(error)
-
-        for error in form.shift_repeating.errors:
-            errors_dict['shift_repeating'].append(error)
-
-        for error in form.shift_repeat_list.errors:
-            errors_dict['shift_repeat_list'].append(error)
-
-        for error in form.shift_start_time.errors:
-            errors_dict['shift_start_time'].append(error)
-
-        for error in form.shift_end_time.errors:
-            errors_dict['shift_end_time'].append(error)
-
-        for error in form.shift_id.errors:
-            errors_dict['shift_id'].append(error)
-
+        manual_validation = utils.organization.shift_form_errors_to_dict(form)
+        if 'status' in manual_validation:
+            errors_dict = utils.utils.merge_dicts(manual_validation['errors'], errors_dict)
         return_dict['errors'] = errors_dict
+
     response = Response(response=json.dumps(return_dict),
                     status=200,
                     mimetype="application/json")
@@ -179,10 +171,11 @@ def create_shift(key):
     return response
 
 
-@main_blueprint.route('/organization/<key>/shift/<key1>/time', methods=['POST',])
+@main_blueprint.route('/organization/<int:key>/shift/<int:key1>/time', methods=['POST',])
 @login_required
 @check_confirmed
 @owns_organization
+@shift_belongs_to_org
 def update_shift_time(key, key1):
     """
     updates the shift start and end time
@@ -190,8 +183,12 @@ def update_shift_time(key, key1):
     :param key1:
     :return:
     """
+
+    start_time = request.form['start']
+    end_time = request.form['end']
+
     shift = Shift.query.get(key1)
-    shift.update_time(request.form['start'], request.form['end'])
+    shift.update(start_time=start_time, end_time=end_time)
     response_dict = json.dumps({'status': 'success', 'shift': utils.organization.shift_to_dict(shift)})
 
     response = Response(response=json.dumps(response_dict),
@@ -200,10 +197,11 @@ def update_shift_time(key, key1):
 
     return response
 
-@main_blueprint.route('/organization/<key>/shift/<key1>/delete', methods=['DELETE',])
+@main_blueprint.route('/organization/<int:key>/shift/<int:key1>/delete', methods=['DELETE',])
 @login_required
 @check_confirmed
 @owns_organization
+@shift_belongs_to_org
 def delete_shift(key, key1):
     """
     Deletes a shift
@@ -215,7 +213,7 @@ def delete_shift(key, key1):
 
     response_dict = {
         'status': 'success',
-        'message': 'Shift with id ' + key1 + ' successfully deleted',
+        'message': 'Shift with id ' + str(key1) + ' successfully deleted',
     }
 
     response = Response(response=json.dumps(response_dict),
@@ -229,6 +227,7 @@ def delete_shift(key, key1):
 @login_required
 @check_confirmed
 @owns_organization
+@shift_belongs_to_org
 def update_shift(key, key1):
     """
     Updates an existing shift.
@@ -240,11 +239,24 @@ def update_shift(key, key1):
     shift = utils.organization.get_shift(key1)
     form = ShiftForm(request.form)
     response_dict = {}
+    shift_position_id = None
+    shift_assigned_member_id = None
 
     if form.validate_on_submit():
+
+        return_dict = utils.organization.validate_member_position_id(request.form)
+        if 'status' in return_dict:
+            return Response(response=json.dumps(return_dict),
+                            status=200,
+                            mimetype="application/json")
+
+        if 'shift_position_id' in request.form:
+            shift_position_id = int(request.form['shift_position_id'])
+        if 'shift_assigned_member_id' in request.form:
+            shift_assigned_member_id = request.form['shift_assigned_member_id']
         
-        shift = shift.update(position_id=int(request.form['shift_position_id']),
-                             assigned_user_id=int(request.form['shift_assigned_member_id']),
+        shift = shift.update(position_id=shift_position_id,
+                             assigned_user_id=shift_assigned_member_id,
                              start_time=form.shift_start_time.data,
                              end_time=form.shift_end_time.data,
                              description=form.shift_description.data)
@@ -252,8 +264,13 @@ def update_shift(key, key1):
         response_dict['message'] = 'Shift succesfully updated'
         response_dict['shift'] = utils.organization.shift_to_dict(shift)
     else:
-        response_dict['status'] = 'error'
-        response_dict['message'] = 'unable to update shift'
+        response_dict['status'] = "error"
+        errors_dict = utils.organization.shift_form_errors_to_dict(request.form)
+
+        manual_validation = utils.organization.shift_form_errors_to_dict(form)
+        if 'status' in manual_validation:
+            errors_dict = utils.utils.merge_dicts(manual_validation['errors'], errors_dict)
+            response_dict['errors'] = errors_dict
 
     return Response(response=json.dumps(response_dict),
                     status=200,

@@ -159,7 +159,7 @@ $(document).ready(function() {
                     }
 
                 }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
+                    showErrorModal(data.message, data.errors)
                     $('#shiftSubmit').prop('disabled', false);
                 }
             }
@@ -201,7 +201,7 @@ $(document).ready(function() {
                     $('#shiftModal').modal('hide');
 
                 }else if(data.status == "error"){
-                    alert('Unable to Delete Shift: ' + JSON.stringify(data));
+                    showErrorModal(data.message, data.errors)
                     $('#shiftSubmit').prop('disabled', false);
 
                 }
@@ -269,7 +269,7 @@ $(document).ready(function() {
                     $('#shiftSubmit').prop('disabled', false);
 
                 }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
+                    showErrorModal(data.message, data.errors)
                 }
             }
         });
@@ -300,7 +300,7 @@ $(document).ready(function() {
 
 
                 }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
+                    showErrorModal(data.message, data.errors)
                     revertFunc();
                 }
 
@@ -396,23 +396,7 @@ $(document).ready(function() {
                     APP.adduser(newUser);
                     $('#inviteMemberModal').modal('hide');
                 }else if(data.status == "error"){
-                    console.log(JSON.stringify(data));
-                    if ('message' in data) {
-                        var html = '<p>' + data.message.toString() + '<p>';
-                        $('#errorBody').append(html);
-                    }
-                    if ('errors' in data) {
-                        for (var key in data.errors) {
-                            var value = data.errors[key];
-                            var html = '<p>' + key.toString() + ': ' + value.toString() + '<p>';
-                            $('#errorBody').append(html);
-                        }
-
-                    }
-
-
-                    // $('#errorBody').html(JSON.stringify(data.errors));
-                    $('#errorModal').modal('show');
+                    showErrorModal(data.message, data.errors)
                 }
             }
         });
@@ -421,6 +405,22 @@ $(document).ready(function() {
 
     });
 
+    function showErrorModal(message, errors) {
+        if (message != null) {
+            var html = '<p>' + data.message.toString() + '<p>';
+            $('#errorBody').append(html);
+        }
+        if (errors != null) {
+            for (var key in data.errors) {
+                var value = data.errors[key];
+                var html = '<p>' + key.toString() + ': ' + value.toString() + '<p>';
+                $('#errorBody').append(html);
+            }
 
+        }
+
+        $('#errorModal').modal('show');
+
+    }
 
 });

@@ -200,7 +200,7 @@ def invite_member(org, email, first_name, last_name):
     send_email(user.email, subject, html)
 
     return_dict['status'] = 'success'
-    return_dict['message'] = 'You succesfully invited ' + user.first_name + ' ' + user.last_name + '.'
+    return_dict['message'] = 'You succesfully invited ' + str(user.first_name) + ' ' + str(user.last_name) + '.'
     return_dict['membership'] = membership_to_dict(membership)
     return return_dict
 
@@ -219,6 +219,63 @@ def confirm_invite(membership):
     flash('You have now joined ' + membership.organization.name, 'success')
     return membership
 
+
+def validate_member_position_id(form, pos_required=False):
+    """
+    validates the member and position ID's from the shift form
+    :param form:
+    :param pos_required:
+    :return:
+    """
+    return_dict = {}
+    if 'shift_position_id' in form:
+        if not form['shift_position_id'].isdigit():
+            return_dict['status'] = "error"
+            return_dict['errors'] = {'Invalid Position id: ': form['shift_position_id']}
+    elif pos_required:
+        return_dict['status'] = "error"
+        return_dict['message'] = 'No Position Selected'
+
+    if 'shift_assigned_member_id' in form:
+        if not form['shift_assigned_member_id'].isdigit():
+            return_dict['status'] = "error"
+            return_dict['errors'] = {'Invalid Member id: ': form['shift_assigned_member_id']}
+
+    return return_dict
+
+def shift_form_errors_to_dict(form):
+    """
+    converts the errors from a shift form into a dict
+    :param form:
+    :return:
+    """
+    errors_dict = {
+        'Description': [],
+        'Create Multiple Checkbox': [],
+        'Day Selector': [],
+        'Start Time': [],
+        'End Time': [],
+        'Shift Id': []
+    }
+    for error in form.shift_description.errors:
+        errors_dict['Description'].append(error)
+
+    for error in form.shift_repeating.errors:
+        errors_dict['Create Multiple Checkbox'].append(error)
+
+    for error in form.shift_repeat_list.errors:
+        errors_dict['Day Selector'].append(error)
+
+    for error in form.shift_start_time.errors:
+        errors_dict['Start Time'].append(error)
+
+    for error in form.shift_end_time.errors:
+        errors_dict['End Time'].append(error)
+
+    for error in form.shift_id.errors:
+        errors_dict['Shift Id'].append(error)
+
+    return errors_dict
 
 def create_shift(pos_key, assigned_user_id, start_time, end_time, description):
     """
