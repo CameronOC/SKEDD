@@ -122,6 +122,27 @@ def membership_from_key_token(key, token):
     membership = user.memberships.filter_by(organization_id=org.id).first()
     return membership
 
+
+def membership_to_dict(membership):
+    """
+    Converts a membership object to a dictionary
+    :param membership:
+    :return:
+    """
+    if membership is None or not isinstance(membership, Membership):
+        return None
+
+    membership_dict = {
+        'id': membership.id,
+        'member_id': membership.member_id,
+        'organization_id': membership.organization_id,
+        'is_owner': membership.is_owner,
+        'is_admin': membership.is_admin,
+        'joined': membership.joined,
+    }
+
+    return membership_dict
+
 def create_position(org, title):
     """
     Creates a position given a organization and a position title/name
@@ -180,6 +201,7 @@ def invite_member(org, email, first_name, last_name):
 
     return_dict['status'] = 'success'
     return_dict['message'] = 'You succesfully invited ' + user.first_name + ' ' + user.last_name + '.'
+    return_dict['membership'] = membership_to_dict(membership)
     return return_dict
 
 

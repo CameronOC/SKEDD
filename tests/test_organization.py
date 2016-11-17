@@ -63,26 +63,23 @@ class TestOrganization(BaseTest, TestCase):
         created an account
         :return:
         """
-        membership = org_utils.invite_member(self.organization, 'invitee@org.com', 'Alice', 'Green')
+        response_dict = org_utils.invite_member(self.organization, 'invitee@org.com', 'Alice', 'Green')
+        assert 'status' in response_dict
+        assert response_dict['status'] == 'success'
 
-        assert membership is not None
+        assert 'membership' in response_dict
+        membership_dict = response_dict['membership']
 
-        user = membership.member
-        org = membership.organization
-
+        user = User.query.filter_by(email='invitee@org.com').first()
         assert user is not None
-        assert org is not None
 
-        assert membership.joined == False
+        assert 'member_id' in membership_dict
+        assert 'organization_id' in membership_dict
 
-        assert user.email == 'invitee@org.com'
-        assert user.first_name == 'Alice'
-        assert user.last_name == 'Green'
-        assert user.confirmed == False
+        assert membership_dict['joined'] == False
 
-        assert org.id == self.organization.id
-        assert org.name == self.organization.name
-        assert org.owner_id == self.organization.owner_id
+        assert membership_dict['organization_id'] == self.organization.id
+        assert membership_dict['member_id'] == user.id
 
     def test_invite_confirmed_user(self):
         """
@@ -97,26 +94,24 @@ class TestOrganization(BaseTest, TestCase):
         db.session.add(confirmed_user)
         db.session.commit()
 
-        membership = org_utils.invite_member(self.organization, 'confirmed@user.com', 'John', 'Doe')
+        response_dict = org_utils.invite_member(self.organization, 'confirmed@user.com', 'John', 'Doe')
+        assert 'status' in response_dict
+        assert response_dict['status'] == 'success'
 
-        assert membership is not None
+        assert 'membership' in response_dict
+        membership_dict = response_dict['membership']
 
-        user = membership.member
-        org = membership.organization
-
+        user = User.query.filter_by(email='confirmed@user.com').first()
         assert user is not None
-        assert org is not None
 
-        assert membership.joined == False
+        assert 'member_id' in membership_dict
+        assert 'organization_id' in membership_dict
 
-        assert user.email == 'confirmed@user.com'
-        assert user.first_name == 'John'
-        assert user.last_name == 'Doe'
-        assert user.confirmed == True
+        assert membership_dict['joined'] == False
 
-        assert org.id == self.organization.id
-        assert org.name == self.organization.name
-        assert org.owner_id == self.organization.owner_id
+        assert membership_dict['organization_id'] == self.organization.id
+        assert membership_dict['member_id'] == user.id
+
 
     def test_invite_joined_user(self):
         """
@@ -125,16 +120,13 @@ class TestOrganization(BaseTest, TestCase):
         :return:
         """
 
-        membership = org_utils.invite_member(self.organization,
+        response_dict = org_utils.invite_member(self.organization,
                                              self.john.email,
                                              self.john.first_name,
                                              self.john.last_name)
 
-        memberships = Membership.query.filter_by(organization=self.organization, member=self.john).all()
-
-        assert memberships is not None
-
-        assert len(memberships) == 1
+        assert 'status' in response_dict
+        assert response_dict['status'] == 'error'
 
     def test_join(self):
         """
