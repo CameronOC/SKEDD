@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import json
 from project import db, bcrypt
-from project.models import Organization, User, Membership, Position, Shift
+from project.models import Organization, User, Membership, Position, Shift, position_assignments
 from project.email import send_email
 from project.utils.token import confirm_token, generate_invitation_token
 
@@ -478,9 +478,15 @@ def assign_member_to_position(user, pos):
     #assign the user to an org
     myuser = User.query.filter_by(id=user).first()
     mypos = Position.query.filter_by(id=pos).first()
-    mypos.assigned_users.append(myuser)
-    db.session.commit()
-    return "success"
+    #mypos.assigned_users.append(myuser)
+    if db.session.query(position_assignments).filter(position_assignments.c.user_id==user, position_assignments.c.position_id==pos).first() == None:
+    #if position_assignments.query.filter_by(user_id=user, position_id=pos) == None:
+        mypos.assigned_users.append(myuser)
+        db.session.commit()
+        return "success"
+    else:
+        #flash('member already assigned to this position', category='error')
+        return "already assigned"
 
 
 def unassign_member_to_position(user, pos):
