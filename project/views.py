@@ -11,6 +11,7 @@ from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
 from project import app, db, bcrypt
+from project.email import ts
 from decorators import check_confirmed, owns_organization, organization_member, admin_of_org
 import utils.organization
 from utils.organization import assign_member_to_position, deletepositions, unassign_member_to_position, get_users_for_org_JSON
@@ -405,6 +406,7 @@ def getusersinorg(key):
 
     return response
 
+
 @app.route('/getassignedpositions/<key>/<key2>')
 def getassignedpositions(key, key2):
     response = Response(response=utils.organization.get_assigned_positions_for_user(key, key2),
@@ -412,11 +414,13 @@ def getassignedpositions(key, key2):
                         mimetype="application/json")
     return response
 
+
 @app.route('/getpositionsinorg/<key>')
 @login_required
 @owns_organization
 def getpositionsinorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
+    
     
 @app.route('/getmembership/<key>/<key2>')
 def get_membership(key, key2):
@@ -425,9 +429,12 @@ def get_membership(key, key2):
                         mimetype="application/json")
     return response
     
+    
 @app.route('/setadmin/<key>', methods=['POST'])
 # @owns_organization write new one to work with membership_id?
 def set_admin_privileges(key):
     response = Response(response=utils.organization.set_membership_admin(key),
                         status=200)
-    return response
+    return response 
+  
+  
