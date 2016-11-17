@@ -45,7 +45,7 @@ def register():
         confirm_url = url_for('user.confirm_email', token=token, _external=True)
         html = render_template('user/activate.html', confirm_url=confirm_url)
         subject = "Please confirm your email"
-        send_email(user.email, subject, html)
+        #send_email(user.email, subject, html)
 
         login_user(user)
         flash('You registered and are now logged in. Welcome!', 'success')
@@ -133,6 +133,6 @@ def resend_confirmation():
     confirm_url = url_for('user.confirm_email', token=token, _external=True)
     html = render_template('user/activate.html', confirm_url=confirm_url)
     subject = "Please confirm your email"
-    send_email(current_user.email, subject, html)
+    #send_email(current_user.email, subject, html)
     flash('A new confirmation email has been sent.', 'success')
     return redirect(url_for('user.unconfirmed'))
