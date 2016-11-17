@@ -4,9 +4,11 @@ from project import db, bcrypt
 from project.models import Organization, User, Membership, Position, Shift
 from project.email import send_email
 from project.utils.token import confirm_token, generate_invitation_token
+import project.utils.utils as utils
 
 from flask import render_template, flash, url_for, g
 from flask_login import login_user
+
 
 def create_organization(name, owner_id):
     """
@@ -32,63 +34,64 @@ def create_organization(name, owner_id):
     return org, membership
 
 
-def get_user(id):
+def get_user(user_id):
     """
     Gets a user by ID
-    :param id:
+    :param user_id:
     :return:
     """
-    return User.query.get(id)
+    return User.query.get(user_id)
 
 
-def get_organization(id):
+def get_organization(org_id):
     """
     gets an organization by id and returns the object or None
     if it doesn't exist
-    :param id:
+    :param org_id:
     :return:
     """
-    return Organization.query.get(id)
+    return Organization.query.get(org_id)
 
 
-def get_position(id):
+def get_position(pos_id):
     """
     Gets a position object based on id
-    :param id:
+    :param pos_id:
     :return:
     """
-    return Position.query.get(id)
+    return Position.query.get(pos_id)
 
 
-def get_shift(id):
+def get_shift(shift_id):
     """
     Gets a shift object based on id
-    :param id:
+    :param shift_id:
     :return:
     """
-    return Shift.query.get(id)
+    return Shift.query.get(shift_id)
 
 
 def get_membership(org, user):
     """
     Checks if a user is in an organization
-    :param organization_id:
-    :param user_id:
+    :param org:
+    :param user:
     :return:
     """
     return Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
-    
+
+
 def get_membership_JSON(org, user):
     """
     Checks if a user is in an organization
-    :param organization_id:
-    :param user_id:
+    :param org:
+    :param user:
     :return:
     """
     membership = Membership.query.filter_by(member_id=user, organization_id=org).first()
     membership_dict = {'id': membership.id, 'joined': membership.joined, 'is_owner': membership.is_owner,
-                        'is_admin': membership.is_admin, 'member_id': membership.member_id, 
-                        'organization_id': membership.organization_id}
+                       'is_admin': membership.is_admin, 'member_id': membership.member_id,
+                       'organization_id': membership.organization_id}
                             
     return json.dumps(membership_dict)
 
@@ -123,26 +126,6 @@ def membership_from_key_token(key, token):
     return membership
 
 
-def membership_to_dict(membership):
-    """
-    Converts a membership object to a dictionary
-    :param membership:
-    :return:
-    """
-    if membership is None or not isinstance(membership, Membership):
-        return None
-
-    membership_dict = {
-        'id': membership.id,
-        'member_id': membership.member_id,
-        'organization_id': membership.organization_id,
-        'is_owner': membership.is_owner,
-        'is_admin': membership.is_admin,
-        'joined': membership.joined,
-    }
-
-    return membership_dict
-
 def create_position(org, title):
     """
     Creates a position given a organization and a position title/name
@@ -154,10 +137,14 @@ def create_position(org, title):
     db.session.commit()
     return position
 
+
 def invite_member(org, email, first_name, last_name):
     """
     Invite a user to the organization id, creating a dummy account if needed
-    :param organization_id:
+    :param org:
+    :param email:
+    :param first_name:
+    :param last_name:
     :return:
     """
     user = User.query.filter_by(email=email).first()
@@ -201,15 +188,14 @@ def invite_member(org, email, first_name, last_name):
 
     return_dict['status'] = 'success'
     return_dict['message'] = 'You succesfully invited ' + str(user.first_name) + ' ' + str(user.last_name) + '.'
-    return_dict['membership'] = membership_to_dict(membership)
+    return_dict['membership'] = utils.membership_to_dict(membership)
     return return_dict
 
 
 def confirm_invite(membership):
     """
     Confirms an invitation to an organization, if valid
-    :param key:
-    :param token:
+    :param membership:
     :return:
     """
     membership.joined = True
@@ -220,63 +206,6 @@ def confirm_invite(membership):
     return membership
 
 
-def validate_member_position_id(form, pos_required=False):
-    """
-    validates the member and position ID's from the shift form
-    :param form:
-    :param pos_required:
-    :return:
-    """
-    return_dict = {}
-    if 'shift_position_id' in form:
-        if not form['shift_position_id'].isdigit():
-            return_dict['status'] = "error"
-            return_dict['errors'] = {'Invalid Position id: ': form['shift_position_id']}
-    elif pos_required:
-        return_dict['status'] = "error"
-        return_dict['message'] = 'No Position Selected'
-
-    if 'shift_assigned_member_id' in form:
-        if not form['shift_assigned_member_id'].isdigit():
-            return_dict['status'] = "error"
-            return_dict['errors'] = {'Invalid Member id: ': form['shift_assigned_member_id']}
-
-    return return_dict
-
-def shift_form_errors_to_dict(form):
-    """
-    converts the errors from a shift form into a dict
-    :param form:
-    :return:
-    """
-    errors_dict = {
-        'Description': [],
-        'Create Multiple Checkbox': [],
-        'Day Selector': [],
-        'Start Time': [],
-        'End Time': [],
-        'Shift Id': []
-    }
-    for error in form.shift_description.errors:
-        errors_dict['Description'].append(error)
-
-    for error in form.shift_repeating.errors:
-        errors_dict['Create Multiple Checkbox'].append(error)
-
-    for error in form.shift_repeat_list.errors:
-        errors_dict['Day Selector'].append(error)
-
-    for error in form.shift_start_time.errors:
-        errors_dict['Start Time'].append(error)
-
-    for error in form.shift_end_time.errors:
-        errors_dict['End Time'].append(error)
-
-    for error in form.shift_id.errors:
-        errors_dict['Shift Id'].append(error)
-
-    return errors_dict
-
 def create_shift(pos_key, assigned_user_id, start_time, end_time, description):
     """
     Creates a new shift object
@@ -284,35 +213,17 @@ def create_shift(pos_key, assigned_user_id, start_time, end_time, description):
     :param assigned_user_id:
     :param start_time:
     :param end_time:
+    :param description:
     :return:
     """
     # create shift with parameters
     shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, start_time=start_time,
-                    end_time=end_time, description=description)
+                  end_time=end_time, description=description)
 
     # add shift to database
     db.session.add(shift)
     db.session.commit()
     return shift
-
-
-def gather_members_for_shift(org_key):
-    """
-    Creates a formatted list of users in an organization
-    to use in ShiftForm.user
-    :param org_key:
-    :return:
-    """
-    # filter users by members of current org in current position
-    eligible_members = Membership.query.filter_by(organization_id=org_key).all()
-    # create list to fill in SelectField
-    users = []
-    users.append((None, '--'))
-    for c in eligible_members:
-        # use 'member' backref in user-membership relationship
-        users.append((c.member.id, c.member.first_name + ' ' + c.member.last_name))
-
-    return users
 
 
 def create_shifts_JSON(dictionary):
@@ -361,8 +272,8 @@ def create_shifts_JSON(dictionary):
 
 
 # noinspection PyTypeChecker
-def create_shifts_form( position_id, assigned_user_id, start_time,
-                        end_time, description, repeat_list=None):
+def create_shifts_form(position_id, assigned_user_id, start_time,
+                       end_time, description, repeat_list=None):
     """
     creates a month's worth of shifts
     based on data from a form
@@ -425,7 +336,7 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
                             delta)
 
                     shifts.append(shift_to_dict(new_shift))
-                	
+
                 week_ct += 1
 
     return shifts
@@ -465,6 +376,7 @@ def delete_shift(shift_id):
     db.session.delete(shift)
     db.session.commit()
 
+
 def shift_to_dict(shift):
     """
     Takes a shift object and returns a dictionary representation
@@ -498,6 +410,7 @@ def shift_to_dict(shift):
 
     return shift_dict
 
+
 def get_all_shifts_for_org_JSON(org_id):
     """
     returns all shifts for each position
@@ -529,7 +442,8 @@ def get_all_shifts_for_org_JSON(org_id):
                                 })
 
     return json.dumps(shifts_list)
-            
+
+
 def get_users_for_org_JSON(org_id):
     members_list = []
     members = Membership.query.filter_by(organization_id=org_id).all()
@@ -542,6 +456,7 @@ def get_users_for_org_JSON(org_id):
         })
 
     return json.dumps(members_list)
+
 
 def get_members_for_position(position_id):
     """
@@ -566,12 +481,13 @@ def get_members_for_position(position_id):
         'members': members_list
     })
 
+
 def get_positions_for_org_JSON(org_id):
     """
     returns all positions in an organization as a JSON
     dictionary of type str. Then converts into list of
     dictionaries using json.loads equivalent.
-    :param id:
+    :param org_id:
     :return:
     """
     positions_list = []
@@ -585,18 +501,20 @@ def get_positions_for_org_JSON(org_id):
 
     return json.dumps(positions_list)
 
-#used in views.deletepositions
+
+# used in views.deletepositions
 def deletepositions(posid, orgid):
     pos = posid
     org = orgid
+
     #remove the position from the org
     db.session.delete(pos)
     db.session.commit()
 
 
-#used in views.assign and views.assignpos
+# used in views.assign and views.assignpos
 def assign_member_to_position(user, pos):
-    #assign the user to an org
+    # assign the user to an org
     myuser = User.query.filter_by(id=user).first()
     mypos = Position.query.filter_by(id=pos).first()
     mypos.assigned_users.append(myuser)
@@ -607,7 +525,8 @@ def assign_member_to_position(user, pos):
 def unassign_member_to_position(user, pos):
     myuser = User.query.filter_by(id=user).first()
     mypos = Position.query.filter_by(id=pos).first()
-    #removes the user from the position
+
+    # removes the user from the position
     mypos.assigned_users.remove(myuser)
     db.session.commit()
     return "success"

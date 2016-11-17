@@ -117,14 +117,13 @@ def get_shifts_for_org(key):
 @main_blueprint.route('/organization/<int:key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
-#@owns_organization
+# @owns_organization
 def create_shift(key):
     """
     Creates a new shift.  Shifts can be assigned to a user or left empty at
     initialization, but are always related to a position, which is in turn
     related to an organization
-    :param org_key:
-    :param pos_key:
+    :param key:
     :return:
     """
 
@@ -135,7 +134,7 @@ def create_shift(key):
 
     if form.validate_on_submit():
 
-        return_dict = utils.organization.validate_member_position_id(request.form,
+        return_dict = utils.utils.validate_member_position_id(request.form,
                                                                      pos_required=True)
         if 'status' in return_dict:
             return Response(response=json.dumps(return_dict),
@@ -157,16 +156,16 @@ def create_shift(key):
         return_dict['status'] = "success"
     else:
         return_dict['status'] = "error"
-        errors_dict = utils.organization.shift_form_errors_to_dict(request.form)
+        errors_dict = utils.utils.shift_form_errors_to_dict(request.form)
 
-        manual_validation = utils.organization.shift_form_errors_to_dict(form)
+        manual_validation = utils.utils.shift_form_errors_to_dict(form)
         if 'status' in manual_validation:
             errors_dict = utils.utils.merge_dicts(manual_validation['errors'], errors_dict)
         return_dict['errors'] = errors_dict
 
     response = Response(response=json.dumps(return_dict),
-                    status=200,
-                    mimetype="application/json")
+                        status=200,
+                        mimetype="application/json")
 
     return response
 
@@ -192,10 +191,11 @@ def update_shift_time(key, key1):
     response_dict = json.dumps({'status': 'success', 'shift': utils.organization.shift_to_dict(shift)})
 
     response = Response(response=json.dumps(response_dict),
-                    status=200,
-                    mimetype="application/json")
+                        status=200,
+                        mimetype="application/json")
 
     return response
+
 
 @main_blueprint.route('/organization/<int:key>/shift/<int:key1>/delete', methods=['DELETE',])
 @login_required
@@ -217,8 +217,8 @@ def delete_shift(key, key1):
     }
 
     response = Response(response=json.dumps(response_dict),
-                    status=200,
-                    mimetype="application/json")
+                        status=200,
+                        mimetype="application/json")
 
     return response
 
@@ -231,9 +231,8 @@ def delete_shift(key, key1):
 def update_shift(key, key1):
     """
     Updates an existing shift.
-    :param org_key:
-    :param pos_key:
-    :param shift_key:
+    :param key:
+    :param key1:
     :return:
     """
     shift = utils.organization.get_shift(key1)
@@ -244,7 +243,7 @@ def update_shift(key, key1):
 
     if form.validate_on_submit():
 
-        return_dict = utils.organization.validate_member_position_id(request.form)
+        return_dict = utils.utils.validate_member_position_id(request.form)
         if 'status' in return_dict:
             return Response(response=json.dumps(return_dict),
                             status=200,
@@ -265,9 +264,9 @@ def update_shift(key, key1):
         response_dict['shift'] = utils.organization.shift_to_dict(shift)
     else:
         response_dict['status'] = "error"
-        errors_dict = utils.organization.shift_form_errors_to_dict(request.form)
+        errors_dict = utils.utils.shift_form_errors_to_dict(request.form)
 
-        manual_validation = utils.organization.shift_form_errors_to_dict(form)
+        manual_validation = utils.utils.shift_form_errors_to_dict(form)
         if 'status' in manual_validation:
             errors_dict = utils.utils.merge_dicts(manual_validation['errors'], errors_dict)
             response_dict['errors'] = errors_dict
@@ -305,7 +304,6 @@ def invite(key):
             'Last Name': [],
             'Email': [],
         }
-
 
         for error in form.first_name.errors:
             errors_dict['First Name'].append(error)
@@ -346,6 +344,7 @@ def confirm_invite(key, token):
         utils.organization.confirm_invite(membership)
         return redirect(url_for('main.home'))
 
+
 @main_blueprint.route('/organization/<key>/setup/<token>', methods=['GET', 'POST'])
 def setup_account(key, token):
     """
@@ -375,7 +374,7 @@ def setup_account(key, token):
 @owns_organization
 def create_position(key):
 
-    #the new create_position function.
+    # the new create_position function.
     org = utils.organization.get_organization(key)
     form1 = PositionForm(request.form)
     return_dict = {}
@@ -395,10 +394,11 @@ def create_position(key):
         return_dict['errors'] = errors_dict
 
     response = Response(response=json.dumps(return_dict),
-                    status=200,
-                    mimetype="application/json")
+                        status=200,
+                        mimetype="application/json")
 
     return response
+
 
 @app.route('/positionsinorg/<key>')
 def getpositioninorg(key):

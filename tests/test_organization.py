@@ -4,6 +4,7 @@ from project import app, db
 from project.models import User, Organization, Membership, Position, Shift, position_assignments
 import project.utils.organization as org_utils
 from base_test import BaseTest
+import project.forms as forms
 #from project.utils.organization import deletepositions
 # from project.utils.organization import create_organization, get_organization
 import datetime
