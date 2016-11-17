@@ -51,12 +51,10 @@ class TestPosition(BaseTest, TestCase):
         Tests that a position is delete from a organization
         :return:
         """
-        pos = org_utils.get_position(1)
-        org = org_utils.get_organization(1)
+        pos = org_utils.get_position(1).id
         assert pos is not None
 
-        org_utils.deletepositions(pos, org)
-
+        org_utils.deletepositions(pos)
         pos2 = org_utils.get_position(1)
         assert pos2 is None
 
