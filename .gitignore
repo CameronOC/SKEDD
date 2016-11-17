@@ -9,3 +9,4 @@ setup_env.sh
 *.sqlite
 *.log
 tmp
+.coverage
