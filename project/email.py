@@ -9,7 +9,7 @@ from project import app, mail
 
 
 def send_email(to, subject, template):
-    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+    sg = sendgrid.SendGridAPIClient("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")
     message = sendgrid.Mail()
 
     message.add_to("cjplanes@gmail.com")
