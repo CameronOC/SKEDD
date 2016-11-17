@@ -26,6 +26,12 @@ var app = function() {
         this.id = p;
     }
 
+    function assigneduserobject(f, l, i){
+        this.first_name = f;
+        this.last_name = l;
+        this.id = i;
+    }
+
     //function to add the user data to the user object
     function adduserstoarray(response) {
         console.log('addusertoarray was called');
@@ -68,6 +74,19 @@ var app = function() {
         }
     }
 
+    function addassigneduserstoarray(response){
+        console.log('addassigneduserstoarray was called');
+        console.log(response);
+        for(var i=0; i<response.length; i++){
+            first_name = response[i].first_name;
+            last_name = response[i].last_name;
+            id = response[i].id;
+            APP.vue.addassigneduser(
+                new assigneduserobject(first_name, last_name, id)
+            );
+        }
+    }
+
     //function to add the user object to the vue array
     self.adduser = function (u) {
         //console.log('adduser called ' + u);
@@ -82,6 +101,10 @@ var app = function() {
     self.addassignedposition = function(ap){
         //console.log('add assignedposition called' + ap);
         APP.vue.assignedpositions.push(ap);
+    }
+
+    self.addassigneduser = function(au){
+        APP.vue.assignedusers.push(au);
     }
 
     //gets the users for an org
@@ -111,6 +134,15 @@ var app = function() {
             .then(function(response){
                 APP.vue.assignedpositions = [];
                 addassignedpositiontoarray(response);
+            })
+    }
+
+    self.get_assigned_users = function(index){
+        pos = APP.vue.posid;
+        $.getJSON('/getpositionmembers/' + pos )
+            .then(function(response){
+                APP.vue.assignedusers = [];
+                addassigneduserstoarray(response);
             })
     }
 
@@ -145,7 +177,9 @@ var app = function() {
     self.positionDetail = function(index) {
         position = self.vue.positions[index];
         $('#positionDetailTitle').html(position.title);
+        $('#positionDetailTitle1').html(position.title);
         $('#positionDetailTitle2').html(position.title);
+        $('#positionDetailTitle3').html(position.title);
         $('#positionDetailDescription').html(position.desciption);
         $('#positionDetailId').html(position.id);
 
@@ -154,6 +188,7 @@ var app = function() {
         //APP.vue.posid = position.id;
         //console.log(member.id);
         //self.get_assigned_positions(index);
+        self.get_assigned_users(index);
 
         $('#positionDetailModal').modal('show');
     }
@@ -171,6 +206,23 @@ var app = function() {
         $.post(url,
             function () {
                 self.get_assigned_positions();
+            });
+    }
+
+    self.unassign_user = function(index){
+
+        console.log("unassign_position called")
+
+        var posid = APP.vue.posid;
+        var userid = self.vue.assignedusers[index].id;
+        console.log(posid);
+        console.log(userid);
+
+        url = "/unassign/" + userid.toString() + "/" + posid.toString()
+
+        $.post(url,
+            function () {
+                self.get_assigned_users();
             });
     }
 
@@ -195,9 +247,10 @@ var app = function() {
             users: [],
             positions: [],
             assignedpositions: [],
+            assignedusers: [],
             orgid: orgid,
             userid: -1,
-            posid: -1
+            posid: -1,
             curr_membership_id: 0,
             curr_membership_admin: false
         },
@@ -210,8 +263,12 @@ var app = function() {
             member_detail: self.memberDetail, // why do these have different names (member_detail, memberDetail)
                                             //because philip made it that way
             get_assigned_positions: self.get_assigned_positions,
+            get_assigned_users: self.get_assigned_users,
             addassignedposition: self.addassignedposition,
+            addassigneduser: self.addassigneduser,
             unassign_position: self.unassign_position,
+            unassign_user: self.unassign_user,
+            assign_user: self.assign_user,
             set_admin: self.set_admin
         }
 

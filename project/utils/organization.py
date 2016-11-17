@@ -479,10 +479,11 @@ def get_members_for_position(position_id):
             'id': member.id
         })
 
-    return json.dumps({
-        'status': 'success',
-        'members': members_list
-    })
+    #return json.dumps({
+    #    'status': 'success',
+    #    'members': members_list
+    #})
+    return json.dumps(members_list)
 
 def get_positions_for_org_JSON(org_id):
     """
@@ -548,7 +549,7 @@ def get_assigned_positions_for_user(orgid, userid):
                  })
 
     return json.dumps(assigned_list)
-    
+
 
 #For some reason this sets the org_id to null instead of just removing the row...
 #I'll fix it later if I need to.

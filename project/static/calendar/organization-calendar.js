@@ -252,6 +252,9 @@ $(document).ready(function() {
     *
     */
     $('#createPositionSubmit').on('click', function() {
+
+        $('#createPositionSubmit').prop('disabled', true);
+
         var newPosition = {
             title: $('#title').val()
         };
@@ -301,6 +304,32 @@ $(document).ready(function() {
         });
 
         APP.get_assigned_positions();
+        //$('#memberDetailModal').modal('hide');
+    });
+
+    $('#AddPositionToUserSubmit').on('click', function() {
+        console.log("AddPositionToUserSubmit pressed")
+
+        //get the title of the position from the dropdownmenu
+        var select = document.getElementById("userdropdown");
+        var uid = select.options[select.selectedIndex].value;
+        //var positionid = APP.vue.positions[index].id;
+        //console.log(positionid) 
+        var pid = APP.vue.posid;
+        
+        url = "/assign/" + uid.toString() + "/" + pid.toString()
+
+        $.ajax({
+            type: "POST",
+            url: url,
+
+            success: function()
+            {
+                console.log("success")
+            }
+        });
+
+        APP.get_assigned_users();
         //$('#memberDetailModal').modal('hide');
     });
 
