@@ -3,21 +3,21 @@
 from flask.ext.mail import Message
 import os
 import sendgrid
-from sendgrid.helpers.mail import *
+
 
 from project import app, mail
 
 
 def send_email(to, subject, template):
-    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
-    from_email = Email("skedd.mail@gmail.com")
-    subject = "Hello World from the SendGrid Python Library!"
-    to_email = Email("cjplanes@gmail.com")
-    content = Content("text/plain", "Hello, Email!")
-    mail = Mail(from_email, subject, to_email, template)
+    sg = sendgrid.SendGridClient('SENDGRID_API_KEY')
+    message = sendgrid.Mail()
 
-    response = sg.client.mail.send.post(request_body=mail.get())
-    print(response.status_code)
+    message.add_to(to)
+    message.set_from('APP_EMAIL_USERNAME')
+    message.set_subject(subject)
+    message.set_html(template)
+
+    sg.send(message)
     #msg = Message(
      #   subject,
       #  recipients=[to],
