@@ -372,16 +372,27 @@ def getpositioninorg(key):
     """
     return utils.organization.get_positions_for_org_JSON(key)
 
-
-@app.route('/getpositionmembers/<key>/')
-def get_position_members(key):
+@app.route('/organization/<key>/position/<key2>/users')
+def get_position_members(key, key2):
     """
     Returms a json list of all users for a position
     :param key:
     :param key2:
     :return:
     """
-    response = Response(response=utils.organization.get_members_for_position(key),
+    response = Response(response=utils.organization.get_members_for_position(key2),
+                        status=200,  mimetype="application/json")
+    return response
+
+@app.route('/getpositionmembers/<key>/')
+def get_position_users(key):
+    """
+    Returms a json list of all users for a position
+    :param key:
+    :param key2:
+    :return:
+    """
+    response = Response(response=utils.organization.get_users_for_position(key),
                         status=200,  mimetype="application/json")
     return response
 

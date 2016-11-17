@@ -461,7 +461,7 @@ def get_users_for_org_JSON(org_id):
 
     return json.dumps(members_list)
 
-def get_members_for_position(position_id):
+def get_users_for_position(position_id):
     """
     returns a JSON list of users that are assigned to a position
     :param position_id:
@@ -484,6 +484,29 @@ def get_members_for_position(position_id):
     #    'members': members_list
     #})
     return json.dumps(members_list)
+
+def get_members_for_position(position_id):
+    """
+    returns a JSON list of users that are assigned to a position
+    :param position_id:
+    :return:
+    """
+    members_list = []
+
+    position = Position.query.get(position_id)
+    members = position.assigned_users
+
+    for member in members:
+        members_list.append({
+            'first_name': member.first_name,
+            'last_name': member.last_name,
+            'id': member.id
+        })
+
+    return json.dumps({
+        'status': 'success',
+        'members': members_list
+    })
 
 def get_positions_for_org_JSON(org_id):
     """
