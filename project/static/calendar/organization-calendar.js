@@ -83,7 +83,10 @@ $(document).ready(function() {
       });
     };
 
-    $('#shiftModal').on('hidden.bs.modal', function(){
+
+
+
+    $('.modal').on('hidden.bs.modal', function(){
         $(this).find("input,textarea").val('').end();
         $('#shift_assigned_member_id').empty();
         $('#shift_position_id').val('0');
@@ -104,22 +107,27 @@ $(document).ready(function() {
         $('#shiftModal').modal('hide');
     }
 
-    /*
-    function updateSuccess() {
+
+    function updateSuccess(shift) {
         var tempId = parseInt($('#shift_id').val());
 
         var eventlist = $("#calendar").fullCalendar('clientEvents', tempId);
 
-        evento = eventlist[0];
+        event = eventlist[0];
 
-        evento.title = $('#editShiftPosition').val();
-        evento.description = $('#editShiftDescription').val();
-        evento.assigned = $('#editShiftAssigned').val();
+        event.title = shift.position_title;
+        event.description = shift.description;
+        event.assigned_member = shift.assigned_member;
+        event.assigned_member_id = shift.assigned_member_id;
+        event.position_id = shift.position_id;
+        event.start = shift.start;
+        event.end = shift.end;
+        event.id = shift.id;
 
-        $('#calendar').fullCalendar('updateEvent', evento);
+        $('#calendar').fullCalendar('updateEvent', event);
         $('#shiftModal').modal('hide');
     }
-    */
+
 
     $('#shiftSubmit').on('click', function() {
         $('#shiftSubmit').prop('disabled', true);
@@ -147,7 +155,7 @@ $(document).ready(function() {
                     if (create) {
                         createSuccess();
                     } else {
-                        updateSuccess();
+                        updateSuccess(data.shift);
                     }
 
                 }else if(data.status == "error"){

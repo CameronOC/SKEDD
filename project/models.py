@@ -102,7 +102,7 @@ class Shift(db.Model):
         :return:
         """
         if position_id is not None:
-            if position_id != 0:
+            if position_id > 0:
                 self.position_id = position_id
         if assigned_user_id is not None:
             if assigned_user_id == 0:
@@ -117,6 +117,7 @@ class Shift(db.Model):
             self.description = description
     
         db.session.commit()
+        return self
 
     def update_time(self, start_time=None, end_time=None):
         """

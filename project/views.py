@@ -225,11 +225,11 @@ def delete_shift(key, key1):
     return response
 
 
-@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/<shift_key>/update', methods=['POST'])
+@main_blueprint.route('/organization/<key>/shift/<key1>/update', methods=['POST'])
 @login_required
 @check_confirmed
 @owns_organization
-def update_shift(org_key, pos_key, shift_key):
+def update_shift(key, key1):
     """
     Updates an existing shift.
     :param org_key:
@@ -237,15 +237,27 @@ def update_shift(org_key, pos_key, shift_key):
     :param shift_key:
     :return:
     """
-    shift = utils.organization.get_shift(shift_key)
+    shift = utils.organization.get_shift(key1)
     form = ShiftForm(request.form)
     response_dict = {}
 
     if form.validate_on_submit():
         
-        shift.update(pos_key, form.shift_assigned_member_id.data, form.shift_start_time.data,
-                        form.shift_end_time.data, form.shift_description.data)
-    return redirect(url_for('main.position', key=org_key, key2=pos_key))
+        shift = shift.update(position_id=int(request.form['shift_position_id']),
+                             assigned_user_id=int(request.form['shift_assigned_member_id']),
+                             start_time=form.shift_start_time.data,
+                             end_time=form.shift_end_time.data,
+                             description=form.shift_description.data)
+        response_dict['status'] = 'success'
+        response_dict['message'] = 'Shift succesfully updated'
+        response_dict['shift'] = utils.organization.shift_to_dict(shift)
+    else:
+        response_dict['status'] = 'error'
+        response_dict['message'] = 'unable to update shift'
+
+    return Response(response=json.dumps(response_dict),
+                    status=200,
+                    mimetype="application/json")
 
 
 @main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])

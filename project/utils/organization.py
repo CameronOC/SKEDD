@@ -412,7 +412,7 @@ def shift_to_dict(shift):
 
     else:
         shift_dict['assigned_member_id'] = 0
-        shift_dict['assigned_member'] = ''
+        shift_dict['assigned_member'] = 'Unassigned'
 
     return shift_dict
 
