@@ -133,8 +133,8 @@ def create_shift(key):
 
     if form.validate_on_submit():
 
-        shifts = utils.organization.create_shifts_form(request.form['shift_position_id'],
-                                                       request.form['shift_assigned_member_id'],
+        shifts = utils.organization.create_shifts_form(int(request.form['shift_position_id']),
+                                                       int(request.form['shift_assigned_member_id']),
                                                        form.shift_start_time.data,
                                                        form.shift_end_time.data,
                                                        form.shift_description.data,
@@ -225,10 +225,10 @@ def delete_shift(key, key1):
     return response
 
 
-@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/<shift_key>/edit', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<org_key>/position/<pos_key>/shift/<shift_key>/update', methods=['POST'])
 @login_required
 @check_confirmed
-#@owns_organization
+@owns_organization
 def update_shift(org_key, pos_key, shift_key):
     """
     Updates an existing shift.
@@ -238,13 +238,11 @@ def update_shift(org_key, pos_key, shift_key):
     :return:
     """
     shift = utils.organization.get_shift(shift_key)
-    form = ShiftForm(obj=shift)
-    if request.method == 'GET':
-        if form.validate():
-            # pre-populate form with current data
-            form.populate_obj(shift)
-        return render_template('main/update_shift.html', form=form)
-    else:
+    form = ShiftForm(request.form)
+    response_dict = {}
+
+    if form.validate_on_submit():
+        
         shift.update(pos_key, form.shift_assigned_member_id.data, form.shift_start_time.data,
                         form.shift_end_time.data, form.shift_description.data)
     return redirect(url_for('main.position', key=org_key, key2=pos_key))
