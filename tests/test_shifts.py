@@ -3,9 +3,8 @@ from flask import g
 from project import app, db
 from project.models import User, Organization, Membership, Position, Shift, position_assignments
 import project.utils.organization as org_utils
+import project.utils.utils as utils
 from base_test import BaseTest
-#from project.utils.organization import deletepositions
-# from project.utils.organization import create_organization, get_organization
 import datetime
 import json
 
@@ -352,42 +351,6 @@ class TestShifts(BaseTest, TestCase):
         shift.update(assigned_user_id=0)
         shift = org_utils.get_shift(1)
         assert shift.assigned_user_id == None
-
-    def test_shift_to_dict(self):
-        """
-        tests converting a shift to a dictionary
-        :return:
-        """
-
-        shift_dict = org_utils.shift_to_dict(self.shift)
-
-        print shift_dict
-
-        assert shift_dict is not None
-
-        assert 'id' in shift_dict
-        assert shift_dict['id'] == 1
-
-        assert 'assigned_member_id' in shift_dict
-        assert shift_dict['assigned_member_id'] == 0
-
-        assert 'assigned_member' in shift_dict
-        assert shift_dict['assigned_member'] == 'Unassigned'
-
-        assert 'position_id' in shift_dict
-        assert shift_dict['position_id'] == self.position.id
-
-        assert 'position_title' in shift_dict
-        assert shift_dict['position_title'] == self.position.title
-
-        assert 'start' in shift_dict
-        assert shift_dict['start'] == self.shift.start_time
-
-        assert 'end' in shift_dict
-        assert shift_dict['end'] == self.shift.end_time
-
-        assert 'description' in shift_dict
-        assert shift_dict['description'] == ''
 
     def test_update_shift_time(self):
         """

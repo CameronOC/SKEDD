@@ -1,3 +1,5 @@
+from project.models import Membership, Shift
+
 def merge_dicts(*dict_args):
     """
     Given any number of dicts, shallow copy and merge into a new dict,
@@ -82,8 +84,11 @@ def membership_to_dict(membership):
     :param membership:
     :return:
     """
-    if membership is None or not isinstance(membership, Membership):
+    if membership is None:
         return None
+
+    if not isinstance(membership, Membership):
+        raise TypeError(str(type(membership)) + ' is not type Membership')
 
     membership_dict = {
         'id': membership.id,
@@ -95,3 +100,39 @@ def membership_to_dict(membership):
     }
 
     return membership_dict
+
+def shift_to_dict(shift):
+    """
+    Takes a shift object and returns a dictionary representation
+    :param shift:
+    :return:
+    """
+
+    if shift is None:
+        return None
+
+    if not isinstance(shift, Shift):
+        raise TypeError(str(type(shift)) + ' is not type Shift')
+
+    shift_dict = {
+        'id': shift.id,
+        'position_id': shift.position_id,
+        'position_title': shift.Position.title,
+        'start': shift.start_time,
+        'end': shift.end_time,
+    }
+
+    if shift.description is None:
+        shift_dict['description'] = ''
+    else:
+        shift_dict['description'] = shift.description
+
+    if shift.user is not None:
+        shift_dict['assigned_member_id'] = shift.assigned_user_id
+        shift_dict['assigned_member'] = shift.user.first_name + ' ' + shift.user.last_name
+
+    else:
+        shift_dict['assigned_member_id'] = 0
+        shift_dict['assigned_member'] = 'Unassigned'
+
+    return shift_dict
