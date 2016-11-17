@@ -62,28 +62,29 @@ class ShiftNotInOrg(Exception):
 
 
 @app.errorhandler(NotOwner)
-def handle_invalid_usage(error):
+def handle_not_owner(error):
     if request_wants_json():
         response = jsonify(error.to_dict())
-        response.status_code = error.status_code
+        response.status_code = 200
+        print str(response)
         return response
     else:
         return render_template('errors/403_organization_owner.html'), 403
 
 @app.errorhandler(NotMember)
-def handle_invalid_usage(error):
+def handle_not_member(error):
     if request_wants_json():
         response = jsonify(error.to_dict())
-        response.status_code = error.status_code
+        response.status_code = 200
         return response
     else:
         return render_template('errors/403_organization_member.html'), 403
 
 @app.errorhandler(ShiftNotInOrg)
-def handle_invalid_usage(error):
+def handle_shift_not_in_org(error):
     if request_wants_json():
         response = jsonify(error.to_dict())
-        response.status_code = error.status_code
+        response.status_code = 200
         return response
     else:
         return render_template('errors/404.html'), 404
