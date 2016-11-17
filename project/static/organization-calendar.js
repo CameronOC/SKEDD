@@ -379,7 +379,7 @@ $(document).ready(function() {
             email: $('#email').val()
         };
 
-        url = "/organization/" + orgid.toString() + "/invite"
+        var url = "/organization/" + orgid.toString() + "/invite"
 
         $.ajax({
             headers: {
@@ -396,7 +396,23 @@ $(document).ready(function() {
                     APP.adduser(newUser);
                     $('#inviteMemberModal').modal('hide');
                 }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
+                    console.log(JSON.stringify(data));
+                    if ('message' in data) {
+                        var html = '<p>' + data.message.toString() + '<p>';
+                        $('#errorBody').append(html);
+                    }
+                    if ('errors' in data) {
+                        for (var key in data.errors) {
+                            var value = data.errors[key];
+                            var html = '<p>' + key.toString() + ': ' + value.toString() + '<p>';
+                            $('#errorBody').append(html);
+                        }
+
+                    }
+
+
+                    // $('#errorBody').html(JSON.stringify(data.errors));
+                    $('#errorModal').modal('show');
                 }
             }
         });

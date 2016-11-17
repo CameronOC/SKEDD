@@ -284,20 +284,20 @@ def invite(key):
     else:
         return_dict['status'] = "error"
         errors_dict = {
-            'first_name': [],
-            'last_name': [],
-            'email': [],
+            'First Name': [],
+            'Last Name': [],
+            'Email': [],
         }
 
 
         for error in form.first_name.errors:
-            errors_dict['first_name'].append(error)
+            errors_dict['First Name'].append(error)
 
         for error in form.last_name.errors:
-            errors_dict['last_name'].append(error)
+            errors_dict['Last Name'].append(error)
 
         for error in form.email.errors:
-            errors_dict['email'].append(error)
+            errors_dict['Email'].append(error)
 
         return_dict['errors'] = errors_dict
 
