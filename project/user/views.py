@@ -8,12 +8,12 @@
 from flask import render_template, Blueprint, url_for, redirect, flash, request, g
 from flask_login import login_user, logout_user, login_required, current_user
 
-from project.models import User
+from project.models import User, Preference
 # from project.email import send_email
 from project import db, bcrypt
 from .forms import LoginForm, RegisterForm, ChangePasswordForm
 from project.utils.token import generate_confirmation_token, confirm_token
-import datetime
+import datetime, json
 from project.email import send_email
 from project.decorators import check_confirmed
 ################
@@ -99,12 +99,26 @@ def profile():
             return redirect(url_for('user.profile'))
     return render_template('user/profile.html', form=form)
 
+
+
+
+
 @user_blueprint.route('/updatepreferences', methods=['GET', 'POST'])
 @login_required
 def updatepreferences():
-    pref_form = request.form
-    print(request.form)
-    return 'success'
+    pref_form = json.dumps(request.form)
+    user = User.query.filter_by(email=current_user.email).first()
+    user_pref = Preference(
+        user_id=user.id,
+        preferences=pref_form,
+    )
+    print("Information to be saved into DB:  ",pref_form)
+    db.session.add(user_pref)
+    db.session.commit()
+    return 'operation performed'
+
+
+
 
 @user_blueprint.route('/confirm/<token>')
 def confirm_email(token):

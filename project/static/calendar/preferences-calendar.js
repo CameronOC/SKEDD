@@ -14,9 +14,6 @@ $(document).ready(function() {
         selectHelper: true,
 
         select: function(start, end, allDay) {
-            var newEventData = {from_day: start.format('dddd'), from_time: start.format('HH:mm'), 
-                                to_day: end.format('dddd'), to_time: end.format('HH:mm'), 
-                                id: timeId};
             var newEvent = {
                 start: start,
                 end: end,
@@ -24,22 +21,26 @@ $(document).ready(function() {
             };
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
             timeId = timeId + 1;
-            alert('EVENT ID:  '+newEventData.id+' || '+'START:  '+newEventData.from+' || '+'END:  '+newEventData.to);
             
-            var newEventDataString = JSON.stringify(newEventData);
+            var newEventString = JSON.stringify(newEvent);
 
-            console.log(newEventDataString);
-            console.log(newEvent);
+            console.log("String output:  " + newEventString);
+            console.log("Object output:  " + newEvent);
  
             $.ajax({
                 url: "/updatepreferences",
                 type: "POST",
-                data: newEventDataString,
+                data: newEventString,
                 dataType: 'json',
                 success: function(data) {
-                    alert("Totes worked: " + newEventDataString);
+                    alert("Totes worked: " + newEventString);
                 }
             });
+            
+            /*Test Code to convert event to string back to event
+            var backtoObject = JSON.parse(newEventString);
+            console.log("backToMoment:  " + backtoObject);
+            console.log("restringed:  " + JSON.stringify(backtoObject)); */
 
         },
 
