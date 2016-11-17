@@ -12,8 +12,8 @@ def send_email(to, subject, template):
     sg = sendgrid.SendGridClient('SENDGRID_API_KEY')
     message = sendgrid.Mail()
 
-    message.add_to(to)
-    message.set_from('APP_EMAIL_USERNAME')
+    message.add_to("cjplanes@gmail.com")
+    message.set_from("skedd.mail@gmail.com")
     message.set_subject(subject)
     message.set_html(template)
 
