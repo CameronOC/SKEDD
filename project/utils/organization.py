@@ -77,6 +77,20 @@ def get_membership(org, user):
     :return:
     """
     return Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
+    
+def get_membership_JSON(org, user):
+    """
+    Checks if a user is in an organization
+    :param organization_id:
+    :param user_id:
+    :return:
+    """
+    membership = Membership.query.filter_by(member_id=user, organization_id=org).first()
+    membership_dict = {'id': membership.id, 'joined': membership.joined, 'is_owner': membership.is_owner,
+                        'is_admin': membership.is_admin, 'member_id': membership.member_id, 
+                        'organization_id': membership.organization_id}
+                            
+    return json.dumps(membership_dict)
 
 
 def confirm_user(user, password=None):
@@ -305,8 +319,10 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
 
             while week_ct < 4:
                 day_difference = int(day_int) - main_day_int
-                delta = timedelta(days=day_difference, weeks=week_ct)
-                new_shift = create_shift_helper(
+                if week_ct == 0:
+                    if day_int > main_day_int:
+                        delta = timedelta(days=day_difference, weeks=0)
+                        new_shift = create_shift_helper(
                             position_id,
                             assigned_user_id,
                             description,
@@ -314,8 +330,20 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
                             main_end_time,
                             delta)
 
-                shifts.append(shift_to_dict(new_shift))
+                        shifts.append(shift_to_dict(new_shift))
 
+                else:
+                    delta = timedelta(days=day_difference, weeks=week_ct)
+                    new_shift = create_shift_helper(
+                            position_id,
+                            assigned_user_id,
+                            description,
+                            main_start_time,
+                            main_end_time,
+                            delta)
+
+                    shifts.append(shift_to_dict(new_shift))
+                	
                 week_ct += 1
 
     return shifts
@@ -344,6 +372,16 @@ def create_shift_helper(position_id, assigned_user_id, description, start_time, 
     db.session.commit()
     return new_shift
 
+
+def delete_shift(shift_id):
+    """
+    deletes a shift
+    :param shift_id:
+    :return:
+    """
+    shift = Shift.query.get(shift_id)
+    db.session.delete(shift)
+    db.session.commit()
 
 def shift_to_dict(shift):
     """
@@ -510,6 +548,7 @@ def get_assigned_positions_for_user(orgid, userid):
                  })
 
     return json.dumps(assigned_list)
+    
 
 #For some reason this sets the org_id to null instead of just removing the row...
 #I'll fix it later if I need to.
@@ -523,5 +562,11 @@ def delete_user_from_org(userid, orgid):
     #membership.organization_members.remove(membership)
     #membership.delete()
     db.session.commit()
+    return "success"
+
+    
+def set_membership_admin(mem_id):
+    membership = Membership.query.filter_by(id=mem_id).first()
+    membership.change_admin()
     return "success"
 
