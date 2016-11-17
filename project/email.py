@@ -14,7 +14,7 @@ def send_email(to, subject, template):
     subject = "Hello World from the SendGrid Python Library!"
     to_email = Email("cjplanes@gmail.com")
     content = Content("text/plain", "Hello, Email!")
-    mail = Mail(from_email, subject, to_email, content)
+    mail = Mail(from_email, subject, to_email, template)
 
     response = sg.client.mail.send.post(request_body=mail.get())
     print(response.status_code)
