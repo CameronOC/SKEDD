@@ -5,21 +5,44 @@
                 var orgid = {{organization.id}}
             </script>
             <div class="modal-header">
-                <h4 id="createShiftTitle" class="modal-title">New Shift</h4>
+                <h4 id="createShiftTitle" class="modal-title">Shift Creator</h4>
             </div>
             <div class="modal-body">
-                <select class="form-control" id="createShiftPosition">
-                    <option v-for="position in positions">${position.title}</option>
-                </select> <br>
-                <select class="form-control" id="createShiftAssigned">
-                    <option>Unassigned</option>>
-                    <option v-for="user in users">${user.first_name} ${user.last_name}</option>
-                </select> <br>
-                <textarea class="form-control" rows="5" id="createShiftDescription" placeholder="Description...">
-                </textarea> <br>
-                Start: <span id="createShiftStart"></span> <br>
-                End: <span id="createShiftEnd"></span>
-                <h1 id="createShiftId"></h1>
+                <form action="" method="post" name="invite" id="createShiftForm">
+                    {{ shift_form.csrf_token }}
+                    <p>
+                        Position:
+                        <select class="form-control" name="shift_position_id" id="shift_position_id">
+                            <option selected disabled value="0">Choose a Position...</option>
+                            <option v-for="position in positions" v-bind:value="position.id">${position.title}</option>
+
+                        </select> <br>
+                    </p>
+                    <p>
+                        Assigned Member:
+                        <select class="form-control" name="shift_assigned_member_id" id="shift_assigned_member_id">
+                        </select> <br>
+                    </p>
+                    <p>
+                        Create Multiple {{ shift_form.shift_repeating(class_="") }}
+                    </p>
+                    <p>
+                        {{ shift_form.shift_repeat_list(class_="form-control", size=7) }}
+                    </p>
+                    <p>
+                        {{ shift_form.shift_description(class_="form-control", rows=7, placeholder="description...") }}
+                    </p>
+                    <p>
+                        {{ shift_form.shift_start_time(class_="form-control") }}
+                    </p>
+                    <p>
+                        {{ shift_form.shift_end_time(class_="form-control") }}
+                    </p>
+                    <p>
+                        {{ shift_form.shift_id(class_="form-control") }}
+                    </p>
+                </form>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="createCancel">Cancel</button>
@@ -58,7 +81,7 @@
     </div>
 </div>
 
-<div id="createPositionModal" class="modal fade" data-backdrop="static" data-keyboard="false">
+<div id="CreatePositionModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -66,8 +89,12 @@
             </div>
             <div id="createPositionBody" class="modal-body">
 
-                <input type="text" class="form-control" id="createPositionName" placeholder="Name">
-                <br>
+                <form action="" method="post" name="create" id="CreatePositionForm">
+                    {{ form1.csrf_token }}
+                  <p>
+                    {{ form1.name(placeholder="Position Name", class_="form-control") }}
+                  </p>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="createPositionCancel" data-dismiss="modal">Cancel</button>
@@ -76,9 +103,6 @@
         </div>
     </div>
 </div>
-
-
-
 
 <div id="inviteMemberModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
@@ -109,7 +133,6 @@
     </div>
 </div>
 
-
 <div id="memberDetailModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
         <div class="modal-content">
@@ -121,10 +144,37 @@
                 Last Name: <span id="memberDetailLastName"></span> <br>
                 Email: <span id="memberDetailEmail"></span> <br>
                 ID: <span id="memberDetailId"></span> <br>
+                Admin <input type="checkbox" name="admin" id="memberDetailAdmin"
+                        v-on:click="set_admin()" v-model="curr_membership_admin"> <br>
+
+                Positions Assigned to: <span id="memberDetailFirstName2"></span>
+
+                <form action="" method='post' id="DeleteUserFromPosition">
+                <!-- Because this button is in a v-for loop i had to write the function for unassign in organization-index.js and not organization-calendar.js.-->
+                    <div v-for="(position, index) in assignedpositions">
+                        <div id="unposition">
+                        ${position.title} <button type="button" class="btn btn-primary" v-on:click="unassign_position(index)"/> Unassign </button>
+                        </div>
+                    </div>
+                </form>
+
+                <form action="" method='post' id="AddUserToPositionForm" >
+                    Assign Positions to: <span id="memberDetailFirstName3"></span>
+                    <div>
+                        <select class="dropdownmenu" name="position" id="positiondropdown">
+                            <option v-for="(position, index) in positions" v-bind:value="position.id"> ${position.title} </option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="AddUserToPositionSubmit"/> Press Me </button>
+                </form>
+
             </div>
+
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="memberDetailSubmit">Submit</button>
+                <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Back</button>
+                <!-- <button type="button" class="btn btn-primary" id="memberDetailSubmit">Submit</button> -->
             </div>
         </div>
     </div>

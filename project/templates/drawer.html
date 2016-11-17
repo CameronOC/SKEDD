@@ -17,10 +17,14 @@
             <ul v-for="position in positions">
                 <li>${position.title} </li>
             </ul>
-            <a data-toggle="modal" href="#createPositionModal" class="btn btn-primary">New Position</a>
+            <a data-toggle="modal" href="#CreatePositionModal" class="btn btn-primary">New Position</a>
             <h2>Members</h2>
             <ul v-for="(user, index) in users">
-                <li class="btn btn-primary" v-on:click="member_detail(index)">${user.first_name} ${user.last_name}</li>
+                <li>
+                    <a v-on:click="member_detail(index)" style="color:black">
+                        ${user.first_name} ${user.last_name}
+                    </a>
+                </li>
             </ul>
             <a data-toggle="modal" href="#inviteMemberModal" class="btn btn-primary">Invite Member</a>
         </div>

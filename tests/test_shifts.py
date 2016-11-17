@@ -316,43 +316,93 @@ class TestShifts(BaseTest, TestCase):
         :return:
         """
         shifts = org_utils.get_all_shifts_for_org_JSON(org_id=1) #string
-        shift_dict = json.loads(shifts) # dictionary of dictionaries
+        shift_list = json.loads(shifts) # dictionary of dictionaries
 
         assert shifts is not None
-        assert shift_dict is not None
-        assert len(shift_dict) == 1
-        for s in shift_dict:
-            assert shift_dict[str(s)]['position_id'] == self.shift.position_id
-            assert shift_dict[str(s)]['assigned_user_name'] == ''
-            assert shift_dict[str(s)]['assigned_user_id'] == self.shift.assigned_user_id
-            assert shift_dict[str(s)]['start_time'] == self.shift.start_time
-            assert shift_dict[str(s)]['end_time'] == self.shift.end_time
-            assert shift_dict[str(s)]['description'] == self.shift.description
+        assert shift_list is not None
+        assert len(shift_list) == 1
+        for s in shift_list:
+            assert s['position_id'] == self.shift.position_id
+            assert s['title'] == self.shift.Position.title
+            assert s['assigned_member'] == ''
+            assert s['assigned_member_id'] == self.shift.assigned_user_id
+            assert s['start'] == self.shift.start_time
+            assert s['end'] == self.shift.end_time
+            assert s['description'] == self.shift.description
+            assert s['id'] == self.shift.id
 
         shift = org_utils.get_shift(1)
         shift.update(assigned_user_id=self.john.id)
         shifts = org_utils.get_all_shifts_for_org_JSON(org_id=1) #string
-        shift_dict = json.loads(shifts)
+        shift_list = json.loads(shifts)
         assert shifts is not None
-        assert shift_dict is not None
-        assert len(shift_dict) == 1
-        for s in shift_dict:
-            assert shift_dict[str(s)]['position_id'] == self.shift.position_id
-            assert shift_dict[str(s)]['assigned_user_name'] == 'John Doe'
-            assert shift_dict[str(s)]['assigned_user_id'] == self.shift.assigned_user_id
-            assert shift_dict[str(s)]['start_time'] == self.shift.start_time
-            assert shift_dict[str(s)]['end_time'] == self.shift.end_time
-            assert shift_dict[str(s)]['description'] == self.shift.description
+        assert shift_list is not None
+        assert len(shift_list) == 1
+        for s in shift_list:
+            assert s['position_id'] == self.shift.position_id
+            assert s['assigned_member'] == 'John Doe'
+            assert s['assigned_member_id'] == self.shift.assigned_user_id
+            assert s['start'] == self.shift.start_time
+            assert s['end'] == self.shift.end_time
+            assert s['description'] == self.shift.description
+            assert s['id'] == self.shift.id
         
         shift.update(assigned_user_id=None)
         shift = org_utils.get_shift(1)
         assert shift.assigned_user_id == None
 
+    def test_shift_to_dict(self):
+        """
+        tests converting a shift to a dictionary
+        :return:
+        """
+
+        shift_dict = org_utils.shift_to_dict(self.shift)
+
+        print shift_dict
+
+        assert shift_dict is not None
+
+        assert 'id' in shift_dict
+        assert shift_dict['id'] == 1
+
+        assert 'assigned_member_id' in shift_dict
+        assert shift_dict['assigned_member_id'] == 0
+
+        assert 'assigned_member' in shift_dict
+        assert shift_dict['assigned_member'] == ''
+
+        assert 'position_id' in shift_dict
+        assert shift_dict['position_id'] == self.position.id
+
+        assert 'position_title' in shift_dict
+        assert shift_dict['position_title'] == self.position.title
+
+        assert 'start' in shift_dict
+        assert shift_dict['start'] == self.shift.start_time
+
+        assert 'end' in shift_dict
+        assert shift_dict['end'] == self.shift.end_time
+
+        assert 'description' in shift_dict
+        assert shift_dict['description'] == ''
+
+    def test_update_shift_time(self):
+        """
+        Tests updating the start and end times of a shift
+        :return:
+        """
+        self.shift.update_time("2016-11-15T09:30:00", "2016-11-15T09:30:00")
+
+        assert self.shift.start_time == "2016-11-15T09:30:00"
+        assert self.shift.end_time == "2016-11-15T09:30:00"
 
 
-
-
-
-
-
-
+    def test_delete_shift(self):
+        """
+        Tests deleting a shift
+        :return:
+        """
+        id = self.shift.id
+        org_utils.delete_shift(id)
+        assert Shift.query.get(id) is None

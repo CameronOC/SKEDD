@@ -77,6 +77,20 @@ def get_membership(org, user):
     :return:
     """
     return Membership.query.filter_by(member_id=user.id, organization_id=org.id).first()
+    
+def get_membership_JSON(org, user):
+    """
+    Checks if a user is in an organization
+    :param organization_id:
+    :param user_id:
+    :return:
+    """
+    membership = Membership.query.filter_by(member_id=user, organization_id=org).first()
+    membership_dict = {'id': membership.id, 'joined': membership.joined, 'is_owner': membership.is_owner,
+                        'is_admin': membership.is_admin, 'member_id': membership.member_id, 
+                        'organization_id': membership.organization_id}
+                            
+    return json.dumps(membership_dict)
 
 
 def confirm_user(user, password=None):
@@ -108,6 +122,16 @@ def membership_from_key_token(key, token):
     membership = user.memberships.filter_by(organization_id=org.id).first()
     return membership
 
+def create_position(org, title):
+    """
+    Creates a position given a organization and a position title/name
+    :return:
+    """
+    position = Position(title=title, organization_id=org.id)
+    db.session.add(position)
+    org.owned_positions.append(position)
+    db.session.commit()
+    return position
 
 def invite_member(org, email, first_name, last_name):
     """
@@ -252,14 +276,20 @@ def create_shifts_JSON(dictionary):
                 week_ct += 1
 
     return shifts
-    
-    
-def create_shifts_form( position_id, assigned_user_id, start_time, 
+
+
+# noinspection PyTypeChecker
+def create_shifts_form( position_id, assigned_user_id, start_time,
                         end_time, description, repeat_list=None):
     """
     creates a month's worth of shifts
     based on data from a form
-    :param dictionary:
+    :param position_id:
+    :param assigned_user_id:
+    :param start_time:
+    :param end_time:
+    :param description:
+    :param repeat_list:
     :return:
     """
     shifts = []
@@ -267,34 +297,53 @@ def create_shifts_form( position_id, assigned_user_id, start_time,
     main_end_time = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
 
     delta = timedelta()
-    shifts.append(create_shift_helper(
+
+    new_shift = create_shift_helper(
                 position_id,
                 assigned_user_id,
                 description,
                 main_start_time,
                 main_end_time,
-                delta))
+                delta)
+
+    shifts.append(shift_to_dict(new_shift))
 
     if repeat_list is not None and len(repeat_list) > 0:
         main_day_int = main_start_time.weekday()
         for day_int in repeat_list:
 
-            if main_day_int == day_int:
-                week_ct = 1;
+            if main_day_int == int(day_int):
+                week_ct = 1
             else:
                 week_ct = 0
 
             while week_ct < 4:
-                day_difference = day_int - main_day_int
-                delta = timedelta(days=day_difference, weeks=week_ct)
-                shifts.append(create_shift_helper(
-                    position_id,
-                    assigned_user_id,
-                    description,
-                    main_start_time,
-                    main_end_time,
-                    delta
-                ))
+                day_difference = int(day_int) - main_day_int
+                if week_ct == 0:
+                    if day_int > main_day_int:
+                        delta = timedelta(days=day_difference, weeks=0)
+                        new_shift = create_shift_helper(
+                            position_id,
+                            assigned_user_id,
+                            description,
+                            main_start_time,
+                            main_end_time,
+                            delta)
+
+                        shifts.append(shift_to_dict(new_shift))
+
+                else:
+                    delta = timedelta(days=day_difference, weeks=week_ct)
+                    new_shift = create_shift_helper(
+                            position_id,
+                            assigned_user_id,
+                            description,
+                            main_start_time,
+                            main_end_time,
+                            delta)
+
+                    shifts.append(shift_to_dict(new_shift))
+                	
                 week_ct += 1
 
     return shifts
@@ -319,9 +368,53 @@ def create_shift_helper(position_id, assigned_user_id, description, start_time, 
                              new_end_time,
                              description
                              )
-    # db.session.add(new_shift)
-    # db.session.commit()
+    db.session.add(new_shift)
+    db.session.commit()
     return new_shift
+
+
+def delete_shift(shift_id):
+    """
+    deletes a shift
+    :param shift_id:
+    :return:
+    """
+    shift = Shift.query.get(shift_id)
+    db.session.delete(shift)
+    db.session.commit()
+
+def shift_to_dict(shift):
+    """
+    Takes a shift object and returns a dictionary representation
+    :param shift:
+    :return:
+    """
+
+    if shift is None or not isinstance(shift, Shift):
+        return None
+
+    shift_dict = {
+        'id': shift.id,
+        'position_id': shift.position_id,
+        'position_title': shift.Position.title,
+        'start': shift.start_time,
+        'end': shift.end_time,
+    }
+
+    if shift.description is None:
+        shift_dict['description'] = ''
+    else:
+        shift_dict['description'] = shift.description
+
+    if shift.user is not None:
+        shift_dict['assigned_member_id'] = shift.assigned_user_id
+        shift_dict['assigned_member'] = shift.user.first_name + ' ' + shift.user.last_name
+
+    else:
+        shift_dict['assigned_member_id'] = 0
+        shift_dict['assigned_member'] = ''
+
+    return shift_dict
 
 def get_all_shifts_for_org_JSON(org_id):
     """
@@ -332,7 +425,7 @@ def get_all_shifts_for_org_JSON(org_id):
     :param org_id:
     :return:
     """
-    outer = {}
+    shifts_list = []
     positions = Position.query.filter_by(organization_id=org_id).all()
     for p in positions:
         shifts = Shift.query.filter_by(position_id=p.id).all()
@@ -343,15 +436,17 @@ def get_all_shifts_for_org_JSON(org_id):
             else:
                 assigned_user_name = ''
                 
-            inner = {   'position_id': s.position_id,
-                        'assigned_user_name': assigned_user_name,
-                        'assigned_user_id': s.assigned_user_id,
-                        'start_time': s.start_time,
-                        'end_time': s.end_time,
-                        'description': s.description}
-            outer[str(s.id)] = inner
+            shifts_list.append({'position_id': s.position_id,
+                                'title': s.Position.title,
+                                'assigned_member': assigned_user_name,
+                                'assigned_member_id': s.assigned_user_id,
+                                'start': s.start_time,
+                                'end': s.end_time,
+                                'description': s.description,
+                                'id': s.id
+                                })
 
-    return json.dumps(outer)
+    return json.dumps(shifts_list)
             
 def get_users_for_org_JSON(org_id):
     members_list = []
@@ -366,6 +461,29 @@ def get_users_for_org_JSON(org_id):
 
     return json.dumps(members_list)
 
+def get_members_for_position(position_id):
+    """
+    returns a JSON list of users that are assigned to a position
+    :param position_id:
+    :return:
+    """
+    members_list = []
+
+    position = Position.query.get(position_id)
+    members = position.assigned_users
+
+    for member in members:
+        members_list.append({
+            'first_name': member.first_name,
+            'last_name': member.last_name,
+            'id': member.id
+        })
+
+    return json.dumps({
+        'status': 'success',
+        'members': members_list
+    })
+
 def get_positions_for_org_JSON(org_id):
     """
     returns all positions in an organization as a JSON
@@ -374,14 +492,16 @@ def get_positions_for_org_JSON(org_id):
     :param id:
     :return:
     """
-    outer = {}
+    positions_list = []
     pos = Position.query.filter_by(organization_id=org_id).all()
     for p in pos:
-        inner = {   'title': p.title,
-                    'organization_id': p.organization_id}
-        outer[str(p.id)] = inner
+        positions_list.append({   
+                    'title': p.title,
+                    'organization_id': p.organization_id,
+                    'id': p.id
+        })
 
-    return json.dumps(outer)
+    return json.dumps(positions_list)
 
 #used in views.deletepositions
 def deletepositions(posid, orgid):
@@ -393,19 +513,38 @@ def deletepositions(posid, orgid):
 
 
 #used in views.assign and views.assignpos
-def assign_member_to_position(userid, posid, orgid):
-    user = userid
-    pos = posid
-    org = orgid
+def assign_member_to_position(user, pos):
     #assign the user to an org
-    pos.assigned_users.append(user)
+    myuser = User.query.filter_by(id=user).first()
+    mypos = Position.query.filter_by(id=pos).first()
+    mypos.assigned_users.append(myuser)
     db.session.commit()
+    return "success"
 
 
-def unassign_member_to_position(userid, posid, orgid):
-    user = userid
-    pos = posid
-    org = orgid
+def unassign_member_to_position(user, pos):
+    myuser = User.query.filter_by(id=user).first()
+    mypos = Position.query.filter_by(id=pos).first()
     #removes the user from the position
-    pos.assigned_users.remove(user)
+    mypos.assigned_users.remove(myuser)
     db.session.commit()
+    return "success"
+
+def get_assigned_positions_for_user(orgid, userid):
+    assigned_list = []
+    org = Organization.query.filter_by(id=orgid).first()
+    for pos in org.owned_positions:
+        for person in pos.assigned_users:
+            if str(person.id) == str(userid):
+                assigned_list.append({ 
+                    'title': pos.title,
+                    'position_id': pos.id,
+                    'user_id': person.id
+                 })
+
+    return json.dumps(assigned_list)
+    
+def set_membership_admin(mem_id):
+    membership = Membership.query.filter_by(id=mem_id).first()
+    membership.change_admin()
+    return "success"
