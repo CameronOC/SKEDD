@@ -394,7 +394,7 @@ class TestShifts(BaseTest, TestCase):
         Tests updating the start and end times of a shift
         :return:
         """
-        self.shift.update_time("2016-11-15T09:30:00", "2016-11-15T09:30:00")
+        self.shift.update(start_time="2016-11-15T09:30:00", end_time="2016-11-15T09:30:00")
 
         assert self.shift.start_time == "2016-11-15T09:30:00"
         assert self.shift.end_time == "2016-11-15T09:30:00"
