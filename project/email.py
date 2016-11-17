@@ -10,8 +10,7 @@ from project import app, mail
 
 def send_email(to, subject, template):
     sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
-    #from_email = Email(os.environ['APP_EMAIL_USERNAME'])
-    from_email = Email("test@example.com")
+    from_email = Email(os.environ['APP_EMAIL_USERNAME'])
     subject = "Hello World from the SendGrid Python Library!"
     to_email = Email("cjplanes@gmail.com")
     content = Content("text/plain", "Hello, Email!")
