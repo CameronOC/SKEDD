@@ -276,8 +276,11 @@ def invite(key):
     return_dict = {}
 
     if form.validate_on_submit():
-        utils.organization.invite_member(org, form.email.data, form.first_name.data, form.last_name.data)
-        return_dict['status'] = "success"
+        return_dict = utils.organization.invite_member(org,
+                                                       form.email.data,
+                                                       form.first_name.data,
+                                                       form.last_name.data)
+
     else:
         return_dict['status'] = "error"
         errors_dict = {
@@ -285,6 +288,7 @@ def invite(key):
             'last_name': [],
             'email': [],
         }
+
 
         for error in form.first_name.errors:
             errors_dict['first_name'].append(error)
@@ -298,8 +302,8 @@ def invite(key):
         return_dict['errors'] = errors_dict
 
     response = Response(response=json.dumps(return_dict),
-                    status=200,
-                    mimetype="application/json")
+                        status=200,
+                        mimetype="application/json")
 
     return response
 

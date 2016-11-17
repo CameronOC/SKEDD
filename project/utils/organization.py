@@ -140,6 +140,7 @@ def invite_member(org, email, first_name, last_name):
     :return:
     """
     user = User.query.filter_by(email=email).first()
+    return_dict = {}
 
     if user is None:
         user = User(
@@ -156,28 +157,30 @@ def invite_member(org, email, first_name, last_name):
     membership = get_membership(org, user)
 
     if membership is not None:
-        flash('This person is already a member of ' + org.name, 'danger')
-    else:
-        membership = Membership(
-            member_id=user.id,
-            organization_id=org.id
-        )
-        db.session.add(membership)
-        db.session.commit()
+        return_dict['status'] = 'error'
+        return_dict['message'] = user.first_name + ' ' + user.last_name + ' is already a member of ' + org.name
+        return return_dict
 
-        token = generate_invitation_token(user.email)
+    membership = Membership(
+        member_id=user.id,
+        organization_id=org.id
+    )
+    db.session.add(membership)
+    db.session.commit()
 
-        confirm_url = url_for('main.confirm_invite', key=org.id, token=token, _external=True)
+    token = generate_invitation_token(user.email)
 
-        html = render_template('emails/invitation.html', confirm_url=confirm_url, user=user, organization=org)
+    confirm_url = url_for('main.confirm_invite', key=org.id, token=token, _external=True)
 
-        subject = "You've been invited to use SKEDD"
+    html = render_template('emails/invitation.html', confirm_url=confirm_url, user=user, organization=org)
 
-        send_email(user.email, subject, html)
+    subject = "You've been invited to use SKEDD"
 
-        flash('You succesfully invited ' + user.first_name + ' ' + user.last_name + '.', 'success')
+    send_email(user.email, subject, html)
 
-    return membership
+    return_dict['status'] = 'success'
+    return_dict['message'] = 'You succesfully invited ' + user.first_name + ' ' + user.last_name + '.'
+    return return_dict
 
 
 def confirm_invite(membership):
