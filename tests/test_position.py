@@ -17,17 +17,11 @@ class TestPosition(BaseTest, TestCase):
         Tests that a user is assigned to a position
         :return:
         """
-        pos = org_utils.get_position(1)
-        org = org_utils.get_organization(1)
-        user = User(
-            email='member2@organization.com',
-            first_name='Will',
-            last_name='Smith',
-            password='password',
-            confirmed=True
-        )
-        org_utils.assign_member_to_position(user, pos, org)
-        assigneduser = position_assignments.select(position_assignments.c.user_id == 2)
+        pos = org_utils.get_position(1).id
+        user = org_utils.get_user(1).id
+        
+        org_utils.assign_member_to_position(user, pos)
+        assigneduser = position_assignments.select(position_assignments.c.user_id == 1)
         assert assigneduser is not None
 
     def test_unassign_member_to_position(self):
@@ -35,18 +29,12 @@ class TestPosition(BaseTest, TestCase):
         Tests that a user is unassigned from a position
         :return:
         """
-        pos = org_utils.get_position(1)
-        org = org_utils.get_organization(1)
-        user = User(
-            email='member2@organization.com',
-            first_name='Will',
-            last_name='Smith',
-            password='password',
-            confirmed=True
-        )
-        org_utils.assign_member_to_position(user, pos, org)
-        org_utils.unassign_member_to_position(user, pos, org)
-        unassigned = position_assignments.select(position_assignments.c.user_id == 2)
+        pos = org_utils.get_position(1).id
+        user = org_utils.get_user(1).id
+
+        org_utils.assign_member_to_position(user, pos)
+        org_utils.unassign_member_to_position(user, pos)
+        unassigned = position_assignments.select(position_assignments.c.user_id == 1)
         assert unassigned is not None
 
     def test_create_position(self):
@@ -63,12 +51,10 @@ class TestPosition(BaseTest, TestCase):
         Tests that a position is delete from a organization
         :return:
         """
-        pos = org_utils.get_position(1)
-        org = org_utils.get_organization(1)
+        pos = org_utils.get_position(1).id
         assert pos is not None
 
-        org_utils.deletepositions(pos, org)
-
+        org_utils.deletepositions(pos)
         pos2 = org_utils.get_position(1)
         assert pos2 is None
 
@@ -79,11 +65,40 @@ class TestPosition(BaseTest, TestCase):
         :return:
         """
         positions = org_utils.get_positions_for_org_JSON(org_id=1) #string
-        position_dict = json.loads(positions) # dictionary of dictionaries
+        positions_list = json.loads(positions) # dictionary of dictionaries
 
         assert positions is not None
-        assert position_dict is not None
-        assert len(position_dict) == 1
-        for p in position_dict:
-            assert position_dict[str(p)]['title'] == self.position.title
-            assert position_dict[str(p)]['organization_id'] == self.position.organization_id
+        assert positions_list is not None
+        assert len(positions_list) == 1
+        for p in positions_list:
+            assert p['title'] == self.position.title
+            assert p['organization_id'] == self.position.organization_id
+
+    def test_get_users_for_position(self):
+        """
+        Tests getting all the users for a specific position
+        :return:
+        """
+        org_utils.assign_member_to_position(self.john.id, self.position.id)
+        org_utils.assign_member_to_position(self.owner.id, self.position.id)
+
+        response = json.loads(org_utils.get_members_for_position(self.position.id))
+        assert response is not None
+        assert 'status' in response
+        assert response['status'] == 'success'
+
+        assert 'members' in response
+        members = response['members']
+
+        print members
+        assert len(members) == 2
+        member_one = members[0]
+        member_two = members[1]
+
+        assert member_one['first_name'] == 'John'
+        assert member_one['last_name'] == 'Doe'
+        assert member_one['id'] == 2
+
+        assert member_two['first_name'] == 'Organization'
+        assert member_two['last_name'] == 'Owner'
+        assert member_two['id'] == 1

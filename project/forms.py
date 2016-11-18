@@ -2,8 +2,9 @@
 
 
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, SelectField, DateTimeField
+from wtforms import StringField, PasswordField, SelectField, BooleanField, HiddenField, SelectMultipleField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
+from wtforms.widgets import TextArea
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from models import User, Position
@@ -14,20 +15,25 @@ class CreateForm(Form):
     name = StringField('name', validators=[DataRequired(), Length(min=1, max=50)])
     
 class ShiftForm(Form):
-    assigned_user_id = SelectField('users', choices=[])
+    # shift_position_id = SelectField('positions', choices=[])
+    
+    # shift_assigned_member_id = SelectField('users', choices=[])
+    
+    shift_description = StringField('description', validators=[Length(min=0, max=100)], widget=TextArea())
+    
+    shift_repeating = BooleanField('repeating', default=False)
 
-    day = SelectField('day', choices=[  ('Monday', 'Monday'), 
-                                        ('Tuesday', 'Tuesday'), 
-                                        ('Wednesday', 'Wednesday'), 
-                                        ('Thursday', 'Thursday'), 
-                                        ('Friday', 'Friday'), 
-                                        ('Saturday', 'Saturday'), 
-                                        ('Sunday', 'Sunday')])
+    shift_repeat_list = SelectMultipleField('day', choices=[('0', 'Monday'),
+                                                        ('1', 'Tuesday'),
+                                                        ('2', 'Wednesday'),
+                                                        ('3', 'Thursday'),
+                                                        ('4', 'Friday'),
+                                                        ('5', 'Saturday'),
+                                                        ('6', 'Sunday')])
                                         
-    start_time = DateTimeField('StartTime', format='%H:%M')
-    end_time = DateTimeField('EndTime', format='%H:%M')
-    am_or_pm = SelectField('AMorPM', choices=[('AM', 'AM'), ('PM', 'PM')])
-
+    shift_start_time = HiddenField('StartTime')
+    shift_end_time = HiddenField('EndTime')
+    shift_id = HiddenField('ShiftId')
 
 class InviteForm(Form):
     email = StringField(

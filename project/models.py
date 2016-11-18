@@ -81,6 +81,49 @@ class Shift(db.Model):
         self.end_time = end_time
         self.description = description
         
+    def update  (   self,
+                    position_id=0, 
+                    assigned_user_id=0,
+                    start_time=None,
+                    end_time=None,
+                    description=''
+                ):
+        """
+        Updates fields of this shift in database
+        :param shift:
+        :param pos_key:
+        :param assigned_user_id:
+        :param start_time:
+        :param end_time
+        :return:
+        """
+        if position_id is not 0: 
+            self.position_id = position_id
+        if assigned_user_id is not 0:
+            self.assigned_user_id = assigned_user_id
+        if start_time is not None:
+            self.start_time = start_time
+        if end_time is not None:
+            self.end_time = end_time
+        if description is not '':
+            self.description = description
+    
+        db.session.commit()
+
+    def update_time(self, start_time=None, end_time=None):
+        """
+        Updates a shifts start and end times, if they are given.
+        :param start_time:
+        :param end_time:
+        :return:
+        """
+        if start_time is not None:
+            self.start_time = start_time
+        if end_time is not None:
+            self.end_time = end_time
+
+        db.session.commit()
+
 
 class Membership(db.Model):
     __tablename__ = 'organization_members'
@@ -88,6 +131,7 @@ class Membership(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     joined = db.Column(db.Boolean, default=False, nullable=False)
     is_owner = db.Column(db.Boolean, default=False, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
@@ -95,15 +139,20 @@ class Membership(db.Model):
     # makes it so that a user can't be a member of an organization multiple times
     UniqueConstraint('member_id', 'organization_id')
 
-    def __init__(self, member_id, organization_id, is_owner=False, joined=False):
+    def __init__(self, member_id, organization_id, is_owner=False, joined=False, is_admin=False):
         self.member_id = member_id
         self.organization_id = organization_id
         self.is_owner = is_owner
         self.joined = joined
+        self.is_admin = is_admin
 
     def __repr__(self):
         return '<Organization: {}, Member: {}, joined: {}>'.format(self.organization_id, self.member_id, self.joined)
-
+        
+    def change_admin(self):
+        self.is_admin = not self.is_admin
+        db.session.commit()
+        
 
 class Organization(db.Model):
     __tablename__ = "organizations"
