@@ -384,7 +384,8 @@ $(document).ready(function() {
         $('#createPositionSubmit').prop('disabled', true);
 
         var newPosition = {
-            title: $('#title').val()
+            title: $('#title').val(),
+            description: $('#description').val()
         };
 
         url = "/organization/" + orgid.toString() + "/create_position"
@@ -410,14 +411,10 @@ $(document).ready(function() {
 
     //Code to add a member to a position
     $('#AddUserToPositionSubmit').on('click', function() {
-        console.log("AddUsertopositionsubmit pressed")
 
-        //get the title of the position from the dropdownmenu
         var select = document.getElementById("positiondropdown");
-        var positionid = select.options[select.selectedIndex].value;
-        //var positionid = APP.vue.positions[index].id;
-        //console.log(positionid) 
-        var uid = APP.vue.userid;
+        var positionid = select.options[select.selectedIndex].value; //get the id of the position from the dropdownmenu
+        var uid = APP.vue.userid;   //gets the userid
         
         url = "/assign/" + uid.toString() + "/" + positionid.toString()
 
@@ -432,7 +429,7 @@ $(document).ready(function() {
         });
 
         APP.get_assigned_positions();
-        //$('#memberDetailModal').modal('hide');
+        
     });
 
     $('#AddPositionToUserSubmit').on('click', function() {
@@ -441,8 +438,6 @@ $(document).ready(function() {
         //get the title of the position from the dropdownmenu
         var select = document.getElementById("userdropdown");
         var uid = select.options[select.selectedIndex].value;
-        //var positionid = APP.vue.positions[index].id;
-        //console.log(positionid) 
         var pid = APP.vue.posid;
         
         url = "/assign/" + uid.toString() + "/" + pid.toString()
@@ -458,7 +453,7 @@ $(document).ready(function() {
         });
 
         APP.get_assigned_users();
-        //$('#memberDetailModal').modal('hide');
+        
     });
 
     //Code to invite a member

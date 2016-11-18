@@ -98,10 +98,13 @@
             </div>
             <div id="createPositionBody" class="modal-body">
 
-                <form action="" method="post" name="create" id="CreatePositionForm" onsubmit="return false">
+                <form action="" method="post" name="create" id="CreatePositionForm">
                     {{ form1.csrf_token }}
                   <p>
                     {{ form1.name(placeholder="Position Name", class_="form-control") }}
+                  </p>
+                  <p>
+                    {{ form1.description(placeholder="Description", class_="form-control") }}
                   </p>
                 </form>
             </div>

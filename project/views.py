@@ -381,7 +381,7 @@ def create_position(key):
     return_dict = {}
 
     if form1.validate_on_submit():
-        utils.organization.create_position(org, form1.name.data)
+        utils.organization.create_position(org, form1.name.data, form1.description.data)
         return_dict['status'] = "success"
     else:
         return_dict['status'] = "error"
@@ -391,6 +391,9 @@ def create_position(key):
 
         for error in form1.name.errors:
             errors_dict['title'].append(error)
+
+        for error in form1.description.errors:
+            errors_dict['description'].append(error)
 
         return_dict['errors'] = errors_dict
 

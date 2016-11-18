@@ -7,18 +7,16 @@ var app = function() {
     //user object to store the data, this might not be neccassary
     function usersobject(firstName, lastName, email, id) {
         this.first_name =  firstName;
-        //console.log(this.first_name);
         this.last_name = lastName;
-        //console.log(this.last_name);
         this.email = email;
-        //console.log(this.email);
         this.id = id;
     };
 
-    function positionsobject(t, o, p){
+    function positionsobject(t, o, p, d){
         this.title = t;
         this.orgid = o;
         this.id = p;
+        this.description = d;
     }
 
     function assignedpositionobject(t, p){
@@ -54,8 +52,9 @@ var app = function() {
             t = response[key].title;
             o = response[key].orgid;
             p = response[key].id;
+            d = response[key].description;
             APP.vue.addposition(
-                    new positionsobject(t, o, p)
+                    new positionsobject(t, o, p, d)
                 );
         }
     }
@@ -180,7 +179,7 @@ var app = function() {
         $('#positionDetailTitle1').html(position.title);
         $('#positionDetailTitle2').html(position.title);
         $('#positionDetailTitle3').html(position.title);
-        $('#positionDetailDescription').html(position.desciption);
+        $('#positionDetailDescription').html(position.description);
         $('#positionDetailId').html(position.id);
 
         APP.vue.posid = position.id;
