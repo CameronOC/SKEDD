@@ -11,6 +11,7 @@ from flask_login import login_required, login_user
 from forms import CreateForm, InviteForm, JoinForm, PositionForm, ShiftForm
 from models import User, Organization, Membership, Position, Shift
 from project import app, db, bcrypt
+from project.email import ts
 from decorators import check_confirmed, owns_organization, organization_member, admin_of_org, shift_belongs_to_org
 import utils.organization
 import utils.utils
@@ -368,7 +369,7 @@ def setup_account(key, token):
         return render_template('main/setup.html', form=form, organization=membership.organization)
 
 
-@main_blueprint.route('/organization/<int:key>/create_position', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<int:key>/create_position', methods=['POST'])
 @login_required
 @check_confirmed
 @owns_organization
@@ -423,16 +424,28 @@ def get_position_members(key, key2):
                         status=200,  mimetype="application/json")
     return response
 
+@app.route('/getpositionmembers/<key>/')
+def get_position_users(key):
+    """
+    Returms a json list of all users for a position
+    :param key:
+    :param key2:
+    :return:
+    """
+    response = Response(response=utils.organization.get_users_for_position(key),
+                        status=200,  mimetype="application/json")
+    return response
 
-@app.route('/assign/<int:key1>/<int:key2>', methods=['POST'])
+
+@app.route('/assign/<key>/<key1>', methods=['POST'])
 @login_required
 @check_confirmed
-def assign(key1, key2):
+def assign(key, key1):
     """
 
     :return:
     """
-    response = Response(response=assign_member_to_position(key1, key2),
+    response = Response(response=assign_member_to_position(key, key1),
                         status=200)
     return response
 
@@ -440,15 +453,27 @@ def assign(key1, key2):
 @app.route('/unassign/<int:key1>/<int:key2>', methods=['POST'])
 @login_required
 @check_confirmed
-def unassign(key1, key2):
+def unassign(key, key1):
     """
 
     :return:
     """
     # get the user, position, and org
-    response = Response(response=unassign_member_to_position(key1, key2),
+    response = Response(response=unassign_member_to_position(key, key1),
                         status=200)
     return response
+
+
+@app.route('/deleteposition/<key>', methods=['POST'])
+@login_required
+@check_confirmed
+def deleteposition(key):
+    """
+
+    :return:
+    """
+    utils.organization.deletepositions(key)
+    return "success"
 
 
 @app.route('/getusersinorg/<int:key>')
@@ -461,6 +486,7 @@ def getusersinorg(key):
 
     return response
 
+
 @app.route('/getassignedpositions/<int:key>/<int:key2>')
 def getassignedpositions(key, key2):
     response = Response(response=utils.organization.get_assigned_positions_for_user(key, key2),
@@ -468,12 +494,35 @@ def getassignedpositions(key, key2):
                         mimetype="application/json")
     return response
 
+
 @app.route('/getpositionsinorg/<int:key>')
 @login_required
 @organization_member
 def getpositionsinorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
+
+
+@app.route('/organization/<key>/shifts')
+@login_required
+#@owns_organization
+def get_shifts_for_org(key):
+    """
+    :param key:
+    :return:
+    """
+    response = Response(response=utils.organization.get_all_shifts_for_org_JSON(key),
+                        status=200,
+                        mimetype="application/json")
+
+    return response
+
+
+@app.route('/deleteuserfromorg/<key>/<key1>',  methods=['POST'])
+@login_required
+def deleteuserfromorg(key, key1):
+    return utils.organization.delete_user_from_org(key, key1)
     
+
 @app.route('/getmembership/<int:key>/<int:key2>')
 def get_membership(key, key2):
     response = Response(response=utils.organization.get_membership_JSON(key, key2),
@@ -481,9 +530,12 @@ def get_membership(key, key2):
                         mimetype="application/json")
     return response
     
+
 @app.route('/setadmin/<int:key>', methods=['POST'])
 # @owns_organization write new one to work with membership_id?
 def set_admin_privileges(key):
     response = Response(response=utils.organization.set_membership_admin(key),
                         status=200)
-    return response
+    return response 
+  
+  

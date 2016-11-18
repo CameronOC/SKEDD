@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 import json
 from project import db, bcrypt
-from project.models import Organization, User, Membership, Position, Shift
-from project.email import send_email
+from project.email import send_email, ts
+from project.models import Organization, User, Membership, Position, Shift, position_assignments
 from project.utils.token import confirm_token, generate_invitation_token
 import project.utils.utils as utils
 
@@ -472,6 +472,11 @@ def get_all_shifts_for_org_JSON(org_id):
 
 
 def get_users_for_org_JSON(org_id):
+    """
+
+    :param org_id:
+    :return:
+    """
     members_list = []
     members = Membership.query.filter_by(organization_id=org_id).all()
     for member in members:
@@ -482,6 +487,31 @@ def get_users_for_org_JSON(org_id):
             'id': member.member.id
         })
 
+    return json.dumps(members_list)
+
+
+def get_users_for_position(position_id):
+    """
+    returns a JSON list of users that are assigned to a position
+    :param position_id:
+    :return:
+    """
+    members_list = []
+
+    position = Position.query.get(position_id)
+    members = position.assigned_users
+
+    for member in members:
+        members_list.append({
+            'first_name': member.first_name,
+            'last_name': member.last_name,
+            'id': member.id
+        })
+
+    #return json.dumps({
+    #    'status': 'success',
+    #    'members': members_list
+    #})
     return json.dumps(members_list)
 
 
@@ -529,27 +559,47 @@ def get_positions_for_org_JSON(org_id):
     return json.dumps(positions_list)
 
 
-# used in views.deletepositions
-def deletepositions(posid, orgid):
-    pos = posid
-    org = orgid
+#used in views.deletepositions
+def deletepositions(posid):
+    """
 
+    :param posid:
+    :return:
+    """
+    position = Position.query.filter_by(id=posid).first()
     #remove the position from the org
-    db.session.delete(pos)
+    db.session.delete(position)
     db.session.commit()
 
 
 # used in views.assign and views.assignpos
 def assign_member_to_position(user, pos):
-    # assign the user to an org
+    """
+    assign the user to an org
+    :param user:
+    :param pos:
+    :return:
+    """
     myuser = User.query.filter_by(id=user).first()
     mypos = Position.query.filter_by(id=pos).first()
-    mypos.assigned_users.append(myuser)
-    db.session.commit()
-    return "success"
+    #mypos.assigned_users.append(myuser)
+    if db.session.query(position_assignments).filter(position_assignments.c.user_id==user, position_assignments.c.position_id==pos).first() == None:
+    #if position_assignments.query.filter_by(user_id=user, position_id=pos) == None:
+        mypos.assigned_users.append(myuser)
+        db.session.commit()
+        return "success"
+    else:
+        #flash('member already assigned to this position', category='error')
+        return "already assigned"
 
 
 def unassign_member_to_position(user, pos):
+    """
+
+    :param user:
+    :param pos:
+    :return:
+    """
     myuser = User.query.filter_by(id=user).first()
     mypos = Position.query.filter_by(id=pos).first()
 
@@ -559,6 +609,12 @@ def unassign_member_to_position(user, pos):
     return "success"
 
 def get_assigned_positions_for_user(orgid, userid):
+    """
+
+    :param orgid:
+    :param userid:
+    :return:
+    """
     assigned_list = []
     org = Organization.query.filter_by(id=orgid).first()
     for pos in org.owned_positions:
@@ -571,8 +627,52 @@ def get_assigned_positions_for_user(orgid, userid):
                  })
 
     return json.dumps(assigned_list)
+
+
+
+def delete_user_from_org(userid, orgid):
+    """
+
+    :param userid:
+    :param orgid:
+    :return:
+    """
+    user = User.query.filter_by(id=userid).first()
+    org = Organization.query.filter_by(id=orgid).first()
+    membership = get_membership(org, user)
+    db.session.delete(membership)
+    db.session.commit()
+    return "success"
+
     
 def set_membership_admin(mem_id):
+    """
+
+    :param mem_id:
+    :return:
+    """
     membership = Membership.query.filter_by(id=mem_id).first()
     membership.change_admin()
     return "success"
+    
+    
+def send_password_recovery_email(email):
+    """
+
+    :param email:
+    :return:
+    """
+    user = User.query.filter_by(email=email).first()
+    
+    token = ts.dumps(user.email, salt='recover-key')
+
+    reset_url = url_for('user.recover_password', token=token, _external=True)
+
+    html = render_template('emails/password_reset_request.html', reset_url=reset_url, user=user)
+
+    subject = "SKEDD - Password Reset Requested"
+
+    send_email(user.email, subject, html)
+
+    flash('Password reset email sent to ' + email, 'success')    
+

@@ -197,3 +197,38 @@ class Position(db.Model):
 
     def __repr__(self):
         return '<title: {}>'.format(self.title)
+
+
+class Preference(db.Model):
+    __tablename__ = "preferences"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    preferences = db.Column(db.String, nullable=False)
+
+    def __init__(self, user_id, preferences):
+        self.user_id = user_id
+        self.preferences = preferences
+
+    def __repr__(self):
+        return '<preferences: {}>'.format(self.preferences) 
+
+"""
+class Preference(db.Model):
+    __tablename__ = "preferences"
+
+    id = db.Column(db.Integer, primary_key=True)
+    pref_start_time = db.Column(db.DateTime, nullable=False)
+    pref_end_time = db.Column(db.DateTime, nullable=False)
+    pref_day_of_week = db.Column(db.String(50))
+    pref_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __init__(self, pref_start_time, pref_end_time, pref_day_of_week, pref_user_id):
+        self.pref_start_time = pref_start_time
+        self.pref_end_time = pref_end_time
+        self.pref_day_of_week = pref_day_of_week
+        self.pref_user_id = pref_user_id
+
+    def __repr__(self):
+        return '<title: {}>'.format(self.title)
+"""

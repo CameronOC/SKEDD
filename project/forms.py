@@ -45,7 +45,6 @@ class InviteForm(Form):
         'last_name',
         validators=[DataRequired(), Length(min=1, max=20)])
 
-
 class JoinForm(Form):
     password = PasswordField(
         'password',
