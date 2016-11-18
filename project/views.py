@@ -338,14 +338,14 @@ def confirm_invite(key, token):
         return redirect(url_for('main.home'))
 
     if not membership.member.confirmed:
-        return redirect('/organization/' + key + '/setup/' + token)
+        return redirect('/organization/' + str(key) + '/setup/' + str(token))
 
     else:
         utils.organization.confirm_invite(membership)
         return redirect(url_for('main.home'))
 
 
-@main_blueprint.route('/organization/<int:key>/setup/<int:token>', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<int:key>/setup/<token>', methods=['GET', 'POST'])
 def setup_account(key, token):
     """
 
