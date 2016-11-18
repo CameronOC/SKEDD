@@ -13,7 +13,7 @@ def send_email(to, subject, template):
     sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
     from_email = Email("skedd.mail@gmail.com")
     to_email = Email(to)
-    content = Content("text/plain", "and easy to do anywhere, even with Python")
+    content = Content("text/html", template)
     mail = Mail(from_email, subject, to_email, content)
     response = sg.client.mail.send.post(request_body=mail.get())
     print(response.status_code)
