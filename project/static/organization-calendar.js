@@ -1,4 +1,6 @@
+
 $(document).ready(function() {
+
 
     var create = true;
 
@@ -29,6 +31,11 @@ $(document).ready(function() {
         events: "/organization/" + orgid.toString() + "/shifts",
         eventRender: function(event, element) {
             element.find('.fc-title').after("<span class=\"assigned\">" + event.assigned_member + "</span>");
+            var checkbox = $('#' + event.position_id);
+            if (checkbox.prop("checked") == false) {
+                return false;
+            }
+
         },
         eventClick:  function(event, jsEvent, view) {
             create = false;
@@ -80,11 +87,6 @@ $(document).ready(function() {
         $('#calendar').fullCalendar('option', 'height', calHeight);
       });
     };
-
-    function rerender_events() {
-        positions = APP.data.positions;
-        console.log(JSON.stringify(positions));
-    }
 
 
     $('#shiftModal').on('hidden.bs.modal', function(){
@@ -274,7 +276,7 @@ $(document).ready(function() {
 
 
     $('#drawerBody').on('change', '.position-toggle', function() {
-        console.log('change');
+        $('#calendar').fullCalendar( 'rerenderEvents' );
     });
 
 
@@ -404,6 +406,7 @@ $(document).ready(function() {
                 }else if(data.status == "error"){
                     alert(JSON.stringify(data));
                 }
+                $('#createPositionSubmit').prop('disabled', false);
             }
         });
     });
