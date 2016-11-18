@@ -1,5 +1,20 @@
 $(document).ready(function() {
-    var timeId = 0;
+    var timeId = 1;
+
+    //Retrieve list of events for current_user
+    $.ajax({
+        url: 'getTwitterFollowers.php',
+        type: 'GET',
+        data: 'twitterUsername=jquery4u',
+        success: function(data) {
+            //called when successful
+            $('#ajaxphp-results').html(data);
+        },
+        error: function(e) {
+            //called when there is an error
+            //console.log(e.message);
+        }
+    });
 
     $('#calendar').fullCalendar({
         header: {
@@ -46,6 +61,23 @@ $(document).ready(function() {
 
         eventClick: function (calEvent, jsEvent, view) {           
             $('#calendar').fullCalendar('removeEvents', calEvent._id);
+            var calEventOutput = {
+                start: calEvent.start,
+                end: calEvent.end,
+                id: calEvent.id,
+            }
+            console.log("calEventStringg:  " + JSON.stringify(calEventOutput));
+
+            $.ajax({
+                url: "/updatepreferences/delete",
+                type: "POST",
+                data: JSON.stringify(calEventOutput),
+                dataType: 'json',
+                success: function(data) {
+                    alert("Totes worked: " + newEventString);
+                }
+            });
+
         }
     });
 

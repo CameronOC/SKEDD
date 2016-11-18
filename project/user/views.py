@@ -119,6 +119,19 @@ def updatepreferences():
 
 
 
+@user_blueprint.route('/updatepreferences/delete', methods=['GET', 'POST'])
+@login_required
+def updatepreferences_delete():
+    pref_form = json.dumps(request.form)
+    user = User.query.filter_by(email=current_user.email).first()
+    selected_preference = Preference.query.filter_by(preferences=pref_form, user_id=user.id).one()
+    print("Preference time is being deleted:  ",pref_form)
+    db.session.delete(selected_preference)
+    db.session.commit()
+    return 'operation performed'
+
+
+
 
 @user_blueprint.route('/confirm/<token>')
 def confirm_email(token):
