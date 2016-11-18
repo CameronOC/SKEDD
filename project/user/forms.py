@@ -56,9 +56,7 @@ class ChangePasswordForm(Form):
             EqualTo('password', message='Passwords must match.')
         ]
     )
-<<<<<<< HEAD
-=======
-    
+
 class PasswordResetEnterEmailForm(Form):
     email = StringField(
         'Email',
@@ -76,5 +74,4 @@ class PasswordResetEnterPasswordForm(Form):
             EqualTo('password', message='Passwords must match.')
         ]
     )
->>>>>>> be837de423a5b69cb33f32abe10939d70c724bc1
 
