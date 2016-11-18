@@ -56,4 +56,25 @@ class ChangePasswordForm(Form):
             EqualTo('password', message='Passwords must match.')
         ]
     )
+<<<<<<< HEAD
+=======
+    
+class PasswordResetEnterEmailForm(Form):
+    email = StringField(
+        'Email',
+        validators=[DataRequired(), Email(message=None), Length(min=1, max=50), ])
+        
+class PasswordResetEnterPasswordForm(Form):
+    password = PasswordField(
+        'New Password',
+        validators=[DataRequired(), Length(min=6, max=25)]
+    )
+    confirm = PasswordField(
+        'Confirm Password',
+        validators=[
+            DataRequired(),
+            EqualTo('password', message='Passwords must match.')
+        ]
+    )
+>>>>>>> be837de423a5b69cb33f32abe10939d70c724bc1
 

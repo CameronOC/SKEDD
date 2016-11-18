@@ -697,3 +697,23 @@ select.dropdownmenu
    height: 50px;
    overflow: auto;
 }
+
+form.form {
+    width: 350px;
+}
+
+form.form table {
+    margin-bottom: 10px;
+}
+
+table {
+    width: 100%;
+}
+
+table td {
+    padding: 5px;
+}
+
+table input {
+    width: 100%;
+}

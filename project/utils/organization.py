@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 import json
 from project import db, bcrypt
+from project.email import send_email, ts
 from project.models import Organization, User, Membership, Position, Shift, position_assignments
-from project.email import send_email
 from project.utils.token import confirm_token, generate_invitation_token
 
 from flask import render_template, flash, url_for, g
@@ -593,4 +593,20 @@ def set_membership_admin(mem_id):
     membership = Membership.query.filter_by(id=mem_id).first()
     membership.change_admin()
     return "success"
+    
+    
+def send_password_recovery_email(email):
+    user = User.query.filter_by(email=email).first()
+    
+    token = ts.dumps(user.email, salt='recover-key')
+
+    reset_url = url_for('user.recover_password', token=token, _external=True)
+
+    html = render_template('emails/password_reset_request.html', reset_url=reset_url, user=user)
+
+    subject = "SKEDD - Password Reset Requested"
+
+    send_email(user.email, subject, html)
+
+    flash('Password reset email sent to ' + email, 'success')    
 
