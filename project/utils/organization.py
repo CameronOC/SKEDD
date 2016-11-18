@@ -567,7 +567,7 @@ def deletepositions(posid):
     :return:
     """
     position = Position.query.filter_by(id=posid).first()
-    shifts = Shifts.query.filter_by(position_id=posid).all()
+    shifts = Shift.query.filter_by(position_id=posid).all()
     for shift in shifts:
         db.session.delete(shift)
     #remove the position from the org, and the shifts for that position

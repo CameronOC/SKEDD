@@ -15,7 +15,11 @@
 
             <h2>Positions</h2>
             <ul v-for="(position, index) in positions">
-                <li ><input class="position-toggle" v-on:id="position.id" value="1" type="checkbox" checked>  ${position.title} </li>
+                <li ><input class="position-toggle" v-on:id="position.id" value="1" type="checkbox" checked>
+                    <a v-on:click="position_detail(index)" style="color:black">
+                        ${position.title}
+                    </a>
+                </li>
             </ul>
             <a data-toggle="modal" href="#CreatePositionModal" class="btn btn-primary">New Position</a>
             
