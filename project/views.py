@@ -79,7 +79,7 @@ def create():
     return render_template('main/create.html', form=CreateForm())
 
 
-@main_blueprint.route('/organization/<key>', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<int:key>', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 @organization_member
@@ -188,7 +188,7 @@ def update_shift_time(key, key1):
 
     shift = Shift.query.get(key1)
     shift.update(start_time=start_time, end_time=end_time)
-    response_dict = json.dumps({'status': 'success', 'shift': utils.utils.shift_to_dict(shift)})
+    response_dict = json.dumps({'status': 'success', 'shift': utils.organization.shift_to_dict(shift)})
 
     response = Response(response=json.dumps(response_dict),
                         status=200,
@@ -223,7 +223,7 @@ def delete_shift(key, key1):
     return response
 
 
-@main_blueprint.route('/organization/<key>/shift/<key1>/update', methods=['POST'])
+@main_blueprint.route('/organization/<int:key>/shift/<int:key1>/update', methods=['POST'])
 @login_required
 @check_confirmed
 @owns_organization
@@ -261,7 +261,7 @@ def update_shift(key, key1):
                              description=form.shift_description.data)
         response_dict['status'] = 'success'
         response_dict['message'] = 'Shift succesfully updated'
-        response_dict['shift'] = utils.utils.shift_to_dict(shift)
+        response_dict['shift'] = utils.organization.shift_to_dict(shift)
     else:
         response_dict['status'] = "error"
         errors_dict = utils.utils.shift_form_errors_to_dict(request.form)
@@ -276,7 +276,7 @@ def update_shift(key, key1):
                     mimetype="application/json")
 
 
-@main_blueprint.route('/organization/<key>/invite', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<int:key>/invite', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 @owns_organization
@@ -323,7 +323,7 @@ def invite(key):
     return response
 
 
-@main_blueprint.route('/organization/<key>/join/<token>', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<int:key>/join/<token>', methods=['GET', 'POST'])
 def confirm_invite(key, token):
     """
 
@@ -345,7 +345,7 @@ def confirm_invite(key, token):
         return redirect(url_for('main.home'))
 
 
-@main_blueprint.route('/organization/<key>/setup/<token>', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<int:key>/setup/<int:token>', methods=['GET', 'POST'])
 def setup_account(key, token):
     """
 
@@ -368,7 +368,7 @@ def setup_account(key, token):
         return render_template('main/setup.html', form=form, organization=membership.organization)
 
 
-@main_blueprint.route('/organization/<key>/create_position', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<int:key>/create_position', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
 @owns_organization
@@ -400,7 +400,7 @@ def create_position(key):
     return response
 
 
-@app.route('/positionsinorg/<key>')
+@app.route('/positionsinorg/<int:key>')
 def getpositioninorg(key):
     """
 
@@ -410,7 +410,7 @@ def getpositioninorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
 
 
-@app.route('/organization/<key>/position/<key2>/users')
+@app.route('/organization/<int:key>/position/<int:key2>/users')
 def get_position_members(key, key2):
     """
     Returms a json list of all users for a position
@@ -418,12 +418,13 @@ def get_position_members(key, key2):
     :param key2:
     :return:
     """
+    print key2
     response = Response(response=utils.organization.get_members_for_position(key2),
                         status=200,  mimetype="application/json")
     return response
 
 
-@app.route('/assign/<key1>/<key2>', methods=['POST'])
+@app.route('/assign/<int:key1>/<int:key2>', methods=['POST'])
 @login_required
 @check_confirmed
 def assign(key1, key2):
@@ -436,7 +437,7 @@ def assign(key1, key2):
     return response
 
 
-@app.route('/unassign/<key1>/<key2>', methods=['POST'])
+@app.route('/unassign/<int:key1>/<int:key2>', methods=['POST'])
 @login_required
 @check_confirmed
 def unassign(key1, key2):
@@ -450,7 +451,7 @@ def unassign(key1, key2):
     return response
 
 
-@app.route('/getusersinorg/<key>')
+@app.route('/getusersinorg/<int:key>')
 @login_required
 @organization_member
 def getusersinorg(key):
@@ -460,27 +461,27 @@ def getusersinorg(key):
 
     return response
 
-@app.route('/getassignedpositions/<key>/<key2>')
+@app.route('/getassignedpositions/<int:key>/<int:key2>')
 def getassignedpositions(key, key2):
     response = Response(response=utils.organization.get_assigned_positions_for_user(key, key2),
                         status=200,
                         mimetype="application/json")
     return response
 
-@app.route('/getpositionsinorg/<key>')
+@app.route('/getpositionsinorg/<int:key>')
 @login_required
 @organization_member
 def getpositionsinorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
     
-@app.route('/getmembership/<key>/<key2>')
+@app.route('/getmembership/<int:key>/<int:key2>')
 def get_membership(key, key2):
     response = Response(response=utils.organization.get_membership_JSON(key, key2),
                         status=200,
                         mimetype="application/json")
     return response
     
-@app.route('/setadmin/<key>', methods=['POST'])
+@app.route('/setadmin/<int:key>', methods=['POST'])
 # @owns_organization write new one to work with membership_id?
 def set_admin_privileges(key):
     response = Response(response=utils.organization.set_membership_admin(key),
