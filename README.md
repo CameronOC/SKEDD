@@ -46,3 +46,6 @@ for production:
 ## To run all tests
     cd SKEDD
     nosetests
+
+## To run tests with coverage report
+    nosetests --with-coverage --cover-package=project --cover-erase

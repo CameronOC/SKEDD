@@ -8,14 +8,14 @@
         </div>
 
 
-        <div class="drawer-body" >
+        <div id="drawerBody" class="drawer-body" >
             <script type="text/javascript">
                 var orgid = {{organization.id}}
             </script>
 
             <h2>Positions</h2>
             <ul v-for="(position, index) in positions">
-                <li class="btn btn-primary" v-on:click="position_detail(index)">${position.title} </li>
+                <li ><input class="position-toggle" v-on:id="position.id" value="1" type="checkbox" checked>  ${position.title} </li>
             </ul>
             <a data-toggle="modal" href="#CreatePositionModal" class="btn btn-primary">New Position</a>
             
