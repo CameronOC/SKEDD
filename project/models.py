@@ -5,6 +5,7 @@ import datetime
 
 from project import db, bcrypt
 from sqlalchemy import UniqueConstraint
+from utils.utils import random_color
 
 position_assignments = db.Table('position_assignments',
                                 db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
@@ -187,9 +188,12 @@ class Position(db.Model):
         secondary=position_assignments,
         backref=db.backref('Position', lazy='dynamic'))
 
+    color = db.Column(db.String(7))
+
     def __init__(self, title, organization_id):
         self.title = title
         self.organization_id = organization_id
+        self.color = random_color()
 
     def __repr__(self):
         return '<title: {}>'.format(self.title)

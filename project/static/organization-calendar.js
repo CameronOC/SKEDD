@@ -62,7 +62,7 @@ $(document).ready(function() {
             $('#shiftSubmit').prop('disabled', true);
             $('#shiftDelete').hide();
             $('#createMultipleShifts').show();
-            showAdminShiftsModal(newEvent);
+            showAdminShiftModal(newEvent);
 
         },
         eventResize: function(event, delta, revertFunc) {

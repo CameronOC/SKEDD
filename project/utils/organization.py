@@ -188,7 +188,7 @@ def invite_member(org, email, first_name, last_name):
 
     return_dict['status'] = 'success'
     return_dict['message'] = 'You succesfully invited ' + str(user.first_name) + ' ' + str(user.last_name) + '.'
-    return_dict['membership'] = utils.membership_to_dict(membership)
+    return_dict['membership'] = membership_to_dict(membership)
     return return_dict
 
 
@@ -299,7 +299,7 @@ def create_shifts_form(position_id, assigned_user_id, start_time,
                 main_end_time,
                 delta)
 
-    shifts.append(utils.shift_to_dict(new_shift))
+    shifts.append(shift_to_dict(new_shift))
 
     if repeat_list is not None and len(repeat_list) > 0:
         main_day_int = main_start_time.weekday()
@@ -323,7 +323,7 @@ def create_shifts_form(position_id, assigned_user_id, start_time,
                             main_end_time,
                             delta)
 
-                        shifts.append(utils.shift_to_dict(new_shift))
+                        shifts.append(shift_to_dict(new_shift))
 
                 else:
                     delta = timedelta(days=day_difference, weeks=week_ct)
@@ -335,7 +335,7 @@ def create_shifts_form(position_id, assigned_user_id, start_time,
                             main_end_time,
                             delta)
 
-                    shifts.append(utils.shift_to_dict(new_shift))
+                    shifts.append(shift_to_dict(new_shift))
 
                 week_ct += 1
 
@@ -377,6 +377,66 @@ def delete_shift(shift_id):
     db.session.commit()
 
 
+def membership_to_dict(membership):
+    """
+    Converts a membership object to a dictionary
+    :param membership:
+    :return:
+    """
+    if membership is None:
+        return None
+
+    if not isinstance(membership, Membership):
+        raise TypeError(str(type(membership)) + ' is not type Membership')
+
+    membership_dict = {
+        'id': membership.id,
+        'member_id': membership.member_id,
+        'organization_id': membership.organization_id,
+        'is_owner': membership.is_owner,
+        'is_admin': membership.is_admin,
+        'joined': membership.joined,
+    }
+
+    return membership_dict
+
+def shift_to_dict(shift):
+    """
+    Takes a shift object and returns a dictionary representation
+    :param shift:
+    :return:
+    """
+
+    if shift is None:
+        return None
+
+    if not isinstance(shift, Shift):
+        raise TypeError(str(type(shift)) + ' is not type Shift')
+
+    shift_dict = {
+        'id': shift.id,
+        'position_id': shift.position_id,
+        'position_title': shift.Position.title,
+        'start': shift.start_time,
+        'end': shift.end_time,
+    }
+
+    if shift.description is None:
+        shift_dict['description'] = ''
+    else:
+        shift_dict['description'] = shift.description
+
+    if shift.user is not None:
+        shift_dict['assigned_member_id'] = shift.assigned_user_id
+        shift_dict['assigned_member'] = shift.user.first_name + ' ' + shift.user.last_name
+
+    else:
+        shift_dict['assigned_member_id'] = 0
+        shift_dict['assigned_member'] = 'Unassigned'
+
+    return shift_dict
+
+
 def get_all_shifts_for_org_JSON(org_id):
     """
     returns all shifts for each position
@@ -404,7 +464,8 @@ def get_all_shifts_for_org_JSON(org_id):
                                 'start': s.start_time,
                                 'end': s.end_time,
                                 'description': s.description,
-                                'id': s.id
+                                'id': s.id,
+                                'color': p.color
                                 })
 
     return json.dumps(shifts_list)
@@ -431,16 +492,16 @@ def get_members_for_position(position_id):
     :return:
     """
     members_list = []
+    if position_id != 0:
+        position = Position.query.get(position_id)
+        members = position.assigned_users
 
-    position = Position.query.get(position_id)
-    members = position.assigned_users
-
-    for member in members:
-        members_list.append({
-            'first_name': member.first_name,
-            'last_name': member.last_name,
-            'id': member.id
-        })
+        for member in members:
+            members_list.append({
+                'first_name': member.first_name,
+                'last_name': member.last_name,
+                'id': member.id
+            })
 
     return json.dumps({
         'status': 'success',
