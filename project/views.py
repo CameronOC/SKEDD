@@ -57,9 +57,9 @@ def home():
     Renders a user's home page
     :return:
     """
-    orgs = g.user.orgs_owned.all()
-    memberships = g.user.memberships.filter_by(is_owner=False).all()
-    return render_template('project/home.html', organizations=orgs, memberships=memberships)
+    #orgs = g.user.orgs_owned.all()
+    #memberships = g.user.memberships.filter_by(is_owner=False).all()
+    return render_template('project/home.html')#, organizations=orgs, memberships=memberships)
 
 
 @main_blueprint.route('/create', methods=['GET', 'POST'])
