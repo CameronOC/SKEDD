@@ -1,4 +1,3 @@
-from project.models import Membership, Shift
 from random import randint
 
 def merge_dicts(*dict_args):
@@ -79,65 +78,6 @@ def shift_form_errors_to_dict(form):
 
     return errors_dict
 
-def membership_to_dict(membership):
-    """
-    Converts a membership object to a dictionary
-    :param membership:
-    :return:
-    """
-    if membership is None:
-        return None
-
-    if not isinstance(membership, Membership):
-        raise TypeError(str(type(membership)) + ' is not type Membership')
-
-    membership_dict = {
-        'id': membership.id,
-        'member_id': membership.member_id,
-        'organization_id': membership.organization_id,
-        'is_owner': membership.is_owner,
-        'is_admin': membership.is_admin,
-        'joined': membership.joined,
-    }
-
-    return membership_dict
-
-def shift_to_dict(shift):
-    """
-    Takes a shift object and returns a dictionary representation
-    :param shift:
-    :return:
-    """
-
-    if shift is None:
-        return None
-
-    if not isinstance(shift, Shift):
-        raise TypeError(str(type(shift)) + ' is not type Shift')
-
-    shift_dict = {
-        'id': shift.id,
-        'position_id': shift.position_id,
-        'position_title': shift.Position.title,
-        'start': shift.start_time,
-        'end': shift.end_time,
-    }
-
-    if shift.description is None:
-        shift_dict['description'] = ''
-    else:
-        shift_dict['description'] = shift.description
-
-    if shift.user is not None:
-        shift_dict['assigned_member_id'] = shift.assigned_user_id
-        shift_dict['assigned_member'] = shift.user.first_name + ' ' + shift.user.last_name
-
-    else:
-        shift_dict['assigned_member_id'] = 0
-        shift_dict['assigned_member'] = 'Unassigned'
-
-    return shift_dict
-
 
 def rgb_to_hex(red, green, blue):
     """Return color as #rrggbb for the given color values."""
@@ -149,13 +89,15 @@ def random_color():
     Generates a random, but aesthetically pleasing color
     :return:
     """
-    red_mix = 255
-    green_mix = 255
-    blue_mix = 255
+    red_mix = 45
+    green_mix = 163
+    blue_mix = 37
 
-    red = (randint(0,255) + red_mix) / 2
-    green = (randint(0,255) + green_mix) / 2
-    blue = (randint(0,255) + blue_mix) / 2
+    randomizer = (randint(5, 10) + 0.0) / 10.0
+
+    red = (randint(0,255) + (red_mix * randomizer)) * .5
+    green = (randint(0,255) + (green_mix * randomizer)) * .5
+    blue = (randint(0,255) + (blue_mix * randomizer)) * .5
 
     return rgb_to_hex(red, green, blue)
 

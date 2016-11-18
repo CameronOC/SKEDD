@@ -3,7 +3,6 @@ from flask import g
 from project import app, db
 from project.models import User, Organization, Membership, Position, Shift, position_assignments
 import project.utils.organization as org_utils
-import project.utils.utils as utils
 from base_test import BaseTest
 import datetime
 import json
