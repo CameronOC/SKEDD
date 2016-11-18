@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 import json
 from project import db, bcrypt
-from project.models import Organization, User, Membership, Position, Shift
 from project.email import send_email, ts
+from project.models import Organization, User, Membership, Position, Shift, position_assignments
 from project.utils.token import confirm_token, generate_invitation_token
 
 from flask import render_template, flash, url_for, g
@@ -461,6 +461,30 @@ def get_users_for_org_JSON(org_id):
 
     return json.dumps(members_list)
 
+def get_users_for_position(position_id):
+    """
+    returns a JSON list of users that are assigned to a position
+    :param position_id:
+    :return:
+    """
+    members_list = []
+
+    position = Position.query.get(position_id)
+    members = position.assigned_users
+
+    for member in members:
+        members_list.append({
+            'first_name': member.first_name,
+            'last_name': member.last_name,
+            'id': member.id
+        })
+
+    #return json.dumps({
+    #    'status': 'success',
+    #    'members': members_list
+    #})
+    return json.dumps(members_list)
+
 def get_members_for_position(position_id):
     """
     returns a JSON list of users that are assigned to a position
@@ -504,11 +528,10 @@ def get_positions_for_org_JSON(org_id):
     return json.dumps(positions_list)
 
 #used in views.deletepositions
-def deletepositions(posid, orgid):
-    pos = posid
-    org = orgid
+def deletepositions(posid):
+    position = Position.query.filter_by(id=posid).first()
     #remove the position from the org
-    db.session.delete(pos)
+    db.session.delete(position)
     db.session.commit()
 
 
@@ -517,9 +540,15 @@ def assign_member_to_position(user, pos):
     #assign the user to an org
     myuser = User.query.filter_by(id=user).first()
     mypos = Position.query.filter_by(id=pos).first()
-    mypos.assigned_users.append(myuser)
-    db.session.commit()
-    return "success"
+    #mypos.assigned_users.append(myuser)
+    if db.session.query(position_assignments).filter(position_assignments.c.user_id==user, position_assignments.c.position_id==pos).first() == None:
+    #if position_assignments.query.filter_by(user_id=user, position_id=pos) == None:
+        mypos.assigned_users.append(myuser)
+        db.session.commit()
+        return "success"
+    else:
+        #flash('member already assigned to this position', category='error')
+        return "already assigned"
 
 
 def unassign_member_to_position(user, pos):
@@ -543,6 +572,22 @@ def get_assigned_positions_for_user(orgid, userid):
                  })
 
     return json.dumps(assigned_list)
+
+
+#For some reason this sets the org_id to null instead of just removing the row...
+#I'll fix it later if I need to.
+def delete_user_from_org(userid, orgid):
+    user = User.query.filter_by(id=userid).first()
+    org = Organization.query.filter_by(id=orgid).first()
+    membership = get_membership(org, user)
+    #Membership.query.filter_by(member_id=userid, organization_id=orgid).delete()
+    db.session.delete(membership)
+    #user.memberships.remove(membership)
+    #membership.organization_members.remove(membership)
+    #membership.delete()
+    db.session.commit()
+    return "success"
+
     
 def set_membership_admin(mem_id):
     membership = Membership.query.filter_by(id=mem_id).first()
@@ -564,3 +609,4 @@ def send_password_recovery_email(email):
     send_email(user.email, subject, html)
 
     flash('Password reset email sent to ' + email, 'success')    
+

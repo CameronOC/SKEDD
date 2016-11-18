@@ -252,6 +252,9 @@ $(document).ready(function() {
     *
     */
     $('#createPositionSubmit').on('click', function() {
+
+        $('#createPositionSubmit').prop('disabled', true);
+
         var newPosition = {
             title: $('#title').val()
         };
@@ -304,6 +307,32 @@ $(document).ready(function() {
         //$('#memberDetailModal').modal('hide');
     });
 
+    $('#AddPositionToUserSubmit').on('click', function() {
+        console.log("AddPositionToUserSubmit pressed")
+
+        //get the title of the position from the dropdownmenu
+        var select = document.getElementById("userdropdown");
+        var uid = select.options[select.selectedIndex].value;
+        //var positionid = APP.vue.positions[index].id;
+        //console.log(positionid) 
+        var pid = APP.vue.posid;
+        
+        url = "/assign/" + uid.toString() + "/" + pid.toString()
+
+        $.ajax({
+            type: "POST",
+            url: url,
+
+            success: function()
+            {
+                console.log("success")
+            }
+        });
+
+        APP.get_assigned_users();
+        //$('#memberDetailModal').modal('hide');
+    });
+
     //Code to invite a member
     $('#inviteMemberSubmit').on('click', function() {
 
@@ -341,6 +370,48 @@ $(document).ready(function() {
 
     });
 
+    $('#DeleteUserFromOrg').on('click', function() {
+        console.log("DeleteUserFromOrg pressed")
 
+        var uid = APP.vue.userid;
+        console.log(uid);
+        
+        url = "/deleteuserfromorg/" + uid.toString() + "/" + orgid.toString()
+
+        $.ajax({
+            type: "POST",
+            url: url,
+
+            success: function()
+            {
+                console.log("success")
+            }
+        });
+
+        APP.get_users();
+        //$('#memberDetailModal').modal('hide');
+    });
+
+    $('#DeletePositionFromOrg').on('click', function() {
+        console.log("DeletePositionFromOrg pressed")
+
+        var posid = APP.vue.posid;
+        console.log(posid);
+        
+        url = "/deleteposition/" + posid.toString()
+
+        $.ajax({
+            type: "POST",
+            url: url,
+
+            success: function()
+            {
+                console.log("success")
+            }
+        });
+
+        APP.get_positions();
+        //$('#memberDetailModal').modal('hide');
+    });
 
 });

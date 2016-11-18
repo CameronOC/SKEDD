@@ -89,7 +89,7 @@
             </div>
             <div id="createPositionBody" class="modal-body">
 
-                <form action="" method="post" name="create" id="CreatePositionForm">
+                <form action="" method="post" name="create" id="CreatePositionForm" onsubmit="return false">
                     {{ form1.csrf_token }}
                   <p>
                     {{ form1.name(placeholder="Position Name", class_="form-control") }}
@@ -174,7 +174,49 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Back</button>
-                <!-- <button type="button" class="btn btn-primary" id="memberDetailSubmit">Submit</button> -->
+                <button type="button" class="btn btn-primary" id="DeleteUserFromOrg" data-dismiss="modal">Delete User From Org</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="positionDetailModal" class="modal fade" data-backdrop="static" data-keyboard="false">
+   <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="positionDetailTitle" class="modal-title"></h4>
+            </div>
+            <div id="positionDetailBody" class="modal-body">
+                Title: <span id="positionDetailTitle1"></span> <br>
+                Description: <span id="positionDetailDescription"></span> <br>
+                ID: <span id="positionDetailId"></span> <br>
+            
+                Users Assigned to: <span id="positionDetailTitle2"></span>
+
+                <form action="" method='post' id="DeleteUserFromPosition">
+                <!-- Because this button is in a v-for loop i had to write the function for unassign in organization-index.js and not organization-calendar.js.-->
+                    <div v-for="(user, index) in assignedusers">
+                        <div id="unposition">
+                        ${user.first_name}  ${user.last_name}<button type="button" class="btn btn-primary" v-on:click="unassign_user(index)"/> Unassign </button>
+                        </div>
+                    </div>
+                </form>
+
+                <form action="" method='post' id="AddUserToPositionForm" >
+                    Assign Users to: <span id="positionDetailTitle3"></span>
+                    <div>
+                        <select class="dropdownmenu" name="user" id="userdropdown">
+                            <option v-for="(user, index) in users" v-bind:value="user.id"> ${user.first_name} ${user.last_name} </option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="AddPositionToUserSubmit"/> Press Me </button>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Back</button>
+                <button type="button" class="btn btn-primary" id="DeletePositionFromOrg" data-dismiss="modal">Delete Position From Org</button>
             </div>
         </div>
     </div>
