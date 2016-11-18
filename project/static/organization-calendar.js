@@ -552,7 +552,7 @@ $(document).ready(function() {
         });
 
         APP.get_positions();
-        //$('#memberDetailModal').modal('hide');
+        $('#calendar').fullCalendar( 'refetchEvents' );
     });
 
 });
