@@ -81,6 +81,11 @@ $(document).ready(function() {
       });
     };
 
+    function rerender_events() {
+        positions = APP.data.positions;
+        console.log(JSON.stringify(positions));
+    }
+
 
     $('#shiftModal').on('hidden.bs.modal', function(){
         $('#shift_assigned_member_id').empty();
@@ -266,6 +271,12 @@ $(document).ready(function() {
         $('#shift_repeat_list').toggle();
         $("#shift_repeat_list option:selected").prop("selected", false);
     });
+
+
+    $('#drawerBody').on('change', '.position-toggle', function() {
+        console.log('change');
+    });
+
 
     /*
     *
