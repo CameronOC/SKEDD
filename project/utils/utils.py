@@ -86,28 +86,31 @@ def rgb_to_hex(red, green, blue):
 
 def random_color():
     """
-    Generates a random, but aesthetically pleasing color
+    Generates a random color
     :return:
     """
-    red_mix = 45
-    green_mix = 163
-    blue_mix = 37
 
-    randomizer = (randint(5, 10) + 0.0) / 10.0
-
-    red = (randint(0,255) + (red_mix * randomizer)) * .5
-    green = (randint(0,255) + (green_mix * randomizer)) * .5
-    blue = (randint(0,255) + (blue_mix * randomizer)) * .5
+    red = randint(0,255)
+    green = randint(0,255)
+    blue = randint(0,255)
 
     return rgb_to_hex(red, green, blue)
 
 
+def random_pastel():
+    """
+    Generates a random pastel color
+    :return:
+    """
+    red_mix = 255
+    green_mix = 255
+    blue_mix = 255
 
+    red = (randint(0,255) + red_mix) * .5
+    green = (randint(0,255) + green_mix) * .5
+    blue = (randint(0,255) + blue_mix) * .5
 
-
-
-
-
+    return rgb_to_hex(red, green, blue)
 
 
 
