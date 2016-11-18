@@ -16,9 +16,6 @@ def send_email(to, subject, template):
     content = Content("text/html", template)
     mail = Mail(from_email, subject, to_email, content)
     response = sg.client.mail.send.post(request_body=mail.get())
-    print(response.status_code)
-    print(response.body)
-    print(response.headers)
     #msg = Message(
      #   subject,
       #  recipients=[to],
