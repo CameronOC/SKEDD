@@ -59,7 +59,7 @@ def home():
     """
     orgs = g.user.orgs_owned.all()
     memberships = g.user.memberships.filter_by(is_owner=False).all()
-    return render_template('main/index.html', organizations=orgs, memberships=memberships)
+    return render_template('main/home.html', organizations=orgs, memberships=memberships)
 
 
 @main_blueprint.route('/create', methods=['GET', 'POST'])
