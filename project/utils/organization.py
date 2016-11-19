@@ -217,6 +217,7 @@ def create_shift(pos_key, assigned_user_id, start_time, end_time, description):
     :return:
     """
     # create shift with parameters
+    print type(assigned_user_id)
     shift = Shift(position_id=pos_key, assigned_user_id=assigned_user_id, start_time=start_time,
                   end_time=end_time, description=description)
 

@@ -133,28 +133,31 @@ def create_shift(key):
     return_dict = {}
     shift_assigned_member_id = None
 
-    if form.validate_on_submit():
+    return_dict = utils.utils.validate_shift(request.form, pos_required=True)
 
-        return_dict = utils.utils.validate_member_position_id(request.form,
-                                                              pos_required=True)
-        if 'status' in return_dict:
-            return Response(response=json.dumps(return_dict),
-                            status=200,
-                            mimetype="application/json")
+    # print request.form['shift_position_id']
+    # print type(request.form['shift_position_id'])
 
-        shift_position_id = int(request.form['shift_position_id'])
-        if 'shift_assigned_member_id' in request.form:
-            shift_assigned_member_id = request.form['shift_assigned_member_id']
+    if 'status' in return_dict:
+        return_dict['message'] = 'Unable to Create Shift.'
+        return Response(response=json.dumps(return_dict),
+                        status=200,
+                        mimetype="application/json")
 
-        shifts = utils.organization.create_shifts_form(shift_position_id,
-                                                       shift_assigned_member_id,
-                                                       form.shift_start_time.data,
-                                                       form.shift_end_time.data,
-                                                       form.shift_description.data,
-                                                       form.shift_repeat_list.data)
+    shift_position_id = int(request.form['shift_position_id'])
+    if 'shift_assigned_member_id' in request.form:
+        shift_assigned_member_id = int(request.form['shift_assigned_member_id'])
 
-        return_dict['shifts'] = shifts
-        return_dict['status'] = "success"
+    shifts = utils.organization.create_shifts_form(shift_position_id,
+                                                   shift_assigned_member_id,
+                                                   request.form['shift_start_time'],
+                                                   request.form['shift_end_time'],
+                                                   request.form['shift_description'],
+                                                   request.form['shift_repeat_list'])
+    return_dict['shifts'] = shifts
+    return_dict['status'] = "success"
+    """
+
     else:
         return_dict['status'] = "error"
         errors_dict = utils.utils.shift_form_errors_to_dict(request.form)
@@ -163,6 +166,7 @@ def create_shift(key):
         if 'status' in manual_validation:
             errors_dict = utils.utils.merge_dicts(manual_validation['errors'], errors_dict)
         return_dict['errors'] = errors_dict
+    """
 
     response = Response(response=json.dumps(return_dict),
                         status=200,
@@ -242,27 +246,27 @@ def update_shift(key, key1):
     shift_position_id = None
     shift_assigned_member_id = None
 
-    if form.validate_on_submit():
+    return_dict = utils.utils.validate_shift(request.form)
+    if 'status' in return_dict:
+        return Response(response=json.dumps(return_dict),
+                        status=200,
+                        mimetype="application/json")
 
-        return_dict = utils.utils.validate_member_position_id(request.form)
-        if 'status' in return_dict:
-            return Response(response=json.dumps(return_dict),
-                            status=200,
-                            mimetype="application/json")
+    if 'shift_position_id' in request.form:
+        shift_position_id = int(request.form['shift_position_id'])
+    if 'shift_assigned_member_id' in request.form:
+        shift_assigned_member_id = int(request.form['shift_assigned_member_id'])
 
-        if 'shift_position_id' in request.form:
-            shift_position_id = int(request.form['shift_position_id'])
-        if 'shift_assigned_member_id' in request.form:
-            shift_assigned_member_id = request.form['shift_assigned_member_id']
-        
-        shift = shift.update(position_id=shift_position_id,
-                             assigned_user_id=shift_assigned_member_id,
-                             start_time=form.shift_start_time.data,
-                             end_time=form.shift_end_time.data,
-                             description=form.shift_description.data)
-        response_dict['status'] = 'success'
-        response_dict['message'] = 'Shift succesfully updated'
-        response_dict['shift'] = utils.organization.shift_to_dict(shift)
+    shift = shift.update(position_id=shift_position_id,
+                         assigned_user_id=shift_assigned_member_id,
+                         start_time=request.form['shift_start_time'],
+                         end_time=request.form['shift_end_time'],
+                         description=request.form['shift_description'])
+    response_dict['status'] = 'success'
+    response_dict['message'] = 'Shift succesfully updated'
+    response_dict['shift'] = utils.organization.shift_to_dict(shift)
+
+    """
     else:
         response_dict['status'] = "error"
         errors_dict = utils.utils.shift_form_errors_to_dict(request.form)
@@ -271,6 +275,8 @@ def update_shift(key, key1):
         if 'status' in manual_validation:
             errors_dict = utils.utils.merge_dicts(manual_validation['errors'], errors_dict)
             response_dict['errors'] = errors_dict
+    """
+
 
     return Response(response=json.dumps(response_dict),
                     status=200,
@@ -380,10 +386,18 @@ def create_position(key):
     form1 = PositionForm(request.form)
     return_dict = {}
 
-    if form1.validate_on_submit():
+    utils.organization.create_position(org, request.form['name'])
+    return_dict['status'] = "success"
+
+
+    """
+     if form1.validate_on_submit():
         utils.organization.create_position(org, form1.name.data)
         return_dict['status'] = "success"
     else:
+
+        print str(form1.csrf_token.errors)
+
         return_dict['status'] = "error"
         errors_dict = {
             'title': []
@@ -393,6 +407,8 @@ def create_position(key):
             errors_dict['title'].append(error)
 
         return_dict['errors'] = errors_dict
+    """
+
 
     response = Response(response=json.dumps(return_dict),
                         status=200,

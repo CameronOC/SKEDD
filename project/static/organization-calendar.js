@@ -112,7 +112,9 @@ $(document).ready(function() {
         $('#shift_end_time').val(shift.end.toISOString());
         $('#shift_id').val(shift.id);
         $('#shift_position_id').val(shift.position_id)
-        updateUsersForPosition(shift.position_id, shift.assigned_member_id);
+        if (create == false) {
+            updateUsersForPosition(shift.position_id, shift.assigned_member_id);
+        }
         $('#shift_description').val(shift.description);
         $('#shiftModal').modal('show');
     }
@@ -178,13 +180,24 @@ $(document).ready(function() {
             url = '/organization/' + orgid.toString() + '/shift/' + ($('#shift_id').val()).toString() + '/update';
         }
 
+        var shiftDict = {
+            shift_position_id: $('#shift_position_id').val(),
+            shift_assigned_member_id: $('#shift_assigned_member_id').val(),
+            shift_description: $('#shift_description').val(),
+            shift_repeat_list: $('#shift_repeat_list').val(),
+            shift_start_time: $('#shift_start_time').val(),
+            shift_end_time: $('#shift_end_time').val()
+        };
+
+        console.log(JSON.stringify(shiftDict));
+
         $.ajax({
             headers: {
                 'Accept': "application/json",
             },
             type: "POST",
             url: url,
-            data: $("#shiftForm").serialize(), // serializes the form's elements.
+            data: shiftDict,
 
             success: function(data)
             {
@@ -198,7 +211,7 @@ $(document).ready(function() {
                     }
 
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data);
                     $('#shiftSubmit').prop('disabled', false);
                 }
             }
@@ -251,7 +264,7 @@ $(document).ready(function() {
                     $('#shiftModal').modal('hide');
 
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data)
                     $('#shiftSubmit').prop('disabled', false);
 
                 }
@@ -330,7 +343,7 @@ $(document).ready(function() {
                     $('#shiftSubmit').prop('disabled', false);
 
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data)
                 }
             }
         });
@@ -366,7 +379,7 @@ $(document).ready(function() {
 
 
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data)
                     revertFunc();
                 }
 
@@ -492,7 +505,7 @@ $(document).ready(function() {
                     APP.adduser(newUser);
                     $('#inviteMemberModal').modal('hide');
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data)
                 }
             }
         });
@@ -502,12 +515,12 @@ $(document).ready(function() {
     });
 
 
-    function showErrorModal(message, errors) {
-        if (message != null) {
-            var html = '<p>' + message.toString() + '<p>';
+    function showErrorModal(data) {
+        if ('message' in data) {
+            var html = '<p>' + data.message.toString() + '<p>';
             $('#errorBody').append(html);
         }
-        if (errors != null) {
+        if ('errors' in data) {
             for (var key in data.errors) {
                 var value = data.errors[key];
                 var html = '<p>' + key.toString() + ': ' + value.toString() + '<p>';

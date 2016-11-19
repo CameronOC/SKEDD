@@ -76,10 +76,10 @@ class Shift(db.Model):
     position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
 
     def __init__(self, position_id, assigned_user_id, start_time, end_time, description):
-
         if assigned_user_id == 0:
             self.assigned_user_id = None
         else:
+            print "CREATING SHIFT WITH POS" + str(assigned_user_id)
             self.assigned_user_id = assigned_user_id
         self.position_id = position_id
         self.start_time = start_time

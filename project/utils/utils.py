@@ -1,4 +1,5 @@
 from random import randint
+import datetime
 
 def merge_dicts(*dict_args):
     """
@@ -10,7 +11,7 @@ def merge_dicts(*dict_args):
         result.update(dictionary)
     return result
 
-def validate_member_position_id(form, pos_required=False):
+def validate_shift(form, pos_required=False):
     """
     validates the member and position ID's from the shift form
     :param form:
@@ -22,31 +23,64 @@ def validate_member_position_id(form, pos_required=False):
     if 'shift_position_id' in form:
         if not form['shift_position_id'].isdigit():
             return_dict['status'] = "error"
-            return_dict['errors'] = {'Invalid Position id: ': form['shift_position_id']}
+            return_dict['errors'] = {'Invalid Position id': form['shift_position_id']}
             errors = True
         elif int(form['shift_position_id']) == 0:
             return_dict['status'] = "error"
-            return_dict['errors'] = {'Invalid Position id: ': form['shift_position_id']}
+            return_dict['errors'] = {'Invalid Position id': form['shift_position_id']}
             errors = True
     elif pos_required:
         return_dict['status'] = "error"
-        return_dict['errors'] = {'Invalid Position id: ': 'No Position id selected'}
+        return_dict['errors'] = {'Invalid Position id': 'No Position id selected'}
         errors = True
 
     if 'shift_assigned_member_id' in form:
         if not form['shift_assigned_member_id'].isdigit():
             if errors:
-
-                return_dict['errors']['Invalid Member id: '] = form['shift_assigned_member_id']
+                return_dict['errors']['Invalid Member id'] = form['shift_assigned_member_id']
             else:
+                errors = True
                 return_dict['status'] = "error"
-                return_dict['errors'] = {'Invalid Member id: ': form['shift_assigned_member_id']}
+                return_dict['errors'] = {'Invalid Member id': form['shift_assigned_member_id']}
+
+    if 'shift_description' in form:
+        if len(form['shift_description']) < 0 or len(form['shift_description']) > 100:
+            if errors:
+                return_dict['errors']['Description'] = 'Description must be between 0 and 100 characters.'
+            else:
+                errors = True
+                return_dict['status'] = "error"
+                return_dict['errors'] = {'Description': 'Description must be between 0 and 100 characters.'}
+
+    if 'shift_start_time' in form:
+        try:
+            datetime.datetime.strptime(form['shift_start_time'], '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            if errors:
+                return_dict['errors']['Start Time'] = 'Incorrect Date format for start time.'
+            else:
+                errors = True
+                return_dict['status'] = "error"
+                return_dict['errors'] = {'Start Time': 'Incorrect Date format for start time.'}
+
+    if 'shift_end_time' in form:
+        try:
+            datetime.datetime.strptime(form['shift_end_time'], '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            if errors:
+                return_dict['errors']['End Time'] = 'Incorrect Date format for end time.'
+            else:
+                errors = True
+                return_dict['status'] = "error"
+                return_dict['errors'] = {'End Time': 'Incorrect Date format for end time.'}
 
     return return_dict
+
 
 def shift_form_errors_to_dict(form):
     """
     converts the errors from a shift form into a dict
+    2007-04-05T14:30
     :param form:
     :return:
     """
