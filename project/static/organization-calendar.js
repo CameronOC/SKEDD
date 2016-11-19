@@ -180,17 +180,14 @@ $(document).ready(function() {
             url = '/organization/' + orgid.toString() + '/shift/' + ($('#shift_id').val()).toString() + '/update';
         }
 
-        var newShiftDict = {
+        var shiftDict = {
             shift_position_id: $('#shift_position_id').val(),
             shift_assigned_member_id: $('#shift_assigned_member_id').val(),
             shift_description: $('#shift_description').val(),
             shift_repeat_list: $('#shift_repeat_list').val(),
             shift_start_time: $('#shift_start_time').val(),
             shift_end_time: $('#shift_end_time').val()
-        }
-
-        console.log(newShiftDict);
-        console.log(JSON.stringify(newShiftDict));
+        };
 
 
         $.ajax({
@@ -199,7 +196,7 @@ $(document).ready(function() {
             },
             type: "POST",
             url: url,
-            data: $("#shiftForm").serialize(), // serializes the form's elements.
+            data: shiftDict,
 
             success: function(data)
             {
