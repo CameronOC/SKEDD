@@ -3,11 +3,11 @@ import sendgrid
 import os
 from sendgrid.helpers.mail import *
 from flask.ext.mail import Message
-import os
-import sendgrid
-from sendgrid.helpers.mail import *
+from itsdangerous import URLSafeTimedSerializer
+
 from project import app, mail
 
+ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
 def send_email(to, subject, template):
     sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))

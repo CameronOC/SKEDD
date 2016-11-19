@@ -1,0 +1,23 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<h1>Reset Password</h1>
+<br>
+
+<form class="form" action="{{ url_for('user.recover_password', token=token) }}" method="POST">
+    <table>
+        <tr>
+            <td>{{ form.password.label }}</td>
+            <td>{{ form.password }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.confirm.label }}</td>
+            <td>{{ form.confirm }}</td>
+        </tr>
+    </table>
+    {{ form.csrf_token }}
+    <button class="btn btn-success" type="submit">Reset Password</button>
+</form>
+
+{% endblock %}

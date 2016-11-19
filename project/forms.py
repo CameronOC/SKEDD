@@ -10,7 +10,6 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from models import User, Position
 
 
-
 class CreateForm(Form):
     name = StringField('name', validators=[DataRequired(), Length(min=1, max=50)])
     
@@ -45,7 +44,6 @@ class InviteForm(Form):
     last_name = StringField(
         'last_name',
         validators=[DataRequired(), Length(min=1, max=20)])
-
 
 class JoinForm(Form):
     password = PasswordField(

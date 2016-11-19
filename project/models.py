@@ -5,6 +5,7 @@ import datetime
 
 from project import db, bcrypt
 from sqlalchemy import UniqueConstraint
+from utils.utils import random_color
 
 position_assignments = db.Table('position_assignments',
                                 db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
@@ -75,32 +76,40 @@ class Shift(db.Model):
     position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
 
     def __init__(self, position_id, assigned_user_id, start_time, end_time, description):
-        self.assigned_user_id = assigned_user_id
+
+        if assigned_user_id == 0:
+            self.assigned_user_id = None
+        else:
+            self.assigned_user_id = assigned_user_id
         self.position_id = position_id
         self.start_time = start_time
         self.end_time = end_time
         self.description = description
         
-    def update  (   self,
-                    position_id=0, 
-                    assigned_user_id=0,
-                    start_time=None,
-                    end_time=None,
-                    description=''
-                ):
+    def update(self,
+               position_id=None,
+               assigned_user_id=None,
+               start_time=None,
+               end_time=None,
+               description=''
+               ):
         """
         Updates fields of this shift in database
-        :param shift:
-        :param pos_key:
+        :param position_id:
         :param assigned_user_id:
         :param start_time:
-        :param end_time
+        :param end_time:
+        :param description:
         :return:
         """
-        if position_id is not 0: 
-            self.position_id = position_id
-        if assigned_user_id is not 0:
-            self.assigned_user_id = assigned_user_id
+        if position_id is not None:
+            if position_id > 0:
+                self.position_id = position_id
+        if assigned_user_id is not None:
+            if assigned_user_id == 0:
+                self.assigned_user_id = None
+            else:
+                self.assigned_user_id = assigned_user_id
         if start_time is not None:
             self.start_time = start_time
         if end_time is not None:
@@ -109,20 +118,7 @@ class Shift(db.Model):
             self.description = description
     
         db.session.commit()
-
-    def update_time(self, start_time=None, end_time=None):
-        """
-        Updates a shifts start and end times, if they are given.
-        :param start_time:
-        :param end_time:
-        :return:
-        """
-        if start_time is not None:
-            self.start_time = start_time
-        if end_time is not None:
-            self.end_time = end_time
-
-        db.session.commit()
+        return self
 
 
 class Membership(db.Model):
@@ -192,9 +188,47 @@ class Position(db.Model):
         secondary=position_assignments,
         backref=db.backref('Position', lazy='dynamic'))
 
+    color = db.Column(db.String(7))
+
     def __init__(self, title, organization_id):
         self.title = title
         self.organization_id = organization_id
+        self.color = random_color()
 
     def __repr__(self):
         return '<title: {}>'.format(self.title)
+
+
+class Preference(db.Model):
+    __tablename__ = "preferences"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    preferences = db.Column(db.String, nullable=False)
+
+    def __init__(self, user_id, preferences):
+        self.user_id = user_id
+        self.preferences = preferences
+
+    def __repr__(self):
+        return '<preferences: {}>'.format(self.preferences) 
+
+"""
+class Preference(db.Model):
+    __tablename__ = "preferences"
+
+    id = db.Column(db.Integer, primary_key=True)
+    pref_start_time = db.Column(db.DateTime, nullable=False)
+    pref_end_time = db.Column(db.DateTime, nullable=False)
+    pref_day_of_week = db.Column(db.String(50))
+    pref_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __init__(self, pref_start_time, pref_end_time, pref_day_of_week, pref_user_id):
+        self.pref_start_time = pref_start_time
+        self.pref_end_time = pref_end_time
+        self.pref_day_of_week = pref_day_of_week
+        self.pref_user_id = pref_user_id
+
+    def __repr__(self):
+        return '<title: {}>'.format(self.title)
+"""
