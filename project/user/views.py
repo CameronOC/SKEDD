@@ -102,9 +102,6 @@ def profile():
     return render_template('user/profile.html', form=form)
 
 
-
-
-
 @user_blueprint.route('/updatepreferences/', methods=['GET', 'POST'])
 @login_required
 def updatepreferences():
@@ -121,8 +118,7 @@ def updatepreferences():
     return 'operation performed'
 
 
-
-@user_blueprint.route('/updatepreferences/delete', methods=['GET', 'POST'])
+@user_blueprint.route('/updatepreferences/delete/', methods=['GET', 'POST'])
 @login_required
 def updatepreferences_delete():
     form = (request.form)
@@ -151,15 +147,16 @@ def updatepreferences_get_events(key):
     return response
 
 
-
-
-
-
-
-
-
-
-
+@user_blueprint.route('/updatepreferences/updateevent/', methods=['GET','POST'])
+@login_required
+def updatepreferences_update_event():
+    form = (request.form)
+    json_string = json.loads(form['payload'])
+    old_event = Preference.query.filter_by(id=json_string['id']).first()
+    old_event.start = json_string['start']
+    old_event.end = json_string['end']
+    db.session.commit()
+    return 'operation performed'
 
 @user_blueprint.route('/confirm/<token>')
 def confirm_email(token):

@@ -48,10 +48,9 @@ $(document).ready(function() {
             }
 
             calEventString = 'payload=' + JSON.stringify(calEventOutput);
-            console.log("calEventString:  " + calEventString);
 
             $.ajax({
-                url: "/updatepreferences/delete",
+                url: "/updatepreferences/delete/",
                 type: "POST",
                 data: calEventString,
                 dataType: 'json',
@@ -60,6 +59,34 @@ $(document).ready(function() {
                 }
             });
 
+        },
+
+        eventDrop: function (event, delta, minuteDelta, allDay, revertFunc) {
+            var eventString = JSON.stringify(event);
+            eventString = 'payload=' + eventString
+            $.ajax({
+                url: "/updatepreferences/updateevent/",
+                type: "POST",
+                data: eventString,
+                dataType: 'json',
+                success: function(data) {
+                    alert("Totes worked: " + newEventString);
+                }
+            });
+        },
+
+        eventResize: function(event, delta, revertFunc) {
+            var eventString = JSON.stringify(event);
+            eventString = 'payload=' + eventString
+            $.ajax({
+                url: "/updatepreferences/updateevent/",
+                type: "POST",
+                data: eventString,
+                dataType: 'json',
+                success: function(data) {
+                    alert("Totes worked: " + newEventString);
+                }
+            });
         }
     });
 
