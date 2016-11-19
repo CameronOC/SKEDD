@@ -1,20 +1,8 @@
 $(document).ready(function() {
+    
+    //timeId is used for FIRST TIME users creating events
+    //Events saved in the DB will use DB id
     var timeId = 1;
-
-    //Retrieve list of events for current_user
-    $.ajax({
-        url: 'getTwitterFollowers.php',
-        type: 'GET',
-        data: 'twitterUsername=jquery4u',
-        success: function(data) {
-            //called when successful
-            $('#ajaxphp-results').html(data);
-        },
-        error: function(e) {
-            //called when there is an error
-            //console.log(e.message);
-        }
-    });
 
     $('#calendar').fullCalendar({
         header: {
@@ -27,23 +15,21 @@ $(document).ready(function() {
         editable: true,
         selectable: true,
         selectHelper: true,
-
+        events: "/updatepreferences/" + current_user_id.toString() + "/" ,
         select: function(start, end, allDay) {
             var newEvent = {
                 start: start,
                 end: end,
                 id: timeId,
             };
+            
             $('#calendar').fullCalendar( 'renderEvent', newEvent , 'stick');
             timeId = timeId + 1;
-            
             var newEventString = JSON.stringify(newEvent);
+            newEventString = 'payload=' + newEventString
 
-            console.log("String output:  " + newEventString);
-            console.log("Object output:  " + newEvent);
- 
             $.ajax({
-                url: "/updatepreferences",
+                url: "/updatepreferences/",
                 type: "POST",
                 data: newEventString,
                 dataType: 'json',
@@ -51,12 +37,6 @@ $(document).ready(function() {
                     alert("Totes worked: " + newEventString);
                 }
             });
-            
-            /*Test Code to convert event to string back to event
-            var backtoObject = JSON.parse(newEventString);
-            console.log("backToMoment:  " + backtoObject);
-            console.log("restringed:  " + JSON.stringify(backtoObject)); */
-
         },
 
         eventClick: function (calEvent, jsEvent, view) {           
@@ -66,12 +46,14 @@ $(document).ready(function() {
                 end: calEvent.end,
                 id: calEvent.id,
             }
-            console.log("calEventStringg:  " + JSON.stringify(calEventOutput));
+
+            calEventString = 'payload=' + JSON.stringify(calEventOutput);
+            console.log("calEventString:  " + calEventString);
 
             $.ajax({
                 url: "/updatepreferences/delete",
                 type: "POST",
-                data: JSON.stringify(calEventOutput),
+                data: calEventString,
                 dataType: 'json',
                 success: function(data) {
                     alert("Totes worked: " + newEventString);
@@ -80,42 +62,5 @@ $(document).ready(function() {
 
         }
     });
-
-
-    /*
-    *
-    * Code to Create new Position
-    *
-    */
-
-    /*
-    $('#inviteMemberSubmit').on('click', function() {
-        var newUser = {
-            first_name: $('#first_name').val(),
-            last_name: $('#last_name').val(),
-            email: $('#email').val()
-        };
-
-
-
-        url = "/profile"
-
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: $("#inviteMemberForm").serialize(), // serializes the form's elements.
-
-            success: function(data)
-            {
-
-                if(data.status == "success"){
-                    APP.adduser(newUser);
-                    $('#inviteMemberModal').modal('hide');
-                }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
-                }
-            }
-        });
-    }); */
 
 });

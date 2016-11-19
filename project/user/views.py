@@ -5,7 +5,7 @@
 #### imports ####
 #################
 
-from flask import render_template, Blueprint, url_for, redirect, flash, request, g
+from flask import render_template, Blueprint, url_for, redirect, flash, request, g, Response
 from flask_login import login_user, logout_user, login_required, current_user
 
 from project.models import User, Preference
@@ -105,16 +105,17 @@ def profile():
 
 
 
-@user_blueprint.route('/updatepreferences', methods=['GET', 'POST'])
+@user_blueprint.route('/updatepreferences/', methods=['GET', 'POST'])
 @login_required
 def updatepreferences():
-    pref_form = json.dumps(request.form)
+    form = (request.form)
+    json_string = json.loads(form['payload'])
     user = User.query.filter_by(email=current_user.email).first()
     user_pref = Preference(
         user_id=user.id,
-        preferences=pref_form,
+        start=json_string['start'],
+        end=json_string['end'],
     )
-    print("Information to be saved into DB:  ",pref_form)
     db.session.add(user_pref)
     db.session.commit()
     return 'operation performed'
@@ -124,13 +125,38 @@ def updatepreferences():
 @user_blueprint.route('/updatepreferences/delete', methods=['GET', 'POST'])
 @login_required
 def updatepreferences_delete():
-    pref_form = json.dumps(request.form)
+    form = (request.form)
+    json_string = json.loads(form['payload'])
     user = User.query.filter_by(email=current_user.email).first()
-    selected_preference = Preference.query.filter_by(preferences=pref_form, user_id=user.id).one()
-    print("Preference time is being deleted:  ",pref_form)
+    selected_preference = Preference.query.filter_by(start=json_string['start'], end=json_string['end'], user_id=user.id).one()
     db.session.delete(selected_preference)
     db.session.commit()
     return 'operation performed'
+
+
+@user_blueprint.route('/updatepreferences/<key>/', methods=['GET'])
+@login_required
+def updatepreferences_get_events(key):
+    events_list = []
+    events = Preference.query.filter_by(user_id=key).all()
+    for e in events:                
+        events_list.append({'id': e.id,
+                            'start': e.start,
+                            'end': e.end,
+                            })
+    json_events_list = json.dumps(events_list)
+    response = Response(response=json_events_list,
+        status=200,
+        mimetype="application/json")
+    return response
+
+
+
+
+
+
+
+
 
 
 

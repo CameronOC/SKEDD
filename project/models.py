@@ -205,14 +205,16 @@ class Preference(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    preferences = db.Column(db.String, nullable=False)
+    start = db.Column(db.String, nullable=False)
+    end = db.Column(db.String, nullable=False)
 
-    def __init__(self, user_id, preferences):
+    def __init__(self, user_id, start, end):
         self.user_id = user_id
-        self.preferences = preferences
+        self.start = start
+        self.end = end
 
     def __repr__(self):
-        return '<preferences: {}>'.format(self.preferences) 
+        return '<user_id: {}, start: {}, end: {}>'.format(self.user_id, self.start, self.end)
 
 """
 class Preference(db.Model):
