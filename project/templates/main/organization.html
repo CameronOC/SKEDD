@@ -16,7 +16,7 @@
             body {
             font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
             font-size: 14px;
-            overflow-y: scroll;
+            // overflow-y: scroll;
             }
 
             #calendar {
@@ -31,9 +31,6 @@
             #drawer-page {
                 padding-top: 20px;
                 padding-bottom: 20px;
-            }
-            #screen {
-                background-color: pink;
             }
 
             #menu {
@@ -54,7 +51,25 @@
                 display: none;
             }
 
+            textarea {
+                max-width: 100%;
+            }
+
+            .fc-event-container {
+                cursor: pointer;
+            }
+
         </style>
+        {% if membership.is_owner %}
+            <script>var isAdmin = true;</script>
+        {% else %}
+            <script>var isAdmin = false;</script>
+        {% endif %}
+        <script>
+            var orgid = {{organization.id}};
+        </script>
+
+
 
     </head>
 
@@ -75,8 +90,10 @@
         </div>
 
         <div id="vue-div">
+            {% if membership.is_owner %}
+                {% include "drawer.html" %}
+            {% endif %}
             {% include "modals.html" %}
-            {% include "drawer.html" %}
         </div>
 
         <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -86,7 +103,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-drawer/1.0.6/js/drawer.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.min.js"></script>
         <script src="{{ url_for('static', filename='organization_index.js') }}"></script>
-        <script src="../../static/calendar/organization-calendar.js"></script>
+        <script src="../../static/organization-calendar.js"></script>
         <script>
             $('#drawerExample').drawer({ toggle: false });
             $('#other-toggle').click(function() {
