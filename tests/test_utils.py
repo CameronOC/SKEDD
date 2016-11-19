@@ -64,8 +64,8 @@ class ShiftValidationTest(TestCase):
         return_dict = utils.validate_shift(form, pos_required=True)
         print return_dict
         assert 'status' in return_dict and \
-               'Invalid Position id: ' in return_dict['errors'] and \
-               'Invalid Member id: ' not in return_dict['errors']
+               'Invalid Position id' in return_dict['errors'] and \
+               'Invalid Member id' not in return_dict['errors']
 
     def test_no_member_id(self):
         """
@@ -95,8 +95,8 @@ class ShiftValidationTest(TestCase):
         return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
-               'Invalid Position id: ' in return_dict['errors'] and \
-               'Invalid Member id: ' not in return_dict['errors']
+               'Invalid Position id' in return_dict['errors'] and \
+               'Invalid Member id' not in return_dict['errors']
 
     def test_pos_neg(self):
         """
@@ -108,8 +108,8 @@ class ShiftValidationTest(TestCase):
         return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
-               'Invalid Position id: ' in return_dict['errors'] and \
-               'Invalid Member id: ' not in return_dict['errors']
+               'Invalid Position id' in return_dict['errors'] and \
+               'Invalid Member id' not in return_dict['errors']
 
     def test_pos_float(self):
         """
@@ -121,8 +121,8 @@ class ShiftValidationTest(TestCase):
         return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
-               'Invalid Position id: ' in return_dict['errors'] and \
-               'Invalid Member id: ' not in return_dict['errors']
+               'Invalid Position id' in return_dict['errors'] and \
+               'Invalid Member id' not in return_dict['errors']
 
     def test_mem_neg(self):
         """
@@ -134,8 +134,8 @@ class ShiftValidationTest(TestCase):
         return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
-               'Invalid Position id: ' not in return_dict['errors'] and \
-               'Invalid Member id: ' in return_dict['errors']
+               'Invalid Position id' not in return_dict['errors'] and \
+               'Invalid Member id' in return_dict['errors']
 
     def test_mem_float(self):
         """
@@ -147,8 +147,8 @@ class ShiftValidationTest(TestCase):
         return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
-               'Invalid Position id: ' not in return_dict['errors'] and \
-               'Invalid Member id: ' in return_dict['errors']
+               'Invalid Position id' not in return_dict['errors'] and \
+               'Invalid Member id' in return_dict['errors']
 
     def test_mem_zero(self):
         """
