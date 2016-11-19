@@ -532,7 +532,7 @@ def get_membership(key, key2):
     
 
 @app.route('/setadmin/<int:key>', methods=['POST'])
-# @owns_organization write new one to work with membership_id?
+# @owns_organization
 def set_admin_privileges(key):
     response = Response(response=utils.organization.set_membership_admin(key),
                         status=200)
