@@ -29,7 +29,7 @@ class MergeDictionariesTest(TestCase):
         assert dict_result['key4'] == 4
 
 
-class OrganizationMemberIDValidationTest(TestCase):
+class ShiftValidationTest(TestCase):
 
     def create_app(self):
         app.config.from_object('project.config.TestingConfig')
@@ -43,7 +43,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         """
         # test with correct input
         form = {'shift_position_id': '1', 'shift_assigned_member_id': '2'}
-        assert 'status' not in utils.validate_member_position_id(form)
+        assert 'status' not in utils.validate_shift(form)
 
     def test_no_pos(self):
         """
@@ -52,7 +52,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         :return:
         """
         form = {'shift_assigned_member_id': '2'}
-        assert 'status' not in utils.validate_member_position_id(form)
+        assert 'status' not in utils.validate_shift(form)
 
     def test_required_pos_missing(self):
         """
@@ -61,7 +61,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         :return:
         """
         form = {'shift_assigned_member_id': '2'}
-        return_dict = utils.validate_member_position_id(form, pos_required=True)
+        return_dict = utils.validate_shift(form, pos_required=True)
         print return_dict
         assert 'status' in return_dict and \
                'Invalid Position id: ' in return_dict['errors'] and \
@@ -74,7 +74,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         :return:
         """
         form = {'shift_position_id': '1'}
-        assert 'status' not in utils.validate_member_position_id(form)
+        assert 'status' not in utils.validate_shift(form)
 
     def test_no_entries(self):
         """
@@ -83,7 +83,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         :return:
         """
         form = {}
-        assert 'status' not in utils.validate_member_position_id(form)
+        assert 'status' not in utils.validate_shift(form)
 
     def test_pos_zero(self):
         """
@@ -92,7 +92,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         :return:
         """
         form = {'shift_position_id': '0', 'shift_assigned_member_id': '1'}
-        return_dict = utils.validate_member_position_id(form)
+        return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
                'Invalid Position id: ' in return_dict['errors'] and \
@@ -105,7 +105,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         :return:
         """
         form = {'shift_position_id': '-123', 'shift_assigned_member_id': '1'}
-        return_dict = utils.validate_member_position_id(form)
+        return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
                'Invalid Position id: ' in return_dict['errors'] and \
@@ -118,7 +118,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         :return:
         """
         form = {'shift_position_id': '.123', 'shift_assigned_member_id': '1'}
-        return_dict = utils.validate_member_position_id(form)
+        return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
                'Invalid Position id: ' in return_dict['errors'] and \
@@ -131,7 +131,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         :return:
         """
         form = {'shift_assigned_member_id': '-234'}
-        return_dict = utils.validate_member_position_id(form)
+        return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
                'Invalid Position id: ' not in return_dict['errors'] and \
@@ -144,7 +144,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         :return:
         """
         form = {'shift_assigned_member_id': '.123'}
-        return_dict = utils.validate_member_position_id(form)
+        return_dict = utils.validate_shift(form)
         print return_dict
         assert 'status' in return_dict and \
                'Invalid Position id: ' not in return_dict['errors'] and \
@@ -158,7 +158,7 @@ class OrganizationMemberIDValidationTest(TestCase):
         """
         # test
         form = {'shift_assigned_member_id': '0'}
-        assert 'status' not in utils.validate_member_position_id(form)
+        assert 'status' not in utils.validate_shift(form)
 
 
 class ShiftFormErrorsTest(TestCase):
