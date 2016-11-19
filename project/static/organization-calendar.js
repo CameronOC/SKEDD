@@ -189,6 +189,7 @@ $(document).ready(function() {
             shift_end_time: $('#shift_end_time').val()
         };
 
+        console.log(JSON.stringify(shiftDict));
 
         $.ajax({
             headers: {
@@ -210,7 +211,7 @@ $(document).ready(function() {
                     }
 
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data);
                     $('#shiftSubmit').prop('disabled', false);
                 }
             }
@@ -263,7 +264,7 @@ $(document).ready(function() {
                     $('#shiftModal').modal('hide');
 
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data)
                     $('#shiftSubmit').prop('disabled', false);
 
                 }
@@ -342,7 +343,7 @@ $(document).ready(function() {
                     $('#shiftSubmit').prop('disabled', false);
 
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data)
                 }
             }
         });
@@ -378,7 +379,7 @@ $(document).ready(function() {
 
 
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data)
                     revertFunc();
                 }
 
@@ -504,7 +505,7 @@ $(document).ready(function() {
                     APP.adduser(newUser);
                     $('#inviteMemberModal').modal('hide');
                 }else if(data.status == "error"){
-                    showErrorModal(data.message, data.errors)
+                    showErrorModal(data)
                 }
             }
         });
@@ -514,12 +515,12 @@ $(document).ready(function() {
     });
 
 
-    function showErrorModal(message, errors) {
-        if (message != null) {
-            var html = '<p>' + message.toString() + '<p>';
+    function showErrorModal(data) {
+        if ('message' in data) {
+            var html = '<p>' + data.message.toString() + '<p>';
             $('#errorBody').append(html);
         }
-        if (errors != null) {
+        if ('errors' in data) {
             for (var key in data.errors) {
                 var value = data.errors[key];
                 var html = '<p>' + key.toString() + ': ' + value.toString() + '<p>';

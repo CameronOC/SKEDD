@@ -54,7 +54,7 @@ def validate_shift(form, pos_required=False):
 
     if 'shift_start_time' in form:
         try:
-            datetime.datetime.strptime(form['shift_start_time'], '%Y-%m-%dT%H:%M')
+            datetime.datetime.strptime(form['shift_start_time'], '%Y-%m-%dT%H:%M:%S')
         except ValueError:
             if errors:
                 return_dict['errors']['Start Time'] = 'Incorrect Date format for start time.'
@@ -65,7 +65,7 @@ def validate_shift(form, pos_required=False):
 
     if 'shift_end_time' in form:
         try:
-            datetime.datetime.strptime(form['shift_end_time'], '%Y-%m-%dT%H:%M')
+            datetime.datetime.strptime(form['shift_end_time'], '%Y-%m-%dT%H:%M:%S')
         except ValueError:
             if errors:
                 return_dict['errors']['End Time'] = 'Incorrect Date format for end time.'

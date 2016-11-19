@@ -139,6 +139,7 @@ def create_shift(key):
     # print type(request.form['shift_position_id'])
 
     if 'status' in return_dict:
+        return_dict['message'] = 'Unable to Create Shift.'
         return Response(response=json.dumps(return_dict),
                         status=200,
                         mimetype="application/json")
