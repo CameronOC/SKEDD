@@ -137,6 +137,10 @@ def create_shift(key):
 
         return_dict = utils.utils.validate_member_position_id(request.form,
                                                               pos_required=True)
+
+        # print request.form['shift_position_id']
+        # print type(request.form['shift_position_id'])
+
         if 'status' in return_dict:
             return Response(response=json.dumps(return_dict),
                             status=200,
@@ -144,7 +148,7 @@ def create_shift(key):
 
         shift_position_id = int(request.form['shift_position_id'])
         if 'shift_assigned_member_id' in request.form:
-            shift_assigned_member_id = request.form['shift_assigned_member_id']
+            shift_assigned_member_id = int(request.form['shift_assigned_member_id'])
 
         shifts = utils.organization.create_shifts_form(shift_position_id,
                                                        shift_assigned_member_id,
@@ -380,10 +384,18 @@ def create_position(key):
     form1 = PositionForm(request.form)
     return_dict = {}
 
-    if form1.validate_on_submit():
+    utils.organization.create_position(org, request.form['name'])
+    return_dict['status'] = "success"
+
+
+    """
+     if form1.validate_on_submit():
         utils.organization.create_position(org, form1.name.data)
         return_dict['status'] = "success"
     else:
+
+        print str(form1.csrf_token.errors)
+
         return_dict['status'] = "error"
         errors_dict = {
             'title': []
@@ -393,6 +405,8 @@ def create_position(key):
             errors_dict['title'].append(error)
 
         return_dict['errors'] = errors_dict
+    """
+
 
     response = Response(response=json.dumps(return_dict),
                         status=200,
