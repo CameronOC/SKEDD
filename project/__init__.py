@@ -13,6 +13,7 @@ from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 # from flask_debugtoolbar import DebugToolbarExtension
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CsrfProtect
 
 
 ################
@@ -34,6 +35,7 @@ bcrypt = Bcrypt(app)
 mail = Mail(app)
 # toolbar = DebugToolbarExtension(app)
 db = SQLAlchemy(app)
+
 
 
 ####################
