@@ -10,7 +10,7 @@ def merge_dicts(*dict_args):
         result.update(dictionary)
     return result
 
-def validate_member_position_id(form, pos_required=False):
+def validate_shift(form, pos_required=False):
     """
     validates the member and position ID's from the shift form
     :param form:
@@ -22,25 +22,32 @@ def validate_member_position_id(form, pos_required=False):
     if 'shift_position_id' in form:
         if not form['shift_position_id'].isdigit():
             return_dict['status'] = "error"
-            return_dict['errors'] = {'Invalid Position id: ': form['shift_position_id']}
+            return_dict['errors'] = {'Invalid Position id': form['shift_position_id']}
             errors = True
         elif int(form['shift_position_id']) == 0:
             return_dict['status'] = "error"
-            return_dict['errors'] = {'Invalid Position id: ': form['shift_position_id']}
+            return_dict['errors'] = {'Invalid Position id': form['shift_position_id']}
             errors = True
     elif pos_required:
         return_dict['status'] = "error"
-        return_dict['errors'] = {'Invalid Position id: ': 'No Position id selected'}
+        return_dict['errors'] = {'Invalid Position id': 'No Position id selected'}
         errors = True
 
     if 'shift_assigned_member_id' in form:
         if not form['shift_assigned_member_id'].isdigit():
             if errors:
-
-                return_dict['errors']['Invalid Member id: '] = form['shift_assigned_member_id']
+                return_dict['errors']['Invalid Member id'] = form['shift_assigned_member_id']
             else:
                 return_dict['status'] = "error"
-                return_dict['errors'] = {'Invalid Member id: ': form['shift_assigned_member_id']}
+                return_dict['errors'] = {'Invalid Member id': form['shift_assigned_member_id']}
+
+    if 'shift_description' in form:
+        if len(form['shift_description']) < 0 or len(form['shift_description']) > 100:
+            if errors:
+                return_dict['errors']['Description'] = form['Description must be between 0 and 100 characters.']
+            else:
+                return_dict['status'] = "error"
+                return_dict['errors'] = {'Description': form['Description must be between 0 and 100 characters.']}
 
     return return_dict
 

@@ -133,10 +133,7 @@ def create_shift(key):
     return_dict = {}
     shift_assigned_member_id = None
 
-
-
-    return_dict = utils.utils.validate_member_position_id(request.form,
-                                                          pos_required=True)
+    return_dict = utils.utils.validate_shift(request.form, pos_required=True)
 
     # print request.form['shift_position_id']
     # print type(request.form['shift_position_id'])
@@ -248,8 +245,7 @@ def update_shift(key, key1):
     shift_position_id = None
     shift_assigned_member_id = None
 
-
-    return_dict = utils.utils.validate_member_position_id(request.form)
+    return_dict = utils.utils.validate_shift(request.form)
     if 'status' in return_dict:
         return Response(response=json.dumps(return_dict),
                         status=200,
