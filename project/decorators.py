@@ -31,17 +31,17 @@ def owns_organization(fn):
             raise NotOwner('403 Access Denied. You must own this organization.', status_code=403)
         return fn(*args, **kwargs)
     return decorated_view
-    
-# this needs to be fixed/changed
-def admin_of_org(f):
-    @wraps(f)
+
+
+def admin_of_org(fn):
+    @wraps(fn)
     def decorated_func(*args, **kwargs):
         key = kwargs['key']
-        membership = Membership.query.filter_by(id=key).first()
+        membership = Membership.query.filter_by(member_id=g.user.id, organization_id=key).first()
 
-        if not membership.is_admin:
-            abort(render_template('errors/403_organization_admin.html'), 403)
-        return f(*args, **kwargs)
+        if membership is None:
+            raise NotMember('403 Access Denied. You must be a member of this organization.', status_code=403)
+        return fn(*args, **kwargs)
     return decorated_func
 
 
