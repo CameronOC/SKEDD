@@ -177,6 +177,7 @@ class Position(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50))
+    description = db.Column(db.String(140))
     # shifts connected to Position
     assigned_shifts = db.relationship('Shift',
                                       backref='Position', lazy='dynamic')
@@ -190,9 +191,10 @@ class Position(db.Model):
 
     color = db.Column(db.String(7))
 
-    def __init__(self, title, organization_id):
+    def __init__(self, title, description, organization_id):
         self.title = title
         self.organization_id = organization_id
+        self.description = description
         self.color = random_color()
 
     def __repr__(self):

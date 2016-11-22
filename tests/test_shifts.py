@@ -15,7 +15,7 @@ class TestShifts(BaseTest, TestCase):
         Tests creating a new shift
         :return:
         """
-        new_pos = Position(title='Test 2', organization_id=self.organization.id)
+        new_pos = Position(title='Test 2', organization_id=self.organization.id, description='test')
         db.session.add(new_pos)
         db.session.commit()
 
@@ -274,7 +274,7 @@ class TestShifts(BaseTest, TestCase):
         """
         shift = org_utils.get_shift(1)
 
-        new_pos = Position(title='Test 3', organization_id=self.organization.id)
+        new_pos = Position(title='Test 3', organization_id=self.organization.id, description='Test')
         db.session.add(new_pos)
         db.session.commit()
 

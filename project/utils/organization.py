@@ -126,12 +126,12 @@ def membership_from_key_token(key, token):
     return membership
 
 
-def create_position(org, title):
+def create_position(org, title, description):
     """
     Creates a position given a organization and a position title/name
     :return:
     """
-    position = Position(title=title, organization_id=org.id)
+    position = Position(title=title, organization_id=org.id, description=description)
     db.session.add(position)
     org.owned_positions.append(position)
     db.session.commit()
@@ -554,7 +554,8 @@ def get_positions_for_org_JSON(org_id):
         positions_list.append({   
                     'title': p.title,
                     'organization_id': p.organization_id,
-                    'id': p.id
+                    'id': p.id,
+                    'description': p.description
         })
 
     return json.dumps(positions_list)
@@ -568,6 +569,10 @@ def deletepositions(posid):
     :return:
     """
     position = Position.query.filter_by(id=posid).first()
+    shifts = Shift.query.filter_by(position_id=posid).all()
+    if shifts is not None:
+      for shift in shifts:
+          db.session.delete(shift)
     #remove the position from the org
     db.session.delete(position)
     db.session.commit()

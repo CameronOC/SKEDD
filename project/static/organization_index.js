@@ -15,10 +15,11 @@ var app = function() {
         this.id = id;
     };
 
-    function positionsobject(t, o, p){
+    function positionsobject(t, o, p, d){
         this.title = t;
         this.orgid = o;
         this.id = p;
+        this.description = d;
     }
 
     function assignedpositionobject(t, p){
@@ -54,8 +55,9 @@ var app = function() {
             t = response[key].title;
             o = response[key].orgid;
             p = response[key].id;
+            d = response[key].description;
             APP.vue.addposition(
-                    new positionsobject(t, o, p)
+                    new positionsobject(t, o, p, d)
                 );
         }
     }
@@ -180,7 +182,7 @@ var app = function() {
         $('#positionDetailTitle1').html(position.title);
         $('#positionDetailTitle2').html(position.title);
         $('#positionDetailTitle3').html(position.title);
-        $('#positionDetailDescription').html(position.desciption);
+        $('#positionDetailDescription').html(position.description);
         $('#positionDetailId').html(position.id);
 
         APP.vue.posid = position.id;

@@ -399,7 +399,8 @@ $(document).ready(function() {
         $('#createPositionSubmit').prop('disabled', true);
 
         var newPosition = {
-            title: $('#title').val()
+            title: $('#title').val(),
+            description: $('#description').val()
         };
 
         url = "/organization/" + orgid.toString() + "/create_position"
@@ -573,6 +574,7 @@ $(document).ready(function() {
         });
 
         APP.get_positions();
+        $('#calendar').fullCalendar( 'refetchEvents' );
         //$('#memberDetailModal').modal('hide');
     });
 

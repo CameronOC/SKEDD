@@ -226,7 +226,8 @@ class ShiftToDictTest(TestCase):
         """
         position = Position(
             title='Test Position',
-            organization_id=1
+            organization_id=1,
+            description='test'
         )
 
         user = User(
@@ -279,7 +280,8 @@ class ShiftToDictTest(TestCase):
         """
         position = Position(
             title='Test Position',
-            organization_id=1
+            organization_id=1,
+            description='test'
         )
 
         user = User(
@@ -332,7 +334,8 @@ class ShiftToDictTest(TestCase):
         """
         position = Position(
             title='Test Position',
-            organization_id=1
+            organization_id=1,
+            description='test'
         )
 
         shift = Shift(assigned_user_id=None, description='A description', position_id=position.id,

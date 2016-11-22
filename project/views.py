@@ -386,7 +386,7 @@ def create_position(key):
     form1 = PositionForm(request.form)
     return_dict = {}
 
-    utils.organization.create_position(org, request.form['name'])
+    utils.organization.create_position(org, request.form['name'], request.form['description'])
     return_dict['status'] = "success"
 
 
