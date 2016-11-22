@@ -4,17 +4,15 @@ var app = function() {
 
     Vue.config.silent = false; // show all warnings
 
-    //user object to store the data, this might not be neccassary
+    //user object to store the users.
     function usersobject(firstName, lastName, email, id) {
         this.first_name =  firstName;
-        //console.log(this.first_name);
         this.last_name = lastName;
-        //console.log(this.last_name);
         this.email = email;
-        //console.log(this.email);
         this.id = id;
     };
 
+    //position object to store the positions.
     function positionsobject(t, o, p, d){
         this.title = t;
         this.orgid = o;
@@ -22,11 +20,13 @@ var app = function() {
         this.description = d;
     }
 
+    //object to store the positions assigned to a user.
     function assignedpositionobject(t, p){
         this.title = t;
         this.id = p;
     }
 
+    //object to store the users assigned to a position.
     function assigneduserobject(f, l, i){
         this.first_name = f;
         this.last_name = l;
@@ -35,10 +35,7 @@ var app = function() {
 
     //function to add the user data to the user object
     function adduserstoarray(response) {
-        console.log('addusertoarray was called');
-
         for (var i = 0; i < response.length; i++) {
-            //console.log(response[i].first_name)
             first = response[i].first_name;
             last = response[i].last_name;
             email = response[i].email;
@@ -49,8 +46,8 @@ var app = function() {
         }
     }
 
+    //function to add the position data to the position object
     function addpositionstoarray(response) {
-        console.log('addpositionstoarray was called');
         for (key in response)   {
             t = response[key].title;
             o = response[key].orgid;
@@ -62,11 +59,9 @@ var app = function() {
         }
     }
 
+    //function to add the position data to the assignedposition object
     function addassignedpositiontoarray(response){
-        console.log('addassignedpositiontoarray was called');
-        //console.log(response);
         for (var i = 0; i < response.length; i++) {
-            //console.log(response[i].title)
             title = response[i].title;
             posid = response[i].position_id;
             userid = response[i].user_id;
@@ -76,9 +71,8 @@ var app = function() {
         }
     }
 
+    //function to add the user data to the assigneduser object
     function addassigneduserstoarray(response){
-        console.log('addassigneduserstoarray was called');
-        console.log(response);
         for(var i=0; i<response.length; i++){
             first_name = response[i].first_name;
             last_name = response[i].last_name;
@@ -91,34 +85,34 @@ var app = function() {
 
     //function to add the user object to the vue array
     self.adduser = function (u) {
-        //console.log('adduser called ' + u);
         APP.vue.users.push(u);
     }
 
+    //function to add the position object to the vue array
     self.addposition = function(p){
-        //console.log('addposition called' + p);
         APP.vue.positions.push(p);
     }
 
+    //function to add the assignedposition object to the vue array
     self.addassignedposition = function(ap){
-        //console.log('add assignedposition called' + ap);
         APP.vue.assignedpositions.push(ap);
     }
 
+    //function to add the assigneduser object to the vue array
     self.addassigneduser = function(au){
         APP.vue.assignedusers.push(au);
     }
 
-    //gets the users for an org
+    //gets the users for an organization
     self.get_users = function (){
         $.getJSON('/getusersinorg/' + orgid)
                 .then(function(response){
-                    //clear the array of users
-                    APP.vue.users = [];
+                    APP.vue.users = [];         //this clear the array of users
                     adduserstoarray(response);
                 });
     };
 
+    //gets the positions for an organization
     self.get_positions = function(){
         $.getJSON('/getpositionsinorg/' + orgid)
                 .then(function(response){
@@ -127,11 +121,9 @@ var app = function() {
                 });
     };
 
+    //gets the positions assigned to a user
     self.get_assigned_positions = function(index){
-        //member = self.vue.users[index];
-        //console.log(member)
         memberid = APP.vue.userid;
-        //console.log(memberid);
         $.getJSON('/getassignedpositions/' + orgid + '/' + memberid)
             .then(function(response){
                 APP.vue.assignedpositions = [];
@@ -139,6 +131,7 @@ var app = function() {
             })
     }
 
+    //gets the users assigned to a position
     self.get_assigned_users = function(index){
         pos = APP.vue.posid;
         $.getJSON('/getpositionmembers/' + pos )
@@ -163,19 +156,17 @@ var app = function() {
             .then(function(response){
                 APP.vue.curr_membership_id = response.id;
                 APP.vue.curr_membership_admin = response.is_admin;
-                console.log(APP.vue.curr_membership_id.toString());
-                console.log(APP.vue.curr_membership_admin.toString());
                 $('#memberDetailAdmin').html(response.is_admin);
             });
             
         APP.vue.userid = member.id;
-        //console.log(member.id);
 
         self.get_assigned_positions(index);
 
         $('#memberDetailModal').modal('show');
     }
 
+    // functions for when a position is clicked from the drawer
     self.positionDetail = function(index) {
         position = self.vue.positions[index];
         $('#positionDetailTitle').html(position.title);
@@ -187,21 +178,15 @@ var app = function() {
 
         APP.vue.posid = position.id;
 
-        //APP.vue.posid = position.id;
-        //console.log(member.id);
-        //self.get_assigned_positions(index);
         self.get_assigned_users(index);
 
         $('#positionDetailModal').modal('show');
     }
 
+    //unassigns a user from a position 
     self.unassign_position = function(index){
-
-        console.log("unassign_position called")
-
         var uid = APP.vue.userid;
         var posid = self.vue.assignedpositions[index].id;
-        console.log(posid);
 
         url = "/unassign/" + uid.toString() + "/" + posid.toString()
 
@@ -211,14 +196,10 @@ var app = function() {
             });
     }
 
+    //unassigns a position from a user 
     self.unassign_user = function(index){
-
-        console.log("unassign_position called")
-
         var posid = APP.vue.posid;
         var userid = self.vue.assignedusers[index].id;
-        console.log(posid);
-        console.log(userid);
 
         url = "/unassign/" + userid.toString() + "/" + posid.toString()
 
@@ -228,10 +209,8 @@ var app = function() {
             });
     }
 
+    //sets a user to admin
     self.set_admin = function(){
-
-        console.log("set_admin called")
-
         var mid = APP.vue.curr_membership_id;
 
         url = '/setadmin/' + mid.toString()
@@ -240,7 +219,7 @@ var app = function() {
     }
 
 
-    // Complete as needed.
+    // Vue Object
     self.vue = new Vue({
         el: "#vue-div",
         delimiters: ['${', '}'],
@@ -262,8 +241,7 @@ var app = function() {
             get_positions: self.get_positions,
             addposition: self.addposition,
             position_detail: self.positionDetail,
-            member_detail: self.memberDetail, // why do these have different names (member_detail, memberDetail)
-                                            //because philip made it that way
+            member_detail: self.memberDetail,
             get_assigned_positions: self.get_assigned_positions,
             get_assigned_users: self.get_assigned_users,
             addassignedposition: self.addassignedposition,
@@ -276,7 +254,6 @@ var app = function() {
 
     });
 
-    // i dont know how to pass this orgid on start up
     self.get_users();
     self.get_positions();
     $("#vue-div").show();
