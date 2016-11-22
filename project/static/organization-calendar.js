@@ -120,7 +120,6 @@ $(document).ready(function() {
     }
 
     function showMemberShiftModal(shift) {
-        console.log(shift.title);
         $('#shiftMemberTitle').html(shift.title);
         $('#assignedTo').html(shift.assigned_member);
         $('#description').html(shift.description);
@@ -189,7 +188,6 @@ $(document).ready(function() {
             shift_end_time: $('#shift_end_time').val()
         };
 
-        console.log(JSON.stringify(shiftDict));
 
         $.ajax({
             headers: {
@@ -201,7 +199,6 @@ $(document).ready(function() {
 
             success: function(data)
             {
-                console.log(JSON.stringify(data));
                 if(data.status == "success"){
 
                     if (create) {
@@ -336,7 +333,6 @@ $(document).ready(function() {
                     }
 
                     if (member_id != null) {
-                        console.log('member id not none: ' + member_id)
                         $('#shift_assigned_member_id').val(member_id.toString());
                     }
 
@@ -373,7 +369,6 @@ $(document).ready(function() {
 
             success: function(data)
             {
-                console.log(JSON.stringify(data));
 
                 if(data.status == "success"){
 
@@ -425,15 +420,15 @@ $(document).ready(function() {
         });
     });
 
-    //Code to add a member to a position
+    /*
+    *
+    * Code to add a user to a position
+    *
+    */
     $('#AddUserToPositionSubmit').on('click', function() {
-        console.log("AddUsertopositionsubmit pressed")
-
         //get the title of the position from the dropdownmenu
         var select = document.getElementById("positiondropdown");
         var positionid = select.options[select.selectedIndex].value;
-        //var positionid = APP.vue.positions[index].id;
-        //console.log(positionid) 
         var uid = APP.vue.userid;
         
         url = "/assign/" + uid.toString() + "/" + positionid.toString()
@@ -449,17 +444,18 @@ $(document).ready(function() {
         });
 
         APP.get_assigned_positions();
-        //$('#memberDetailModal').modal('hide');
+
     });
 
+    /*
+    *
+    * Code to add a positon to a user
+    *
+    */
     $('#AddPositionToUserSubmit').on('click', function() {
-        console.log("AddPositionToUserSubmit pressed")
-
         //get the title of the position from the dropdownmenu
         var select = document.getElementById("userdropdown");
-        var uid = select.options[select.selectedIndex].value;
-        //var positionid = APP.vue.positions[index].id;
-        //console.log(positionid) 
+        var uid = select.options[select.selectedIndex].value; 
         var pid = APP.vue.posid;
         
         url = "/assign/" + uid.toString() + "/" + pid.toString()
@@ -475,10 +471,14 @@ $(document).ready(function() {
         });
 
         APP.get_assigned_users();
-        //$('#memberDetailModal').modal('hide');
+
     });
 
-    //Code to invite a member
+    /*
+    *
+    * Code to a invite a member to a organization
+    *
+    */
     $('#inviteMemberSubmit').on('click', function() {
 
         $('#inviteMemberSubmit').prop('disabled', true);
@@ -497,7 +497,7 @@ $(document).ready(function() {
             },
             type: "POST",
             url: url,
-            data: $("#inviteMemberForm").serialize(), // serializes the form's elements.
+            data: $("#inviteMemberForm").serialize(), 
 
             success: function(data)
             {
@@ -516,6 +516,11 @@ $(document).ready(function() {
     });
 
 
+    /*
+    *
+    * Displays a error modal
+    *
+    */
     function showErrorModal(data) {
         if ('message' in data) {
             var html = '<p>' + data.message.toString() + '<p>';
@@ -533,11 +538,14 @@ $(document).ready(function() {
         $('#errorModal').modal('show');
 
     }
-    $('#DeleteUserFromOrg').on('click', function() {
-        console.log("DeleteUserFromOrg pressed")
 
+    /*
+    *
+    * Code to delete a user from a organization
+    *
+    */
+    $('#DeleteUserFromOrg').on('click', function() {
         var uid = APP.vue.userid;
-        console.log(uid);
         
         url = "/deleteuserfromorg/" + uid.toString() + "/" + orgid.toString()
 
@@ -552,14 +560,15 @@ $(document).ready(function() {
         });
 
         APP.get_users();
-        //$('#memberDetailModal').modal('hide');
     });
 
+    /*
+    *
+    * Code to delete a position from a organization
+    *
+    */
     $('#DeletePositionFromOrg').on('click', function() {
-        console.log("DeletePositionFromOrg pressed")
-
         var posid = APP.vue.posid;
-        console.log(posid);
         
         url = "/deleteposition/" + posid.toString()
 
@@ -575,7 +584,6 @@ $(document).ready(function() {
 
         APP.get_positions();
         $('#calendar').fullCalendar( 'refetchEvents' );
-        //$('#memberDetailModal').modal('hide');
     });
 
 });
