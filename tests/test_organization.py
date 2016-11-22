@@ -144,6 +144,28 @@ class TestOrganization(BaseTest, TestCase):
         assert membership.is_owner == False
         assert membership.joined
 
+    def test_delete_user_from_org(self):
+        """
+        Tests deleting a user from a organization
+        :return:
+        """
+        self.john_membership.joined = False
+        db.session.commit()
+        g.user = None
+
+        membership = org_utils.confirm_invite(self.john_membership)
+
+        assert membership is not None
+
+        org_utils.delete_user_from_org(2, 1)
+
+        user = org_utils.get_user(2)
+        org = org_utils.get_organization(1)
+
+        membership = org_utils.get_membership(org, user)
+
+        assert membership is None
+
 class MembershipToDictTest(TestCase):
 
     def create_app(self):
