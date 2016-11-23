@@ -1,7 +1,6 @@
 
 $(document).ready(function() {
 
-
     var create = true;
 
     /*
@@ -95,7 +94,18 @@ $(document).ready(function() {
         $("#shift_repeat_list option:selected").prop("selected", false);
         $('#shift_repeating').prop('checked', false);
         $('#shift_repeat_list').hide();
+    });
+
+    $('#errorModal').on('hidden.bs.modal', function(){
         $('#errorBody').html('');
+    });
+
+    $(document).on('show.bs.modal', '.modal', function () {
+        var zIndex = 1040 + (10 * $('.modal:visible').length);
+        $(this).css('z-index', zIndex);
+        setTimeout(function() {
+            $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+        }, 0);
     });
 
     $('#shiftMemberModal').on('hidden.bs.modal', function(){
@@ -394,7 +404,7 @@ $(document).ready(function() {
         $('#createPositionSubmit').prop('disabled', true);
 
         var newPosition = {
-            title: $('#title').val(),
+            title: $('#name').val(),
             description: $('#description').val()
         };
 
@@ -403,7 +413,7 @@ $(document).ready(function() {
         $.ajax({
             type: "POST",
             url: url,
-            data: $("#CreatePositionForm").serialize(), // serializes the form's elements.
+            data: newPosition, // serializes the form's elements.
 
             success: function(data)
             {
@@ -413,7 +423,7 @@ $(document).ready(function() {
                     APP.get_positions();
                     $('#CreatePositionModal').modal('hide');
                 }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
+                    showErrorModal(data);
                 }
                 $('#createPositionSubmit').prop('disabled', false);
             }
@@ -497,7 +507,7 @@ $(document).ready(function() {
             },
             type: "POST",
             url: url,
-            data: $("#inviteMemberForm").serialize(), 
+            data: newUser,
 
             success: function(data)
             {
