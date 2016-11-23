@@ -73,7 +73,8 @@ def create():
     :return:
     """
     form = CreateForm(request.form)
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate():
+    #if form.validate_on_submit():
         org, membership = utils.organization.create_organization(form.name.data, g.user.id)
         return redirect('/organization/' + str(org.id))
 
