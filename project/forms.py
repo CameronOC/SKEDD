@@ -64,5 +64,5 @@ class ClaimPositionForm(Form):
     position_id = Position.id
 
 class PositionForm(Form):
-    name = StringField('title', validators=[DataRequired(), Length(min=1, max=50)])
-    description = StringField('description')
+    name = StringField('name', validators=[DataRequired(), Length(min=1, max=50)])
+    description = StringField('description', widget=TextArea())

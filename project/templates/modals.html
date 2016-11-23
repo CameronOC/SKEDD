@@ -18,7 +18,7 @@
    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 id="shiftTitle" class="modal-title">Shift Creator</h4>
+                <h4 id="shiftTitle" class="modal-title">Shift</h4>
             </div>
             <div class="modal-body">
                 <form action="" method="post" name="invite" id="shiftForm">
@@ -101,10 +101,10 @@
                 <form action="" method="post" name="create" id="CreatePositionForm" onsubmit="return false">
                     {{ form1.csrf_token }}
                   <p>
-                    {{ form1.name(placeholder="Position Name", class_="form-control") }}
+                    {{ form1.name(placeholder="Name", class_="form-control") }}
                   </p>
                   <p>
-                    {{ form1.description(placeholder="Position Description", class_="form-control") }}
+                    {{ form1.description(class_="form-control", rows=5, placeholder="description...") }}
                   </p>
                 </form>
             </div>

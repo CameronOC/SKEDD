@@ -404,7 +404,7 @@ $(document).ready(function() {
         $('#createPositionSubmit').prop('disabled', true);
 
         var newPosition = {
-            title: $('#title').val(),
+            title: $('#name').val(),
             description: $('#description').val()
         };
 
@@ -413,7 +413,7 @@ $(document).ready(function() {
         $.ajax({
             type: "POST",
             url: url,
-            data: $("#CreatePositionForm").serialize(), // serializes the form's elements.
+            data: newPosition, // serializes the form's elements.
 
             success: function(data)
             {
@@ -423,7 +423,7 @@ $(document).ready(function() {
                     APP.get_positions();
                     $('#CreatePositionModal').modal('hide');
                 }else if(data.status == "error"){
-                    alert(JSON.stringify(data));
+                    showErrorModal(data);
                 }
                 $('#createPositionSubmit').prop('disabled', false);
             }

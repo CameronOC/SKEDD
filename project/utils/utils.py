@@ -160,6 +160,20 @@ def validate_invite_user(form):
     return return_dict
 
 
+def validate_position(form):
+
+    return_dict = {}
+
+    if 'title' not in form or len(form['title']) < 1:
+        return_dict['status'] = "error"
+        return_dict['errors'] = {'Invalid Name': "Field Empty"}
+    elif len(form['title']) > 50:
+        return_dict['status'] = "error"
+        return_dict['errors'] = {'Invalid Name': "Must be less than 50 characters."}
+
+    return return_dict
+
+
 def rgb_to_hex(red, green, blue):
     """Return color as #rrggbb for the given color values."""
     return '#%02x%02x%02x' % (red, green, blue)

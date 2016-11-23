@@ -120,7 +120,7 @@ def get_shifts_for_org(key):
 @main_blueprint.route('/organization/<int:key>/shift/create', methods=['GET', 'POST'])
 @login_required
 @check_confirmed
-# @owns_organization
+@owns_organization
 def create_shift(key):
     """
     Creates a new shift.  Shifts can be assigned to a user or left empty at
@@ -351,10 +351,14 @@ def create_position(key):
 
     # the new create_position function.
     org = utils.organization.get_organization(key)
-    form1 = PositionForm(request.form)
-    return_dict = {}
 
-    utils.organization.create_position(org, request.form['name'], request.form['description'])
+    return_dict = utils.utils.validate_position(request.form)
+    if 'status' in return_dict:
+        return Response(response=json.dumps(return_dict),
+                        status=200,
+                        mimetype="application/json")
+
+    utils.organization.create_position(org, request.form['title'], request.form['description'])
     return_dict['status'] = "success"
 
     response = Response(response=json.dumps(return_dict),
@@ -387,7 +391,7 @@ def get_position_members(key, key2):
                         status=200,  mimetype="application/json")
     return response
 
-@app.route('/getpositionmembers/<key>/')
+@app.route('/getpositionmembers/<int:key>/')
 def get_position_users(key):
     """
     Returms a json list of all users for a position
@@ -400,7 +404,7 @@ def get_position_users(key):
     return response
 
 
-@app.route('/assign/<key>/<key1>', methods=['POST'])
+@app.route('/assign/<int:key>/<int:key1>', methods=['POST'])
 @login_required
 @check_confirmed
 def assign(key, key1):
@@ -413,7 +417,7 @@ def assign(key, key1):
     return response
 
 
-@app.route('/unassign/<int:key1>/<int:key2>', methods=['POST'])
+@app.route('/unassign/<int:key>/<int:key1>', methods=['POST'])
 @login_required
 @check_confirmed
 def unassign(key, key1):
@@ -427,7 +431,7 @@ def unassign(key, key1):
     return response
 
 
-@app.route('/deleteposition/<key>', methods=['POST'])
+@app.route('/deleteposition/<int:key>', methods=['POST'])
 @login_required
 @check_confirmed
 def deleteposition(key):
@@ -465,7 +469,7 @@ def getpositionsinorg(key):
     return utils.organization.get_positions_for_org_JSON(key)
 
 
-@app.route('/organization/<key>/shifts')
+@app.route('/organization/<int:key>/shifts')
 @login_required
 #@owns_organization
 def get_shifts_for_org(key):
@@ -480,7 +484,7 @@ def get_shifts_for_org(key):
     return response
 
 
-@app.route('/deleteuserfromorg/<key>/<key1>',  methods=['POST'])
+@app.route('/deleteuserfromorg/<int:key>/<int:key1>',  methods=['POST'])
 @login_required
 def deleteuserfromorg(key, key1):
     return utils.organization.delete_user_from_org(key, key1)
