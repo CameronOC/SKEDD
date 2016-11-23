@@ -37,6 +37,19 @@ class TestPosition(BaseTest, TestCase):
         unassigned = position_assignments.select(position_assignments.c.user_id == 1)
         assert unassigned is not None
 
+    def test_get_postion(self):
+        """
+        Tests getting a position by ID
+        :return:
+        """
+        position = org_utils.get_position(1)
+        assert position is not None
+        assert position.id == self.position.id
+        assert position.title == self.position.title
+
+        position = org_utils.get_position(3)
+        assert position is None
+
     def test_create_position(self):
         """
         Tests that a position is delete from a organization
@@ -51,12 +64,10 @@ class TestPosition(BaseTest, TestCase):
         Tests that a position is delete from a organization
         :return:
         """
-        pos = org_utils.get_position(1)
-        org = org_utils.get_organization(1)
+        pos = org_utils.get_position(1).id
         assert pos is not None
 
-        org_utils.deletepositions(pos, org)
-
+        org_utils.deletepositions(pos)
         pos2 = org_utils.get_position(1)
         assert pos2 is None
 
@@ -76,7 +87,7 @@ class TestPosition(BaseTest, TestCase):
             assert p['title'] == self.position.title
             assert p['organization_id'] == self.position.organization_id
 
-    def test_get_users_for_position(self):
+    def test_get_members_for_position(self):
         """
         Tests getting all the users for a specific position
         :return:
@@ -104,3 +115,37 @@ class TestPosition(BaseTest, TestCase):
         assert member_two['first_name'] == 'Organization'
         assert member_two['last_name'] == 'Owner'
         assert member_two['id'] == 1
+
+    def test_get_users_for_position(self):
+        """
+        Tests getting all the users for a specific position
+        :return:
+        """
+        org_utils.assign_member_to_position(self.john.id, self.position.id)
+        org_utils.assign_member_to_position(self.owner.id, self.position.id)
+
+        response = json.loads(org_utils.get_users_for_position(self.position.id))
+
+        assert response is not None
+        assert len(response) == 2
+
+        member_one = response[0]
+        member_two = response[1]
+
+        assert member_one['first_name'] == 'John'
+        assert member_one['last_name'] == 'Doe'
+        assert member_one['id'] == 2
+
+        assert member_two['first_name'] == 'Organization'
+        assert member_two['last_name'] == 'Owner'
+        assert member_two['id'] == 1
+
+    def test_get_assigned_positions_for_user(self):
+        """
+        Tests getting all the users for assigned to a position
+        :return:
+        """
+
+        org_utils.assign_member_to_position(self.john.id, self.position.id)
+        response = json.loads(org_utils.get_assigned_positions_for_user(1, 2))
+        assert response is not None

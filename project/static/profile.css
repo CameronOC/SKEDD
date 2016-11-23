@@ -11,16 +11,26 @@ div.PROFILE_window {
 	margin:auto;
 }
 
-div.PROFILE_change-password {
-	margin-left: 2.5%;
-}
-
 h1.PROFILE_title{
 	font-weight:bold;
 	color: white;
 	text-shadow: 2px 2px 4px #1a1a1a;
 	font-size: 32px;
 }
+
+div.PROFILE_body {
+	margin-left: 2.5%;
+	color: white;
+}
+
+div.PROFILE_change-password{
+	font-weight:bold;
+	color: black;
+	text-shadow: 2px 2px 4px #1a1a1a;
+	font-size: 32px;
+}
+
+
 
 button.PROFILE_update-button {
   background-color: #008CBA; 

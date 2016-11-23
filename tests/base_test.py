@@ -55,7 +55,8 @@ class BaseTest(TestCase):
 
         position = Position(
             title='Test Position',
-            organization_id=org.id
+            organization_id=org.id,
+            description='This is a description'
         )
 
         db.session.add(position)

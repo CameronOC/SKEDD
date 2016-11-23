@@ -1,4 +1,4 @@
-<div id="drawerExample" class="drawer dw-xs-10 dw-sm-6 dw-md-4 fold drawer-right" aria-labelledby="drawerExample">
+<div id="drawerExample" class="drawer dw-xs-2 fold drawer-right" aria-labelledby="drawerExample">
     <div class="drawer-controls">
         <a id="menu" data-toggle="drawer" href="#drawerExample" aria-foldedopen="false" aria-controls="drawerExample" class="btn btn-primary btn-sm">Menu</a>
     </div>
@@ -8,16 +8,21 @@
         </div>
 
 
-        <div class="drawer-body" >
+        <div id="drawerBody" class="drawer-body" >
             <script type="text/javascript">
                 var orgid = {{organization.id}}
             </script>
 
             <h2>Positions</h2>
-            <ul v-for="position in positions">
-                <li>${position.title} </li>
+            <ul v-for="(position, index) in positions">
+                <li ><input class="position-toggle" v-bind:id="position.id" value="1" type="checkbox" checked>  
+                    <a v-on:click="position_detail(index)" style="color:black">
+                        ${position.title}
+                   </a>
+                </li>
             </ul>
             <a data-toggle="modal" href="#CreatePositionModal" class="btn btn-primary">New Position</a>
+            
             <h2>Members</h2>
             <ul v-for="(user, index) in users">
                 <li>
@@ -29,10 +34,5 @@
             <a data-toggle="modal" href="#inviteMemberModal" class="btn btn-primary">Invite Member</a>
         </div>
 
-
-
-        <div class="drawer-footer locked text-center">
-            <small>&copy; Caroline Amaba</small>
-        </div>
     </div>
 </div>

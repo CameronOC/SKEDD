@@ -45,7 +45,7 @@ class TestingConfig(BaseConfig):
 class ProductionConfig(BaseConfig):
     """Production configuration."""
     SECRET_KEY = 'my_precious'
-    DEBUG = False
+    DEBUG = True
     #SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/example'
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
     DEBUG_TB_ENABLED = False

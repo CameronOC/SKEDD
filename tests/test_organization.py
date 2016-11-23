@@ -4,6 +4,7 @@ from project import app, db
 from project.models import User, Organization, Membership, Position, Shift, position_assignments
 import project.utils.organization as org_utils
 from base_test import BaseTest
+import project.forms as forms
 #from project.utils.organization import deletepositions
 # from project.utils.organization import create_organization, get_organization
 import datetime
@@ -63,26 +64,23 @@ class TestOrganization(BaseTest, TestCase):
         created an account
         :return:
         """
-        membership = org_utils.invite_member(self.organization, 'invitee@org.com', 'Alice', 'Green')
+        response_dict = org_utils.invite_member(self.organization, 'invitee@org.com', 'Alice', 'Green')
+        assert 'status' in response_dict
+        assert response_dict['status'] == 'success'
 
-        assert membership is not None
+        assert 'membership' in response_dict
+        membership_dict = response_dict['membership']
 
-        user = membership.member
-        org = membership.organization
-
+        user = User.query.filter_by(email='invitee@org.com').first()
         assert user is not None
-        assert org is not None
 
-        assert membership.joined == False
+        assert 'member_id' in membership_dict
+        assert 'organization_id' in membership_dict
 
-        assert user.email == 'invitee@org.com'
-        assert user.first_name == 'Alice'
-        assert user.last_name == 'Green'
-        assert user.confirmed == False
+        assert membership_dict['joined'] == False
 
-        assert org.id == self.organization.id
-        assert org.name == self.organization.name
-        assert org.owner_id == self.organization.owner_id
+        assert membership_dict['organization_id'] == self.organization.id
+        assert membership_dict['member_id'] == user.id
 
     def test_invite_confirmed_user(self):
         """
@@ -97,26 +95,24 @@ class TestOrganization(BaseTest, TestCase):
         db.session.add(confirmed_user)
         db.session.commit()
 
-        membership = org_utils.invite_member(self.organization, 'confirmed@user.com', 'John', 'Doe')
+        response_dict = org_utils.invite_member(self.organization, 'confirmed@user.com', 'John', 'Doe')
+        assert 'status' in response_dict
+        assert response_dict['status'] == 'success'
 
-        assert membership is not None
+        assert 'membership' in response_dict
+        membership_dict = response_dict['membership']
 
-        user = membership.member
-        org = membership.organization
-
+        user = User.query.filter_by(email='confirmed@user.com').first()
         assert user is not None
-        assert org is not None
 
-        assert membership.joined == False
+        assert 'member_id' in membership_dict
+        assert 'organization_id' in membership_dict
 
-        assert user.email == 'confirmed@user.com'
-        assert user.first_name == 'John'
-        assert user.last_name == 'Doe'
-        assert user.confirmed == True
+        assert membership_dict['joined'] == False
 
-        assert org.id == self.organization.id
-        assert org.name == self.organization.name
-        assert org.owner_id == self.organization.owner_id
+        assert membership_dict['organization_id'] == self.organization.id
+        assert membership_dict['member_id'] == user.id
+
 
     def test_invite_joined_user(self):
         """
@@ -125,16 +121,13 @@ class TestOrganization(BaseTest, TestCase):
         :return:
         """
 
-        membership = org_utils.invite_member(self.organization,
+        response_dict = org_utils.invite_member(self.organization,
                                              self.john.email,
                                              self.john.first_name,
                                              self.john.last_name)
 
-        memberships = Membership.query.filter_by(organization=self.organization, member=self.john).all()
-
-        assert memberships is not None
-
-        assert len(memberships) == 1
+        assert 'status' in response_dict
+        assert response_dict['status'] == 'error'
 
     def test_join(self):
         """
@@ -150,3 +143,253 @@ class TestOrganization(BaseTest, TestCase):
         assert membership is not None
         assert membership.is_owner == False
         assert membership.joined
+
+    def test_delete_user_from_org(self):
+        """
+        Tests deleting a user from a organization
+        :return:
+        """
+        self.john_membership.joined = False
+        db.session.commit()
+        g.user = None
+
+        membership = org_utils.confirm_invite(self.john_membership)
+
+        assert membership is not None
+
+        org_utils.delete_user_from_org(2, 1)
+
+        user = org_utils.get_user(2)
+        org = org_utils.get_organization(1)
+
+        membership = org_utils.get_membership(org, user)
+
+        assert membership is None
+
+class MembershipToDictTest(TestCase):
+
+    def create_app(self):
+        app.config.from_object('project.config.TestingConfig')
+        return app
+
+    def test_nonetype(self):
+        """
+        tests converting a NoneType object
+        :return:
+        """
+        assert org_utils.membership_to_dict(None) is None
+
+    def test_invalid_type(self):
+        """
+        Tets converting an object that isn't a membership
+        :return:
+        """
+        shift = Shift(assigned_user_id=1, description='', position_id=1,
+                             start_time='2007-04-05T14:30', end_time='2007-04-05T14:30')
+
+        self.assertRaises(TypeError, org_utils.membership_to_dict, shift)
+
+    def test_valid(self):
+        """
+        tests with a valid membership
+        :return:
+        """
+        membership = Membership(member_id=1, organization_id=1, is_admin=True, is_owner=False, joined=True)
+        assert membership is not None
+        membership_dict = org_utils.membership_to_dict(membership)
+
+        assert membership_dict is not None
+
+        assert 'id' in membership_dict
+        assert membership_dict['id'] == membership.id
+
+        assert 'member_id' in membership_dict
+        assert membership_dict['member_id'] == membership.member_id
+
+        assert 'organization_id' in membership_dict
+        assert membership_dict['organization_id'] == membership.organization_id
+
+        assert 'is_owner' in membership_dict
+        assert membership_dict['is_owner'] == False
+
+        assert 'is_admin' in membership_dict
+        assert membership_dict['is_admin'] == True
+
+        assert 'joined' in membership_dict
+        assert membership_dict['joined'] == True
+
+
+class ShiftToDictTest(TestCase):
+
+    def create_app(self):
+        app.config.from_object('project.config.TestingConfig')
+        return app
+
+    def test_nonetype(self):
+        """
+        tests converting a NoneType object
+        :return:
+        """
+        assert org_utils.shift_to_dict(None) is None
+
+    def test_invalid_type(self):
+        """
+        Tets converting an object that isn't a membership
+        :return:
+        """
+        membership = Membership(member_id=1, organization_id=1, is_admin=True, is_owner=False, joined=True)
+
+        self.assertRaises(TypeError, org_utils.shift_to_dict, membership)
+
+    def test_valid_none_missing(self):
+        """
+        Tests a valid dictionary where all fields are filled
+        :return:
+        """
+        position = Position(
+            title='Test Position',
+            organization_id=1,
+            description='test'
+        )
+
+        user = User(
+            email='member@organization.com',
+            first_name='John',
+            last_name='Doe',
+            password='password',
+            confirmed=True
+        )
+
+        shift = Shift(assigned_user_id=user.id, description='', position_id=position.id,
+                      start_time='2007-04-05T14:30', end_time='2007-04-05T14:30')
+
+        shift.Position = position
+        shift.user = user
+
+        assert shift is not None
+
+        shift_dict = org_utils.shift_to_dict(shift)
+        assert shift_dict is not None
+
+        assert 'id' in shift_dict
+        assert shift_dict['id'] == shift.id
+
+        assert 'position_id' in shift_dict
+        assert shift_dict['position_id'] == shift.Position.id
+
+        assert 'position_title' in shift_dict
+        assert shift_dict['position_title'] == shift.Position.title
+
+        assert 'start' in shift_dict
+        assert shift_dict['start'] == shift.start_time
+
+        assert 'end' in shift_dict
+        assert shift_dict['end'] == shift.end_time
+
+        assert 'description' in shift_dict
+        assert shift_dict['description'] == shift.description
+
+        assert 'assigned_member_id' in shift_dict
+        assert shift_dict['assigned_member_id'] == shift.assigned_user_id
+
+        assert 'assigned_member' in shift_dict
+        assert shift_dict['assigned_member'] == shift.user.first_name + ' ' + shift.user.last_name
+
+    def test_valid_description_missing(self):
+        """
+        Tests a valid dictionary where the description is missing
+        :return:
+        """
+        position = Position(
+            title='Test Position',
+            organization_id=1,
+            description='test'
+        )
+
+        user = User(
+            email='member@organization.com',
+            first_name='John',
+            last_name='Doe',
+            password='password',
+            confirmed=True
+        )
+
+        shift = Shift(assigned_user_id=user.id, description=None, position_id=position.id,
+                             start_time='2007-04-05T14:30', end_time='2007-04-05T14:30')
+
+        shift.Position = position
+        shift.user = user
+
+        assert shift is not None
+
+        shift_dict = org_utils.shift_to_dict(shift)
+        assert shift_dict is not None
+
+        assert 'id' in shift_dict
+        assert shift_dict['id'] == shift.id
+
+        assert 'position_id' in shift_dict
+        assert shift_dict['position_id'] == shift.Position.id
+
+        assert 'position_title' in shift_dict
+        assert shift_dict['position_title'] == shift.Position.title
+
+        assert 'start' in shift_dict
+        assert shift_dict['start'] == shift.start_time
+
+        assert 'end' in shift_dict
+        assert shift_dict['end'] == shift.end_time
+
+        assert 'description' in shift_dict
+        assert shift_dict['description'] == ''
+
+        assert 'assigned_member_id' in shift_dict
+        assert shift_dict['assigned_member_id'] == shift.assigned_user_id
+
+        assert 'assigned_member' in shift_dict
+        assert shift_dict['assigned_member'] == shift.user.first_name + ' ' + shift.user.last_name
+
+    def test_valid_user_missing(self):
+        """
+        Tests a valid dictionary where no user is assigned
+        :return:
+        """
+        position = Position(
+            title='Test Position',
+            organization_id=1,
+            description='test'
+        )
+
+        shift = Shift(assigned_user_id=None, description='A description', position_id=position.id,
+                             start_time='2007-04-05T14:30', end_time='2007-04-05T14:30')
+
+        shift.Position = position
+
+        assert shift is not None
+
+        shift_dict = org_utils.shift_to_dict(shift)
+        assert shift_dict is not None
+
+        assert 'id' in shift_dict
+        assert shift_dict['id'] == shift.id
+
+        assert 'position_id' in shift_dict
+        assert shift_dict['position_id'] == shift.Position.id
+
+        assert 'position_title' in shift_dict
+        assert shift_dict['position_title'] == shift.Position.title
+
+        assert 'start' in shift_dict
+        assert shift_dict['start'] == shift.start_time
+
+        assert 'end' in shift_dict
+        assert shift_dict['end'] == shift.end_time
+
+        assert 'description' in shift_dict
+        assert shift_dict['description'] == shift.description
+
+        assert 'assigned_member_id' in shift_dict
+        assert shift_dict['assigned_member_id'] == 0
+
+        assert 'assigned_member' in shift_dict
+        assert shift_dict['assigned_member'] == 'Unassigned'

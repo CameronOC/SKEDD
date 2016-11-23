@@ -5,15 +5,17 @@
 #### imports ####
 #################
 
-from flask import render_template, Blueprint, url_for, redirect, flash, request, g
+from flask import render_template, Blueprint, url_for, redirect, flash, request, g, Response
 from flask_login import login_user, logout_user, login_required, current_user
 
-from project.models import User
+from project.models import User, Preference
 # from project.email import send_email
 from project import db, bcrypt
-from .forms import LoginForm, RegisterForm, ChangePasswordForm
+from .forms import LoginForm, RegisterForm, ChangePasswordForm, PasswordResetEnterEmailForm, PasswordResetEnterPasswordForm
+from project import utils
+from project.email import ts
 from project.utils.token import generate_confirmation_token, confirm_token
-import datetime
+import datetime, json
 from project.email import send_email
 from project.decorators import check_confirmed
 ################
@@ -99,6 +101,63 @@ def profile():
             return redirect(url_for('user.profile'))
     return render_template('user/profile.html', form=form)
 
+
+@user_blueprint.route('/updatepreferences/', methods=['GET', 'POST'])
+@login_required
+def updatepreferences():
+    form = (request.form)
+    json_string = json.loads(form['payload'])
+    user = User.query.filter_by(email=current_user.email).first()
+    user_pref = Preference(
+        user_id=user.id,
+        start=json_string['start'],
+        end=json_string['end'],
+    )
+    db.session.add(user_pref)
+    db.session.commit()
+    return 'operation performed'
+
+
+@user_blueprint.route('/updatepreferences/delete/', methods=['GET', 'POST'])
+@login_required
+def updatepreferences_delete():
+    form = (request.form)
+    json_string = json.loads(form['payload'])
+    user = User.query.filter_by(email=current_user.email).first()
+    selected_preference = Preference.query.filter_by(start=json_string['start'], end=json_string['end'], user_id=user.id).one()
+    db.session.delete(selected_preference)
+    db.session.commit()
+    return 'operation performed'
+
+
+@user_blueprint.route('/updatepreferences/<key>/', methods=['GET'])
+@login_required
+def updatepreferences_get_events(key):
+    events_list = []
+    events = Preference.query.filter_by(user_id=key).all()
+    for e in events:                
+        events_list.append({'id': e.id,
+                            'start': e.start,
+                            'end': e.end,
+                            })
+    json_events_list = json.dumps(events_list)
+    response = Response(response=json_events_list,
+        status=200,
+        mimetype="application/json")
+    return response
+
+
+@user_blueprint.route('/updatepreferences/updateevent/', methods=['GET','POST'])
+@login_required
+def updatepreferences_update_event():
+    form = (request.form)
+    json_string = json.loads(form['payload'])
+    old_event = Preference.query.filter_by(id=json_string['id']).first()
+    old_event.start = json_string['start']
+    old_event.end = json_string['end']
+    db.session.commit()
+    return 'operation performed'
+
 @user_blueprint.route('/confirm/<token>')
 def confirm_email(token):
     try:
@@ -136,3 +195,35 @@ def resend_confirmation():
     send_email(current_user.email, subject, html)
     flash('A new confirmation email has been sent.', 'success')
     return redirect(url_for('user.unconfirmed'))
+
+
+@user_blueprint.route('/reset_password', methods=['GET', 'POST'])
+def request_password_reset():
+    form = PasswordResetEnterEmailForm(request.form)
+    if form.validate_on_submit():
+        utils.organization.send_password_recovery_email(form.email.data)
+    return render_template('user/reset_password.html', form=form)    
+
+@user_blueprint.route('/recover_password/<token>', methods=['GET', 'POST'])
+def recover_password(token):
+    try:
+        email = ts.loads(token, salt="recover-key", max_age=86400)
+    except:
+        flash('Invalid or expired password reset link', 'danger')
+        return redirect(url_for('main.landing'))
+
+    form = PasswordResetEnterPasswordForm(request.form)
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=email).first()
+
+        user.password = bcrypt.generate_password_hash(form.password.data)
+
+        db.session.add(user)
+        db.session.commit()
+        
+        flash('Password successfully reset!', 'success')
+        
+        return redirect(url_for('main.landing'))
+
+    return render_template('user/reset_with_token.html', form=form, token=token)
