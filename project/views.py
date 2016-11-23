@@ -129,14 +129,9 @@ def create_shift(key):
     :param key:
     :return:
     """
-    form = ShiftForm(request.form)
-    return_dict = {}
     shift_assigned_member_id = None
 
     return_dict = utils.utils.validate_shift(request.form, pos_required=True)
-
-    # print request.form['shift_position_id']
-    # print type(request.form['shift_position_id'])
 
     if 'status' in return_dict:
         return_dict['message'] = 'Unable to Create Shift.'
@@ -156,17 +151,6 @@ def create_shift(key):
                                                    request.form['shift_repeat_list'])
     return_dict['shifts'] = shifts
     return_dict['status'] = "success"
-    """
-
-    else:
-        return_dict['status'] = "error"
-        errors_dict = utils.utils.shift_form_errors_to_dict(request.form)
-
-        manual_validation = utils.utils.shift_form_errors_to_dict(form)
-        if 'status' in manual_validation:
-            errors_dict = utils.utils.merge_dicts(manual_validation['errors'], errors_dict)
-        return_dict['errors'] = errors_dict
-    """
 
     response = Response(response=json.dumps(return_dict),
                         status=200,
@@ -190,6 +174,14 @@ def update_shift_time(key, key1):
 
     start_time = request.form['start']
     end_time = request.form['end']
+
+    return_dict = utils.utils.validate_shift(request.form)
+
+    if 'status' in return_dict:
+        return_dict['message'] = 'Unable to update Shift.'
+        return Response(response=json.dumps(return_dict),
+                        status=200,
+                        mimetype="application/json")
 
     shift = Shift.query.get(key1)
     shift.update(start_time=start_time, end_time=end_time)
@@ -266,17 +258,6 @@ def update_shift(key, key1):
     response_dict['message'] = 'Shift succesfully updated'
     response_dict['shift'] = utils.organization.shift_to_dict(shift)
 
-    """
-    else:
-        response_dict['status'] = "error"
-        errors_dict = utils.utils.shift_form_errors_to_dict(request.form)
-
-        manual_validation = utils.utils.shift_form_errors_to_dict(form)
-        if 'status' in manual_validation:
-            errors_dict = utils.utils.merge_dicts(manual_validation['errors'], errors_dict)
-            response_dict['errors'] = errors_dict
-    """
-
 
     return Response(response=json.dumps(response_dict),
                     status=200,
@@ -298,30 +279,17 @@ def invite(key):
     form = InviteForm(request.form)
     return_dict = {}
 
-    if form.validate_on_submit():
-        return_dict = utils.organization.invite_member(org,
-                                                       form.email.data,
-                                                       form.first_name.data,
-                                                       form.last_name.data)
+    return_dict = utils.utils.validate_invite_user(request.form)
+    if 'status' in return_dict:
+        return Response(response=json.dumps(return_dict),
+                        status=200,
+                        mimetype="application/json")
 
-    else:
-        return_dict['status'] = "error"
-        errors_dict = {
-            'First Name': [],
-            'Last Name': [],
-            'Email': [],
-        }
 
-        for error in form.first_name.errors:
-            errors_dict['First Name'].append(error)
-
-        for error in form.last_name.errors:
-            errors_dict['Last Name'].append(error)
-
-        for error in form.email.errors:
-            errors_dict['Email'].append(error)
-
-        return_dict['errors'] = errors_dict
+    return_dict = utils.organization.invite_member(org,
+                                                   form.email.data,
+                                                   form.first_name.data,
+                                                   form.last_name.data)
 
     response = Response(response=json.dumps(return_dict),
                         status=200,
@@ -388,27 +356,6 @@ def create_position(key):
 
     utils.organization.create_position(org, request.form['name'], request.form['description'])
     return_dict['status'] = "success"
-
-
-    """
-     if form1.validate_on_submit():
-        utils.organization.create_position(org, form1.name.data)
-        return_dict['status'] = "success"
-    else:
-
-        print str(form1.csrf_token.errors)
-
-        return_dict['status'] = "error"
-        errors_dict = {
-            'title': []
-        }
-
-        for error in form1.name.errors:
-            errors_dict['title'].append(error)
-
-        return_dict['errors'] = errors_dict
-    """
-
 
     response = Response(response=json.dumps(return_dict),
                         status=200,

@@ -5,7 +5,7 @@ import datetime
 
 from project import db, bcrypt
 from sqlalchemy import UniqueConstraint
-from utils.utils import random_color
+from utils.utils import random_color, random_pastel
 
 position_assignments = db.Table('position_assignments',
                                 db.Column('user_id', db.Integer, db.ForeignKey('users.id')),

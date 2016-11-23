@@ -1,5 +1,6 @@
 from random import randint
 import datetime
+import re
 
 def merge_dicts(*dict_args):
     """
@@ -111,6 +112,52 @@ def shift_form_errors_to_dict(form):
         errors_dict['Shift Id'].append(error)
 
     return errors_dict
+
+
+def validate_invite_user(form):
+    email_regex = r'[^@]+@[^@]+\.[^@]+'
+    return_dict = {}
+    errors = False
+
+    if 'email' not in form or len(form['email']) < 1:
+        return_dict['status'] = "error"
+        return_dict['errors'] = {'Invalid Email': "Field Empty"}
+        errors = True
+    else:
+        if not re.match(email_regex, form['email']):
+            return_dict['status'] = "error"
+            return_dict['errors'] = {'Invalid Email': "Incorrect Format"}
+            errors = True
+
+    if 'first_name' not in form or len(form['first_name']) < 1:
+        if errors:
+            return_dict['errors']['Invalid First Name'] = "Field Empty"
+        else:
+            return_dict['status'] = "error"
+            return_dict['errors'] = {'Invalid First Name': "Field Empty"}
+            errors = True
+    elif len(form['first_name']) > 20:
+        if errors:
+            return_dict['errors']['Invalid First Name'] = "Must be less than 20 characters"
+        else:
+            return_dict['status'] = "error"
+            return_dict['errors'] = {'Invalid First Name': "Must be less than 20 characters"}
+
+    if 'last_name' not in form or len(form['last_name']) < 1:
+        if errors:
+            return_dict['errors']['Invalid Last Name'] = "Field Empty"
+        else:
+            return_dict['status'] = "error"
+            return_dict['errors'] = {'Invalid Last Name': "Field Empty"}
+            errors = True
+    elif len(form['last_name']) > 20:
+        if errors:
+            return_dict['errors']['Invalid Last Name'] = "Must be less than 20 characters"
+        else:
+            return_dict['status'] = "error"
+            return_dict['errors'] = {'Invalid Last Name': "Must be less than 20 characters"}
+
+    return return_dict
 
 
 def rgb_to_hex(red, green, blue):
