@@ -86,9 +86,18 @@ def deleteorg(key):
     org = utils.organization.get_organization(key)
     db.session.delete(org)
     db.session.commit()
-    #orgs = g.user.orgs_owned.all()
-    #memberships = g.user.memberships.filter_by(is_owner=False).all()
-    #return render_template('main/home.html', organizations=orgs, memberships=memberships)
+    return redirect(url_for('main.home'))
+
+@main_blueprint.route('/leaveorg/<int:key>', methods=['GET', 'POST'])
+@login_required
+@check_confirmed
+def leaveorg(key):
+    org = utils.organization.get_organization(key)
+    membership = utils.organization.get_membership(org, g.user)
+
+    db.session.delete(membership)
+    db.session.commit()
+    
     return redirect(url_for('main.home'))
 
 
