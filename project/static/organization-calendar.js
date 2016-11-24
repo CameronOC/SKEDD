@@ -87,6 +87,13 @@ $(document).ready(function() {
       });
     };
 
+    $('#shiftModal').on('hide.bs.modal', function(){
+        if (create) {
+            $('#calendar').fullCalendar( 'removeEvents', 0);
+        }
+        $('#shiftSubmit').prop('disabled', true);
+    });
+
 
     $('#shiftModal').on('hidden.bs.modal', function(){
         $('#shift_assigned_member_id').empty();
@@ -226,20 +233,6 @@ $(document).ready(function() {
 
 
 
-    });
-
-    /*
-    *
-    * If shift creation is cancelled, the temporary shift that is created
-    * by dragging on the calender needs to be deleted
-    *
-    */
-    $('#shiftCancel').on('click', function() {
-        if (create) {
-            $('#calendar').fullCalendar( 'removeEvents', 0);
-        }
-        $('#shiftSubmit').prop('disabled', true);
-        $('#shiftModal').modal('hide');
     });
 
     /*
@@ -400,7 +393,15 @@ $(document).ready(function() {
     *
     */
     $('#createPositionSubmit').on('click', function() {
+        createPosition();
 
+    });
+
+    $('#CreatePositionForm').submit(function () {
+        return false;
+    });
+
+    function createPosition() {
         $('#createPositionSubmit').prop('disabled', true);
 
         var newPosition = {
@@ -428,7 +429,10 @@ $(document).ready(function() {
                 $('#createPositionSubmit').prop('disabled', false);
             }
         });
-    });
+
+    }
+
+
 
     /*
     *
@@ -490,7 +494,15 @@ $(document).ready(function() {
     *
     */
     $('#inviteMemberSubmit').on('click', function() {
+        inviteMember();
+    });
 
+
+    $('#inviteMemberForm').submit(function () {
+        return false;
+    });
+
+    function inviteMember() {
         $('#inviteMemberSubmit').prop('disabled', true);
 
         var newUser = {
@@ -523,7 +535,7 @@ $(document).ready(function() {
 
         $('#inviteMemberSubmit').prop('disabled', false);
 
-    });
+    }
 
 
     /*
