@@ -182,8 +182,10 @@
                 <strong>Email: </strong><span id="memberDetailEmail"></span> <br>
                 <!-- User ID: <span id="memberDetailId"></span> <br> ## NOT REQ FOR CUSTOMER -->
                 <input type="checkbox" name="admin" id="memberDetailAdmin"
-                        v-on:click="set_admin()" v-model="curr_membership_admin"><strong> Supervisor (Grants Management Access)</strong> <br>
+                        v-on:click="set_admin()" v-model="curr_membership_admin"><strong> Supervisor (Grant Management Access)</strong> <br>
+                {% endif %}
 
+                Positions Assigned to: <span id="memberDetailFirstName2"></span>
                 <strong>Positions Assigned to <span id="memberDetailFirstName2"></span>:</strong>
                 <br>
                 <form action="" method='post' id="DeleteUserFromPosition">
