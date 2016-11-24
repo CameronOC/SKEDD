@@ -649,6 +649,13 @@ def delete_user_from_org(userid, orgid):
     #db.session.delete(membership)
     #db.session.commit()
 
+    poss = Position.query.filter_by(organization_id=orgid).all()
+    print poss
+    for position in poss:
+        if db.session.query(position_assignments).filter(position_assignments.c.user_id==userid, position_assignments.c.position_id==position.id).first() != None:
+            position.assigned_users.remove(user)
+            db.session.commit()
+
     #Because shifts doesn't have a orgid col
     #go through all the positions in the org
     #for each position find all shifts
