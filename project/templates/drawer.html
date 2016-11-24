@@ -27,6 +27,7 @@
             <h2><strong>Members</strong></h2>
             <ul v-for="(user, index) in users">
                 <li>
+                <input class="preference-toggle" v-bind:id="user.id" v-bind:value="user.id" type="checkbox" unchecked>
                     <a v-on:click="member_detail(index)" style="color:black">
                         ${user.first_name} ${user.last_name}
                     </a>

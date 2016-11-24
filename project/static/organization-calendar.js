@@ -35,6 +35,8 @@ $(document).ready(function() {
                 return false;
             }
 
+            var checkbox_preferences =  $('.preference-toggle:checked').val();
+
         },
         eventClick:  function(event, jsEvent, view) {
             create = false;
@@ -289,6 +291,10 @@ $(document).ready(function() {
 
 
     $('#drawerBody').on('change', '.position-toggle', function() {
+        $('#calendar').fullCalendar( 'rerenderEvents' );
+    });
+
+    $('#drawerBody').on('change', '.preference-toggle', function() {
         $('#calendar').fullCalendar( 'rerenderEvents' );
     });
 
