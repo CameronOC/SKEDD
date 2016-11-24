@@ -103,6 +103,7 @@ def organization(key):
 
 @main_blueprint.route('/organization/<int:key>/shifts')
 @login_required
+@check_confirmed
 @organization_member
 def get_shifts_for_org(key):
     """
@@ -117,7 +118,7 @@ def get_shifts_for_org(key):
     return response
 
 
-@main_blueprint.route('/organization/<int:key>/shift/create', methods=['GET', 'POST'])
+@main_blueprint.route('/organization/<int:key>/shift/create', methods=['POST'])
 @login_required
 @check_confirmed
 @owns_organization

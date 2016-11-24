@@ -14,7 +14,7 @@ def request_wants_json():
 class NotOwner(Exception):
     status_code = 403
 
-    def __init__(self, message, status_code=None, payload=None):
+    def __init__(self, message=None, status_code=None, payload=None):
         Exception.__init__(self)
         self.message = message
         if status_code is not None:
@@ -31,7 +31,7 @@ class NotOwner(Exception):
 class NotMember(Exception):
     status_code = 403
 
-    def __init__(self, message, status_code=None, payload=None):
+    def __init__(self, message=None, status_code=None, payload=None):
         Exception.__init__(self)
         self.message = message
         if status_code is not None:
@@ -48,7 +48,7 @@ class NotMember(Exception):
 class NotAdmin(Exception):
     status_code = 403
 
-    def __init__(self, message, status_code=None, payload=None):
+    def __init__(self, message=None, status_code=None, payload=None):
         Exception.__init__(self)
         self.message = message
         if status_code is not None:
@@ -64,7 +64,7 @@ class NotAdmin(Exception):
 class ShiftNotInOrg(Exception):
     status_code = 403
 
-    def __init__(self, message, status_code=None, payload=None):
+    def __init__(self, message=None, status_code=None, payload=None):
         Exception.__init__(self)
         self.message = message
         if status_code is not None:
