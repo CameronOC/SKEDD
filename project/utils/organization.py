@@ -646,8 +646,8 @@ def delete_user_from_org(userid, orgid):
     user = User.query.filter_by(id=userid).first()
     org = Organization.query.filter_by(id=orgid).first()
     membership = get_membership(org, user)
-    db.session.delete(membership)
-    db.session.commit()
+    #db.session.delete(membership)
+    #db.session.commit()
 
     #Because shifts doesn't have a orgid col
     #go through all the positions in the org
@@ -663,12 +663,9 @@ def delete_user_from_org(userid, orgid):
     db.session.commit()
 
     #find all position assignments for that user in that org and delete them
-    #for some reason this works only if the user is assigned to more than one position
-    positions = Position.query.filter_by(organization_id=orgid).all()
-    for position in positions:
-        print position
-        if db.session.query(position_assignments).filter_by(position_id=position.id, user_id=userid):
-            position.assigned_users.remove(User.query.filter_by(id=userid).first())
+    #someone should fix this
+
+    db.session.delete(membership)
     db.session.commit()
 
     return "success"

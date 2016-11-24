@@ -594,7 +594,7 @@ $(document).ready(function() {
         });
 
         APP.get_positions();
-        $('#calendar').fullCalendar( 'refetchEvents' );
+        $('#calendar').fullCalendar( 'fetchEvents' );
     });
 
 });
