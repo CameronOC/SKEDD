@@ -35,12 +35,14 @@
             <a class="HOME_list-group-item-single-member" href="/organization/{{ membership.organization.id }}">
                 {{ membership.organization.name }}
                 {% if not membership.joined %}
-                (invited)
+                (invite)
                 {% endif %}
             </a>
-            <a class="HOME_create-org" href="/leaveorg/{{membership.organization_id}}" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Leave Organization
+            <a class="HOME_delete-org" href="/leaveorg/{{membership.organization_id}}" type="submit">
+                <i class="fa fa-times" aria-hidden="true"></i> Leave Organization
         </a>
         </li>
+        <p></p>
         {% endfor %}
     </ul>
     {% else %}
