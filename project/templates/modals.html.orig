@@ -77,9 +77,15 @@
 
             </div>
             <div class="modal-footer">
+<<<<<<< HEAD
                 <button type="button" class="CREATE_SHIFT_delete" id="shiftDelete">Delete</button>
                 <button type="button" class="CREATE_SHIFT_cancel" id="shiftCancel">Cancel</button>
                 <button type="button" class="CREATE_SHIFT_submit" id="shiftSubmit">Submit</button>
+=======
+                <button type="button" class="btn btn-danger" id="shiftDelete">Delete</button>
+                <button type="button" class="btn btn-default" id="shiftCancel" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="shiftSubmit">Submit</button>
+>>>>>>> c3f986838e08ebc7e5df3d30059ba12562f1c3ff
             </div>
         </div>
     </div>
@@ -256,8 +262,13 @@
 
             </div>
             <div class="modal-footer">
+<<<<<<< HEAD
                 <button type="button" class="POSITION_DETAIL_remove-pos" id="DeletePositionFromOrg" data-dismiss="modal">Remove Position</button>
-                <button type="button" class="POSITION_DETAIL_close" id="memberDetailCancel" data-dismiss="modal">Close</button>
+                <button type="button" class="MEMBER_DETAIL_close" id="memberDetailCancel" data-dismiss="modal">Close</button>
+=======
+                <button type="button" class="btn btn-danger" id="DeletePositionFromOrg" data-dismiss="modal">Delete</button>
+                <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Back</button>
+>>>>>>> c3f986838e08ebc7e5df3d30059ba12562f1c3ff
             </div>
         </div>
     </div>

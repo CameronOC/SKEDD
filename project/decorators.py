@@ -50,7 +50,6 @@ def organization_member(fn):
     def decorated_view(*args, **kwargs):
         key = kwargs['key']
         membership = Membership.query.filter_by(member_id=g.user.id, organization_id=key).first()
-
         if membership is None:
             raise NotMember('403 Access Denied. You must be a member of this organization.', status_code=403)
         return fn(*args, **kwargs)
