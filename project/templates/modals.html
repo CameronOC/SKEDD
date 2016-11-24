@@ -14,6 +14,23 @@
     </div>
 </div>
 
+<div id="confirmModal" class="modal" data-backdrop="static" data-keyboard="false">
+   <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="cofirmTitle" class="modal-title">Confirm</h4>
+            </div>
+            <div id="confirmBody" class="modal-body">
+                Are you sure?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirm">Confirm</button>
+                <button type="button" class="btn btn-default" id="cancel" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="shiftModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
         <div class="modal-content">
@@ -61,7 +78,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" id="shiftDelete">Delete</button>
-                <button type="button" class="btn btn-default" id="shiftCancel">Cancel</button>
+                <button type="button" class="btn btn-default" id="shiftCancel" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="shiftSubmit">Submit</button>
             </div>
         </div>
@@ -98,7 +115,7 @@
             </div>
             <div id="createPositionBody" class="modal-body">
 
-                <form action="" method="post" name="create" id="CreatePositionForm" onsubmit="return false">
+                <form action="" method="post" name="create" id="CreatePositionForm">
                     {{ form1.csrf_token }}
                   <p>
                     {{ form1.name(placeholder="Name", class_="form-control") }}
@@ -156,8 +173,10 @@
                 Last Name: <span id="memberDetailLastName"></span> <br>
                 Email: <span id="memberDetailEmail"></span> <br>
                 ID: <span id="memberDetailId"></span> <br>
+                {% if membership.is_owner %}
                 Admin <input type="checkbox" name="admin" id="memberDetailAdmin"
                         v-on:click="set_admin()" v-model="curr_membership_admin"> <br>
+                {% endif %}
 
                 Positions Assigned to: <span id="memberDetailFirstName2"></span>
 
@@ -227,8 +246,8 @@
 
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="DeletePositionFromOrg" data-dismiss="modal">Delete</button>
                 <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Back</button>
-                <button type="button" class="btn btn-primary" id="DeletePositionFromOrg" data-dismiss="modal">Delete Position From Org</button>
             </div>
         </div>
     </div>

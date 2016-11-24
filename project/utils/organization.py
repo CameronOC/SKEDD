@@ -26,6 +26,7 @@ def create_organization(name, owner_id):
         member_id=owner_id,
         organization_id=org.id,
         is_owner=True,
+        is_admin=True,
         joined=True
     )
     db.session.add(membership)

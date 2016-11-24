@@ -7,7 +7,7 @@ from flask import flash, redirect, url_for, abort, render_template, g
 from flask_login import current_user
 
 from models import Organization, Membership, Shift
-from exceptions import NotOwner, NotMember, ShiftNotInOrg
+from exceptions import NotOwner, NotMember, ShiftNotInOrg, NotAdmin
 
 
 def check_confirmed(func):
@@ -35,14 +35,14 @@ def owns_organization(fn):
 
 def admin_of_org(fn):
     @wraps(fn)
-    def decorated_func(*args, **kwargs):
+    def decorated_view(*args, **kwargs):
         key = kwargs['key']
         membership = Membership.query.filter_by(member_id=g.user.id, organization_id=key).first()
 
-        if membership is None:
-            raise NotMember('403 Access Denied. You must be a member of this organization.', status_code=403)
+        if (membership is None) or (membership.is_admin == False):
+            raise NotAdmin('403 Access Denied. You must be an admin of this organization.', status_code=403)
         return fn(*args, **kwargs)
-    return decorated_func
+    return decorated_view
 
 
 def organization_member(fn):
@@ -50,7 +50,6 @@ def organization_member(fn):
     def decorated_view(*args, **kwargs):
         key = kwargs['key']
         membership = Membership.query.filter_by(member_id=g.user.id, organization_id=key).first()
-
         if membership is None:
             raise NotMember('403 Access Denied. You must be a member of this organization.', status_code=403)
         return fn(*args, **kwargs)
