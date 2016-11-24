@@ -79,6 +79,27 @@ def create():
 
     return render_template('main/create.html', form=CreateForm())
 
+@main_blueprint.route('/deleteorg/<int:key>', methods=['GET', 'POST'])
+@login_required
+@check_confirmed
+def deleteorg(key):
+    org = utils.organization.get_organization(key)
+    db.session.delete(org)
+    db.session.commit()
+    return redirect(url_for('main.home'))
+
+@main_blueprint.route('/leaveorg/<int:key>', methods=['GET', 'POST'])
+@login_required
+@check_confirmed
+def leaveorg(key):
+    org = utils.organization.get_organization(key)
+    membership = utils.organization.get_membership(org, g.user)
+
+    db.session.delete(membership)
+    db.session.commit()
+    
+    return redirect(url_for('main.home'))
+
 
 @main_blueprint.route('/organization/<int:key>', methods=['GET', 'POST'])
 @login_required

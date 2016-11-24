@@ -1,32 +1,35 @@
 {% extends "_base.html" %}
 {% block content %}
-
-<h1>Join {{ organization.name }} and confirm account</h1>
-<br>
-<h2>Set up Password</h2>
-<form role="form" method="post" action="">
-  {{ form.csrf_token }}
-  <p>
-    {{ form.password(placeholder="password") }}
-    <span class="error">
-      {% if form.password.errors %}
-        {% for error in form.password.errors %}
+<div class="SETUP_window">
+  <h1><strong>Confirm your account</strong></h1>
+  <br>
+  <h2>Set up Password</h2>
+  <div class="SETUP_inner-window">
+    <form role="form" method="post" action="">
+      {{ form.csrf_token }}
+      <p>
+        {{ form.password(placeholder="password") }}
+        <span class="error">
+          {% if form.password.errors %}
+          {% for error in form.password.errors %}
           {{ error }}
-        {% endfor %}
-      {% endif %}
-    </span>
-  </p>
-  <p>
-  {{ form.confirm(placeholder="confirm") }}
-    <span class="error">
-      {% if form.confirm.errors %}
-        {% for error in form.confirm.errors %}
+          {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <p>
+        {{ form.confirm(placeholder="confirm") }}
+        <span class="error">
+          {% if form.confirm.errors %}
+          {% for error in form.confirm.errors %}
           {{ error }}
-        {% endfor %}
-      {% endif %}
-    </span>
-  </p>
-  <button class="btn btn-success" type="submit">Join</button>
-</form>
+          {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <button class="SETUP_button" type="submit">Join {{ organization.name }}</button>
+    </form>
+  </div>
+</div>
 
 {% endblock %}

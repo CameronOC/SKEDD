@@ -5,12 +5,16 @@
 <div class="HOME_organizations">
     <h1 class="HOME_Org-title">Organizations</h1>
     {% if organizations %}
-    <ul class="list-group">
+    <ul class="HOME_list-group">
         {% for org in organizations %}
-        <li class="list-group-item">
-            <a class="list-group-item-single" href="/organization/{{ org.id }}">{{ org.name }}</a>
+        <li class="HOME_list-group-item">
+            <a class="HOME_list-group-item-single" href="/organization/{{ org.id }}">{{ org.name }}</a>
+            <a class="HOME_delete-org" href="/deleteorg/{{ org.id }}" type="submit"> <i class="fa fa-times" aria-hidden="true"></i> Delete Org
+        </a>
         </li>
+        <p></p>
         {% endfor %}
+        <p></p>
         <a class="HOME_create-org" href="/create" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create Organization
         </a>
     </ul>
@@ -23,17 +27,19 @@
 
 
 <div class="HOME_memberships">
-    <h1 class="HOME_Mem-title">Memberships</h1>
+    <h1 class="HOME_member-title">Memberships</h1>
     {% if memberships %}
-    <ul>
+    <ul class="HOME_list-group-member">
         {% for membership in memberships %}
-        <li>
-            <a href="/organization/{{ membership.organization.id }}">
+        <li class="HOME_list-group-item-member">
+            <a class="HOME_list-group-item-single-member" href="/organization/{{ membership.organization.id }}">
                 {{ membership.organization.name }}
                 {% if not membership.joined %}
                 (invited)
                 {% endif %}
             </a>
+            <a class="HOME_create-org" href="/leaveorg/{{membership.organization_id}}" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Leave Organization
+        </a>
         </li>
         {% endfor %}
     </ul>

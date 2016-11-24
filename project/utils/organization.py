@@ -26,6 +26,7 @@ def create_organization(name, owner_id):
         member_id=owner_id,
         organization_id=org.id,
         is_owner=True,
+        is_admin=True,
         joined=True
     )
     db.session.add(membership)
@@ -646,8 +647,35 @@ def delete_user_from_org(userid, orgid):
     user = User.query.filter_by(id=userid).first()
     org = Organization.query.filter_by(id=orgid).first()
     membership = get_membership(org, user)
+    #db.session.delete(membership)
+    #db.session.commit()
+
+    poss = Position.query.filter_by(organization_id=orgid).all()
+    print poss
+    for position in poss:
+        if db.session.query(position_assignments).filter(position_assignments.c.user_id==userid, position_assignments.c.position_id==position.id).first() != None:
+            position.assigned_users.remove(user)
+            db.session.commit()
+
+    #Because shifts doesn't have a orgid col
+    #go through all the positions in the org
+    #for each position find all shifts
+    #if that shift has the same userid as the user
+    #set it to none.
+    positions = Position.query.filter_by(organization_id=orgid).all()
+    for position in positions:
+        shifts = Shift.query.filter_by(position_id=position.id).all()
+        for shift in shifts:
+            if shift.assigned_user_id == userid:
+                shift.assigned_user_id = None
+    db.session.commit()
+
+    #find all position assignments for that user in that org and delete them
+    #someone should fix this
+
     db.session.delete(membership)
     db.session.commit()
+
     return "success"
 
     
