@@ -16,3 +16,4 @@ deploy:
   app: skedd
   on:
     repo: CameronOC/SKEDD
+		branch: heroku
