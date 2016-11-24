@@ -570,6 +570,7 @@ $(document).ready(function() {
         });
 
         APP.get_users();
+        $('#calendar').fullCalendar( 'refetchEvents' );
     });
 
     /*
