@@ -1,10 +1,10 @@
 <div id="drawerExample" class="drawer dw-xs-3 fold drawer-right" aria-labelledby="drawerExample">
     <div class="drawer-controls">
-        <a id="menu" data-toggle="drawer" href="#drawerExample" aria-foldedopen="false" aria-controls="drawerExample" class="btn btn-primary btn-sm">Menu</a>
+        <a id="menu" data-toggle="drawer" href="#drawerExample" aria-foldedopen="false" aria-controls="drawerExample" class="DRAWER_menu-button"><strong>Menu</strong></a>
     </div>
     <div class="drawer-contents">
         <div class="drawer-heading">
-            <h2 class="drawer-title"> {{ organization.name }} </h2>
+            <h2 class="drawer-title"><strong> {{ organization.name }} </strong> </h2>
         </div>
 
 
@@ -13,7 +13,7 @@
                 var orgid = {{organization.id}}
             </script>
 
-            <h2>Positions</h2>
+            <h2><strong>Positions</strong></h2>
             <ul v-for="(position, index) in positions">
                 <li ><input class="position-toggle" v-bind:id="position.id" value="1" type="checkbox" checked>  
                     <a v-on:click="position_detail(index)" style="color:black">
@@ -21,9 +21,10 @@
                    </a>
                 </li>
             </ul>
-            <a data-toggle="modal" href="#CreatePositionModal" class="btn btn-primary">New Position</a>
+            <br>
+            <a data-toggle="modal" href="#CreatePositionModal" class="DRAWER_new-position">New Position</a>
             
-            <h2>Members</h2>
+            <h2><strong>Members</strong></h2>
             <ul v-for="(user, index) in users">
                 <li>
                     <a v-on:click="member_detail(index)" style="color:black">
@@ -31,7 +32,8 @@
                     </a>
                 </li>
             </ul>
-            <a data-toggle="modal" href="#inviteMemberModal" class="btn btn-primary">Invite Member</a>
+            <br>
+            <a data-toggle="modal" href="#inviteMemberModal" class="DRAWER_invite-member">Invite Member</a>
         </div>
 
     </div>

@@ -60,9 +60,9 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="shiftDelete">Delete</button>
-                <button type="button" class="btn btn-default" id="shiftCancel">Cancel</button>
-                <button type="button" class="btn btn-primary" id="shiftSubmit">Submit</button>
+                <button type="button" class="CREATE_SHIFT_delete" id="shiftDelete">Delete</button>
+                <button type="button" class="CREATE_SHIFT_cancel" id="shiftCancel">Cancel</button>
+                <button type="button" class="CREATE_SHIFT_submit" id="shiftSubmit">Submit</button>
             </div>
         </div>
     </div>
@@ -109,8 +109,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="createPositionCancel" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="createPositionSubmit">Create</button>
+                <button type="button" class="CREATE_POSITION_cancel" id="createPositionCancel" data-dismiss="modal">Cancel</button>
+                <button type="button" class="CREATE_POSITION_submit" id="createPositionSubmit">Create</button>
             </div>
         </div>
     </div>
@@ -138,12 +138,20 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="inviteMemberCancel" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="inviteMemberSubmit">Submit</button>
+                <button type="button" class="INVITE_MEMBER_cancel" id="inviteMemberCancel" data-dismiss="modal">Cancel</button>
+                <button type="button" class="INVITE_MEMBER_submit" id="inviteMemberSubmit">Submit</button>
             </div>
         </div>
     </div>
 </div>
+
+
+
+
+
+
+
+
 
 <div id="memberDetailModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
@@ -152,45 +160,50 @@
                 <h4 id="memberDetailTitle" class="modal-title"></h4>
             </div>
             <div id="memberDetailBody" class="modal-body">
-                First Name: <span id="memberDetailFirstName"></span> <br>
-                Last Name: <span id="memberDetailLastName"></span> <br>
-                Email: <span id="memberDetailEmail"></span> <br>
-                ID: <span id="memberDetailId"></span> <br>
-                Admin <input type="checkbox" name="admin" id="memberDetailAdmin"
-                        v-on:click="set_admin()" v-model="curr_membership_admin"> <br>
+                <!--First Name: <span id="memberDetailFirstName"></span> <br>
+                Last Name: <span id="memberDetailLastName"></span> <br>  ## REDUNDANT ##-->
+                <strong>Email: </strong><span id="memberDetailEmail"></span> <br>
+                <!-- User ID: <span id="memberDetailId"></span> <br> ## NOT REQ FOR CUSTOMER -->
+                <input type="checkbox" name="admin" id="memberDetailAdmin"
+                        v-on:click="set_admin()" v-model="curr_membership_admin"><strong> Supervisor (Grants Management Access)</strong> <br>
 
-                Positions Assigned to: <span id="memberDetailFirstName2"></span>
-
+                <strong>Positions Assigned to <span id="memberDetailFirstName2"></span>:</strong>
+                <br>
                 <form action="" method='post' id="DeleteUserFromPosition">
                 <!-- Because this button is in a v-for loop i had to write the function for unassign in organization-index.js and not organization-calendar.js.-->
-                    <div v-for="(position, index) in assignedpositions">
+                    <div class="MEMBER_DETAIL_assigned-position-list" v-for="(position, index) in assignedpositions">
                         <div id="unposition">
-                        ${position.title} <button type="button" class="btn btn-primary" v-on:click="unassign_position(index)"/> Unassign </button>
+                        <strong>${position.title}</strong> <button type="button" class="MEMBER_DETAIL-unassign-position" v-on:click="unassign_position(index)"/> Unassign </button>
                         </div>
                     </div>
                 </form>
-
+                <br>
                 <form action="" method='post' id="AddUserToPositionForm" >
-                    Assign Positions to: <span id="memberDetailFirstName3"></span>
-                    <div>
-                        <select class="dropdownmenu" name="position" id="positiondropdown">
+                    <strong> Assign Positions to <span id="memberDetailFirstName3"></span></strong>:
+                    <div class="MEMBER_DETAIL_assignment">
+                        <select class="MEMBER_DETAIL_dropdownmenu" name="position" id="positiondropdown">
                             <option v-for="(position, index) in positions" v-bind:value="position.id"> ${position.title} </option>
                         </select>
                     </div>
-
-                    <button type="button" class="btn btn-primary" id="AddUserToPositionSubmit"/> Press Me </button>
+                    <button type="button" class="MEMBER_DETAIL_assign-position" id="AddUserToPositionSubmit"/> Assign Position </button>
                 </form>
 
             </div>
 
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Back</button>
-                <button type="button" class="btn btn-primary" id="DeleteUserFromOrg" data-dismiss="modal">Delete User From Org</button>
+                <button type="button" class="MEMBER_DETAIL_remove-emp" id="DeleteUserFromOrg" data-dismiss="modal">Remove Employee</button>
+                <button type="button" class="MEMBER_DETAIL_close" id="memberDetailCancel" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+
+
+
+
+
+
 
 <div id="positionDetailModal" class="modal fade" data-backdrop="static" data-keyboard="false">
    <div class="modal-dialog">
@@ -199,36 +212,35 @@
                 <h4 id="positionDetailTitle" class="modal-title"></h4>
             </div>
             <div id="positionDetailBody" class="modal-body">
-                Title: <span id="positionDetailTitle1"></span> <br>
-                Description: <span id="positionDetailDescription"></span> <br>
-                ID: <span id="positionDetailId"></span> <br>
+               <!-- <strong>Position Title: </strong><span id="positionDetailTitle1"></span> <br> ## REDUNDANT ## -->
+                <strong>Description: </strong><span id="positionDetailDescription"></span> <br>
+                <!-- ID: <span id="positionDetailId"></span> <br> ## NOT RELEVANT TO CUSTOMER -->
             
-                Users Assigned to: <span id="positionDetailTitle2"></span>
+                <strong>Assigned Employees to <span id="positionDetailTitle2"></span>: </strong>
 
                 <form action="" method='post' id="DeleteUserFromPosition">
                 <!-- Because this button is in a v-for loop i had to write the function for unassign in organization-index.js and not organization-calendar.js.-->
                     <div v-for="(user, index) in assignedusers">
                         <div id="unposition">
-                        ${user.first_name}  ${user.last_name}<button type="button" class="btn btn-primary" v-on:click="unassign_user(index)"/> Unassign </button>
+                        ${user.first_name}  ${user.last_name}<button type="button" class="POSITION_DETAIL_unassign-user" v-on:click="unassign_user(index)"/> Unassign </button>
                         </div>
                     </div>
                 </form>
 
                 <form action="" method='post' id="AddUserToPositionForm" >
-                    Assign Users to: <span id="positionDetailTitle3"></span>
-                    <div>
-                        <select class="dropdownmenu" name="user" id="userdropdown">
-                            <option v-for="(user, index) in users" v-bind:value="user.id"> ${user.first_name} ${user.last_name} </option>
+                    <strong> Assign Employees to <span id="positionDetailTitle3"></span>: </strong>
+                    <div class="POSITION_DETAIL_assignment">
+                        <select class="POSITION_DETAIL_dropdownmenu" name="user" id="userdropdown">
+                            <option v-for="(user, index) in users" v-bind:value="user.id"> <strong> ${user.first_name} ${user.last_name} </strong></option>
                         </select>
                     </div>
-
-                    <button type="button" class="btn btn-primary" id="AddPositionToUserSubmit"/> Press Me </button>
+                    <button type="button" class="POSITION_DETAIL_assign-user" id="AddPositionToUserSubmit"/> Assign Employee </button>
                 </form>
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="memberDetailCancel" data-dismiss="modal">Back</button>
-                <button type="button" class="btn btn-primary" id="DeletePositionFromOrg" data-dismiss="modal">Delete Position From Org</button>
+                <button type="button" class="POSITION_DETAIL_remove-pos" id="DeletePositionFromOrg" data-dismiss="modal">Remove Position</button>
+                <button type="button" class="MEMBER_DETAIL_close" id="memberDetailCancel" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

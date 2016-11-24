@@ -20,34 +20,12 @@
             }
 
             #calendar {
-            max-width: 100%;
             margin: 0 auto;
             background-color: white;
             color: black;
             padding: 20px;
             margin-top: 10px;
             border-radius: 10px;
-            }
-            #drawer-page {
-                padding-top: 20px;
-                padding-bottom: 20px;
-            }
-            #screen {
-                background-color: pink;
-            }
-
-            #menu {
-                margin-top: 60px;
-            }
-            li {
-                padding: 5px;
-            }
-
-            .modal:nth-of-type(even) {
-                z-index: 1042 !important;
-            }
-            .modal-backdrop.in:nth-of-type(even) {
-                z-index: 1041 !important;
             }
         </style>
 
@@ -65,10 +43,9 @@
   <br>
   <div class="PROFILE_body">
     {% if current_user.is_authenticated() %}
-    <p>Email:  {{current_user.email}}</p>
+    <h3>Email:  {{current_user.email}}</p>
     {% endif %}
     <br>
-    <div id='calendar'></div>
     <h3 class="PROFILE_change-password-title">Change Password</h3>
     <div class="PROFILE_change-password">
       <form class="form-reset" role="form" method="post" action="">
@@ -96,6 +73,9 @@
         <button class="PROFILE_update-button" type="submit">Update</button>
       </form>
     </div>
+    <br>
+    <h2 class="PROFILE_preferences_calendar-title">Add Work Time Preferences</h3>
+    <div class="PROFILE_preferences-calendar" id='calendar'></div>
   </div>
 
 
