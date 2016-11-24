@@ -8,10 +8,13 @@
     <ul class="HOME_list-group">
         {% for org in organizations %}
         <li class="HOME_list-group-item">
-            <a class="HOME_list-group-item-single" href="/organization/{{ org.id }}">{{ org.name }}</a> <a class="HOME_create-org" href="/deleteorg/{{ org.id }}" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Delete Organization
+            <a class="HOME_list-group-item-single" href="/organization/{{ org.id }}">{{ org.name }}</a>
+            <a class="HOME_delete-org" href="/deleteorg/{{ org.id }}" type="submit"> <i class="fa fa-times" aria-hidden="true"></i> Delete Org
         </a>
         </li>
+        <p></p>
         {% endfor %}
+        <p></p>
         <a class="HOME_create-org" href="/create" type="submit"> <i class="fa fa-plus" aria-hidden="true"></i> Create Organization
         </a>
     </ul>
