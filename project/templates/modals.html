@@ -78,7 +78,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="CREATE_SHIFT_delete" id="shiftDelete">Delete</button>
-                <button type="button" class="CREATE_SHIFT_cancel" id="shiftCancel">Cancel</button>
+                <button type="button" class="CREATE_SHIFT_cancel" id="shiftCancel" data-dismiss="modal">Cancel</button>
                 <button type="button" class="CREATE_SHIFT_submit" id="shiftSubmit">Submit</button>
             </div>
         </div>
@@ -183,8 +183,6 @@
                 <!-- User ID: <span id="memberDetailId"></span> <br> ## NOT REQ FOR CUSTOMER -->
                 <input type="checkbox" name="admin" id="memberDetailAdmin"
                         v-on:click="set_admin()" v-model="curr_membership_admin"><strong> Supervisor (Grant Management Access)</strong> <br>
-                {% endif %}
-
                 Positions Assigned to: <span id="memberDetailFirstName2"></span>
                 <strong>Positions Assigned to <span id="memberDetailFirstName2"></span>:</strong>
                 <br>
