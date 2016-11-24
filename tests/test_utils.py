@@ -159,6 +159,53 @@ class ShiftValidationTest(TestCase):
         # test
         form = {'shift_assigned_member_id': '0'}
         assert 'status' not in utils.validate_shift(form)
+        
+    def test_shift_description(self):
+        """
+        Tests the function that verifies the member and position IDs from the shift form
+        with a shift description of incorrect length
+        :return:
+        """
+        form = {'shift_description': 'a' * 101}
+        return_dict = utils.validate_shift(form)
+        assert 'status' in return_dict and \
+               return_dict['status'] == 'error' and \
+               'Description' in return_dict['errors'] and \
+               return_dict['errors']['Description'] == 'Description must be between 0 and 100 characters.'
+               
+    def test_shift_start_time(self):
+        """
+        Tests the function that verifies the member and position IDs from the shift form
+        with proper and improper start_time format
+        :return:
+        """
+        form = {'shift_start_time': '2016-11-23T12:00:00'}
+        return_dict = utils.validate_shift(form)
+        assert 'status' not in return_dict
+        
+        form = {'shift_start_time': '11/23/2016 12:00:00'}
+        return_dict = utils.validate_shift(form)
+        assert 'status' in return_dict and \
+               return_dict['status'] == 'error' and \
+               'Start Time' in return_dict['errors'] and \
+               return_dict['errors']['Start Time'] == 'Incorrect Date format for start time.'
+               
+    def test_shift_end_time(self):
+        """
+        Tests the function that verifies the member and position IDs from the shift form
+        with proper and improper end_time format
+        :return:
+        """
+        form = {'shift_end_time': '2016-11-23T12:00:00'}
+        return_dict = utils.validate_shift(form)
+        assert 'status' not in return_dict
+        
+        form = {'shift_end_time': '11/23/2016 12:00:00'}
+        return_dict = utils.validate_shift(form)
+        assert 'status' in return_dict and \
+               return_dict['status'] == 'error' and \
+               'End Time' in return_dict['errors'] and \
+               return_dict['errors']['End Time'] == 'Incorrect Date format for end time.'
 
 
 class ShiftFormErrorsTest(TestCase):
