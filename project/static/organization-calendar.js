@@ -582,6 +582,7 @@ $(document).ready(function() {
         });
 
         APP.get_users();
+        $('#calendar').fullCalendar( 'refetchEvents' );
     });
 
     /*
@@ -605,7 +606,7 @@ $(document).ready(function() {
         });
 
         APP.get_positions();
-        $('#calendar').fullCalendar( 'refetchEvents' );
+        $('#calendar').fullCalendar( 'fetchEvents' );
     });
 
 });
