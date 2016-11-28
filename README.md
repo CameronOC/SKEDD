@@ -13,7 +13,7 @@
     sudo -u postgres createuser --interactive
 
 ### clone the repo and enter the diector
-    https://github.com/CameronOC/SKEDD.git
+    git clone https://github.com/CameronOC/SKEDD.git
     cd SKEDD
 
 ### set up virtual enviornment
