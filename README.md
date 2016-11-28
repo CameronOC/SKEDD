@@ -29,11 +29,13 @@
     export APP_MAIL_USERNAME="skedd.mail@gmail.com"
     export APP_MAIL_PASSWORD="cumulonimbus"
     export APP_SETTINGS="project.config.ProductionConfig"
+    export DATABASE_URL=postgres:///$(whoami)
 
 #### windows
     setx APP_SETTINGS "project.config.ProductionConfig"
     setx APP_MAIL_USERNAME "skedd.mail@gmail.com"
     setx APP_MAIL_PASSWORD "cumulonimbus"
+    setx DATABASE_URL=postgres:///$(whoami)
 
 ### Set up the database
     python manage.py create_db
