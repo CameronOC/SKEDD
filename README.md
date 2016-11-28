@@ -23,19 +23,6 @@
 ### install python requirements
     pip install -r requirements.txt
 
-### set environment variables
-    export APP_MAIL_USERNAME="skedd.mail@gmail.com"
-    export APP_MAIL_PASSWORD="cumulonimbus"
-    export APP_SETTINGS="project.config.ProductionConfig"
-
-## How to set up the virtual dev environment
-
-### after cloning and cding into the repo:
-
-    virtualenv flask
-    . flask/bin/activate
-    pip install -r requirements.txt
-
 ### Set Environment Variables
 
 #### osx/ubuntu
@@ -56,6 +43,17 @@
     
 ### run the server
     gunicorn manage:app
+
+---------------------------------------------------------------
+
+## How to set up the virtual dev environment
+
+### after cloning and cding into the repo:
+
+    virtualenv flask
+    . flask/bin/activate
+    pip install -r requirements.txt
+
 
 Email server:
 
